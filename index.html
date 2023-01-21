@@ -163,7 +163,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/01/18/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/01/20/%E5%A0%86%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -177,7 +177,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/01/18/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
+            <a href="/2023/01/20/%E5%A0%86%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">2.23堆相关源码阅读笔记</a>
         </h2>
 
         <div class="post-meta">
@@ -186,10 +186,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-01-18 00:00:00 / Modified: 15:19:40" itemprop="dateCreated datePublished" datetime="2023-01-18T00:00:00+08:00">2023-01-18</time>
+              <time title="Created: 2023-01-20 10:00:00" itemprop="dateCreated datePublished" datetime="2023-01-20T10:00:00+08:00">2023-01-20</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-01-21 12:35:48" itemprop="dateModified" datetime="2023-01-21T12:35:48+08:00">2023-01-21</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -198,23 +204,17 @@
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a>
                 </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/pwn/heap/" itemprop="url" rel="index"><span itemprop="name">heap</span></a>
+                </span>
             </span>
 
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>367</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>1 mins.</span>
-            </span>
+          
 
         </div>
       </header>
@@ -225,10 +225,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+          <p>做hgame-week2的堆题时发现自己对于堆的malloc和free相关机制还没有建立一个整体的结构印象，所以决定从源码阅读开始建构关于堆的知识体系。<br>这是我假期堆学习计划的开始，也是博客建立后的第一篇文章，纪念一下。(ง •_•)ง</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/01/18/hello-world/#more" rel="contents">
+              <a class="btn" href="/2023/01/20/%E5%A0%86%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -323,13 +323,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -369,16 +369,6 @@
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">true</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-chart-area"></i>
-    </span>
-    <span title="Symbols count total">0k</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="Reading time total">1 mins.</span>
 </div>
 
 
