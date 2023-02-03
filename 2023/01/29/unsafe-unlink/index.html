@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://akaieurus.github.io/2023/01/29/unsafe-unlink/3.jpg">
 <meta property="og:image" content="http://akaieurus.github.io/2023/01/29/unsafe-unlink/4.jpg">
 <meta property="article:published_time" content="2023-01-29T04:27:16.000Z">
-<meta property="article:modified_time" content="2023-01-29T06:51:51.393Z">
+<meta property="article:modified_time" content="2023-02-03T08:11:37.754Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="how2heap">
 <meta name="twitter:card" content="summary">
@@ -195,10 +195,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-01-29 12:27:16 / Modified: 14:51:51" itemprop="dateCreated datePublished" datetime="2023-01-29T12:27:16+08:00">2023-01-29</time>
+              <time title="Created: 2023-01-29 12:27:16" itemprop="dateCreated datePublished" datetime="2023-01-29T12:27:16+08:00">2023-01-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-02-03 16:11:37" itemprop="dateModified" datetime="2023-02-03T16:11:37+08:00">2023-02-03</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -244,10 +250,11 @@
 <ul>
 <li>连续malloc两个unsorted bin范围内的chunk（2.26以上大小需要在tcache之外），chunk0和chunk1<img src="/2023/01/29/unsafe-unlink/1.jpg" class title="步骤一"></li>
 <li>在chunk0内伪造fake chunk<img src="/2023/01/29/unsafe-unlink/2.jpg" class title="步骤二"></li>
-<li>修改chunk1的presize和size的inuse位（可以通过of by null漏洞+申请大小0x8结尾的chunk实现（使用next chunk的presize部分））<img src="/2023/01/29/unsafe-unlink/3.jpg" class title="步骤三"></li>
+<li>修改chunk1的presize和size的inuse位（可以通过of by null漏洞（或者fastbin_dup_consolidate）+申请大小0x8结尾的chunk实现（使用next chunk的presize部分））<img src="/2023/01/29/unsafe-unlink/3.jpg" class title="步骤三"></li>
 <li>free(chunk1)触发chunk0的向上合并，触发unlink摘除chunk0<img src="/2023/01/29/unsafe-unlink/4.jpg" class title="步骤四"></li>
 <li>最后的结果就是指向chunk0的指针现在指向指针地址-0x18的地址，这样我们就可以通过覆盖指向chunk0指针指向别的地方并且改写那里的内容</li>
 </ul>
+<h3 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h3><p>见fastbin dup consolidate</p>
 
     </div>
 
@@ -331,7 +338,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">利用</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">例题</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -347,20 +354,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

