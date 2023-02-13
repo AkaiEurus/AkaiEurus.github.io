@@ -28,9 +28,10 @@
 <meta property="og:description" content="源码阅读笔记计划之二！范围是2.24——2.35glibc的malloc.c源码（仅包含源码的变化部分的解析）ps：偷了个懒只分析了我感觉有影响的变化(●ˇ∀ˇ●)">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-01-22T06:56:28.000Z">
-<meta property="article:modified_time" content="2023-01-29T04:49:51.928Z">
+<meta property="article:modified_time" content="2023-02-10T11:37:20.557Z">
 <meta property="article:author" content="Eurus">
-<meta property="article:tag" content="malloc源码">
+<meta property="article:tag" content="源码">
+<meta property="article:tag" content="ptmalloc2">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://akaieurus.github.io/2023/01/22/%E5%A0%86%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B01/">
@@ -197,7 +198,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-01-29 12:49:51" itemprop="dateModified" datetime="2023-01-29T12:49:51+08:00">2023-01-29</time>
+                <time title="Modified: 2023-02-10 19:37:20" itemprop="dateModified" datetime="2023-02-10T19:37:20+08:00">2023-02-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -300,7 +301,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/malloc%E6%BA%90%E7%A0%81/" rel="tag"># malloc源码</a>
+              <a href="/tags/%E6%BA%90%E7%A0%81/" rel="tag"># 源码</a>
+              <a href="/tags/ptmalloc2/" rel="tag"># ptmalloc2</a>
           </div>
 
         
@@ -390,20 +392,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
