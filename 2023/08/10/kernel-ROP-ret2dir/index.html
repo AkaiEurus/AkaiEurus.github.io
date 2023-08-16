@@ -31,7 +31,7 @@
 <meta property="og:image" content="http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/gdb2.png">
 <meta property="og:image" content="http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/gdb3.png">
 <meta property="article:published_time" content="2023-08-10T15:10:59.000Z">
-<meta property="article:modified_time" content="2023-08-10T20:20:46.368Z">
+<meta property="article:modified_time" content="2023-08-16T10:51:43.880Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="kernel">
 <meta property="article:tag" content="ROP">
@@ -203,7 +203,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-11 04:20:46" itemprop="dateModified" datetime="2023-08-11T04:20:46+08:00">2023-08-11</time>
+                <time title="Modified: 2023-08-16 18:51:43" itemprop="dateModified" datetime="2023-08-16T18:51:43+08:00">2023-08-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -244,7 +244,7 @@
 <p>有一部分压栈操作在PUSH_AND_CLERT_REGS宏里</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">.macro PUSH_AND_CLEAR_REGS rdx=%rdx rax=%rax save_ret=<span class="number">0</span></span><br><span class="line">	.<span class="keyword">if</span> \save_ret</span><br><span class="line">	pushq	%rsi		<span class="comment">/* pt_regs-&gt;si */</span></span><br><span class="line">	movq	<span class="number">8</span>(%rsp), %rsi	<span class="comment">/* temporarily store the return address in %rsi */</span></span><br><span class="line">	movq	%rdi, <span class="number">8</span>(%rsp)	<span class="comment">/* pt_regs-&gt;di (overwriting original return address) */</span></span><br><span class="line">	.<span class="keyword">else</span></span><br><span class="line">	pushq   %rdi		<span class="comment">/* pt_regs-&gt;di */</span></span><br><span class="line">	pushq   %rsi		<span class="comment">/* pt_regs-&gt;si */</span></span><br><span class="line">	.endif</span><br><span class="line">	pushq	\rdx		<span class="comment">/* pt_regs-&gt;dx */</span></span><br><span class="line">	pushq   %rcx		<span class="comment">/* pt_regs-&gt;cx */</span></span><br><span class="line">	pushq   \rax		<span class="comment">/* pt_regs-&gt;ax */</span></span><br><span class="line">	pushq   %r8		<span class="comment">/* pt_regs-&gt;r8 */</span></span><br><span class="line">	pushq   %r9		<span class="comment">/* pt_regs-&gt;r9 */</span></span><br><span class="line">	pushq   %r10		<span class="comment">/* pt_regs-&gt;r10 */</span></span><br><span class="line">	pushq   %r11		<span class="comment">/* pt_regs-&gt;r11 */</span></span><br><span class="line">	pushq	%rbx		<span class="comment">/* pt_regs-&gt;rbx */</span></span><br><span class="line">	pushq	%rbp		<span class="comment">/* pt_regs-&gt;rbp */</span></span><br><span class="line">	pushq	%r12		<span class="comment">/* pt_regs-&gt;r12 */</span></span><br><span class="line">	pushq	%r13		<span class="comment">/* pt_regs-&gt;r13 */</span></span><br><span class="line">	pushq	%r14		<span class="comment">/* pt_regs-&gt;r14 */</span></span><br><span class="line">	pushq	%r15		<span class="comment">/* pt_regs-&gt;r15 */</span></span><br><span class="line">	UNWIND_HINT_REGS</span><br><span class="line">        ……</span><br></pre></td></tr></table></figure>
 
-<h2 id="ret2dir-例题：MINI-LCTF2022-kgadget"><a href="#ret2dir-例题：MINI-LCTF2022-kgadget" class="headerlink" title="ret2dir-例题：MINI-LCTF2022 - kgadget"></a>ret2dir-例题：MINI-LCTF2022 - kgadget</h2><p>arttnba3师傅的博客讲的很清楚的了就不说了</p>
+<h2 id="例题：MINI-LCTF2022-kgadget"><a href="#例题：MINI-LCTF2022-kgadget" class="headerlink" title="例题：MINI-LCTF2022 - kgadget"></a>例题：MINI-LCTF2022 - kgadget</h2><p>arttnba3师傅的博客讲的很清楚的了就不说了</p>
 <h3 id="调试过程"><a href="#调试过程" class="headerlink" title="调试过程"></a>调试过程</h3><p>进入call rbx，程序跳至gadget：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">add    rsp, 0xa0</span><br><span class="line">pop    rbx</span><br><span class="line">pop    r12</span><br><span class="line">pop    r13</span><br><span class="line">pop    rbp</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
 
@@ -286,7 +286,10 @@
     <a href="/2023/08/08/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8/" rel="prev" title="Kernel源码分析-系统启动">
       <i class="fa fa-chevron-left"></i> Kernel源码分析-系统启动
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/16/kernel-heap-uaf/" rel="next" title="Kernel Heap UAF">
+      Kernel Heap UAF <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -345,7 +348,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pt-regs"><span class="nav-number">1.</span> <span class="nav-text">pt_regs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2dir-%E4%BE%8B%E9%A2%98%EF%BC%9AMINI-LCTF2022-kgadget"><span class="nav-number">2.</span> <span class="nav-text">ret2dir-例题：MINI-LCTF2022 - kgadget</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.</span> <span class="nav-text">调试过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp"><span class="nav-number">2.2.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pt-regs"><span class="nav-number">1.</span> <span class="nav-text">pt_regs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98%EF%BC%9AMINI-LCTF2022-kgadget"><span class="nav-number">2.</span> <span class="nav-text">例题：MINI-LCTF2022 - kgadget</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.</span> <span class="nav-text">调试过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp"><span class="nav-number">2.2.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -361,20 +364,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-count">34</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
