@@ -40,7 +40,7 @@
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/bt.png">
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/vmmap.png">
 <meta property="article:published_time" content="2023-02-20T04:34:31.000Z">
-<meta property="article:modified_time" content="2023-08-04T10:43:32.071Z">
+<meta property="article:modified_time" content="2023-08-21T12:04:50.076Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="IO">
 <meta name="twitter:card" content="summary">
@@ -210,7 +210,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-04 18:43:32" itemprop="dateModified" datetime="2023-08-04T18:43:32+08:00">2023-08-04</time>
+                <time title="Modified: 2023-08-21 20:04:50" itemprop="dateModified" datetime="2023-08-21T20:04:50+08:00">2023-08-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -252,8 +252,9 @@
 <li>调用exit函数时<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">_IO_flush_all_lockp</span><br><span class="line">_IO_cleanup</span><br><span class="line">_run_exit_handlers</span><br><span class="line"><span class="built_in">exit</span></span><br></pre></td></tr></table></figure></li>
 <li>程序正常退出时（同调用exit，因为程序正常退出的时候会调用exit）<br>整个利用过程就是劫持_IO_list_all或者某个_IO_FILE的_chain指针，然后通过以上三种方式触发_IO_flush_all_lockp函数调用</li>
 </ul>
-<h4 id="调用链"><a href="#调用链" class="headerlink" title="调用链"></a>调用链</h4><p><code>malloc_printerr-&gt;__libc_message-&gt;abort-&gt;_IO_flush_all_lockp-&gt;_IO_OVERFLOW</code></p>
-<h3 id="2-24-2-27"><a href="#2-24-2-27" class="headerlink" title="2.24-2.27"></a>2.24-2.27</h3><h4 id="vtable-check"><a href="#vtable-check" class="headerlink" title="vtable check"></a>vtable check</h4><p>2.24中_IO_OVERFLOW的宏定义发生了变化（以下宏定义皆来自<code>glibc-2.24\libio\libioP.h</code>）  </p>
+<h4 id="调用链"><a href="#调用链" class="headerlink" title="调用链"></a>调用链</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">malloc_printerr-&gt;__libc_message-&gt;<span class="built_in">abort</span>-&gt;_IO_flush_all_lockp-&gt;_IO_OVERFLOW</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-24-2-27"><a href="#2-24-2-27" class="headerlink" title="2.24-2.27"></a>2.24-2.27</h3><h4 id="vtable-check"><a href="#vtable-check" class="headerlink" title="vtable check"></a>vtable check</h4><p>2.24中_IO_OVERFLOW的宏定义发生了变化（以下宏定义皆来自glibc-2.24\libio\libioP.h）  </p>
 <ul>
 <li>_IO_OVERFLOW<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_OVERFLOW(FP, CH) JUMP1 (__overflow, FP, CH)</span></span><br></pre></td></tr></table></figure></li>
 <li>JUMP1<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> JUMP1(FUNC, THIS, X1) (_IO_JUMPS_FUNC(THIS)-&gt;FUNC) (THIS, X1)</span></span><br></pre></td></tr></table></figure></li>
@@ -279,7 +280,8 @@
 <p>伪造的_IO_strfile长这样</p>
 <img src="/2023/02/20/FSOP/IO_strfile.png" class title="IO_strfile">
 <p>其中的overflow也有对相对地址的引用，但过程非常复杂，利用起来很不方便</p>
-<h4 id="调用链-1"><a href="#调用链-1" class="headerlink" title="调用链"></a>调用链</h4><p><code>malloc_printerr-&gt;__libc_message-&gt;abort-&gt;_IO_flush_all_lockp-&gt;_IO_str_finish</code></p>
+<h4 id="调用链-1"><a href="#调用链-1" class="headerlink" title="调用链"></a>调用链</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">malloc_printerr-&gt;__libc_message-&gt;<span class="built_in">abort</span>-&gt;_IO_flush_all_lockp-&gt;_IO_str_finish</span><br></pre></td></tr></table></figure>
+
 <h3 id="2-28以后"><a href="#2-28以后" class="headerlink" title="2.28以后"></a>2.28以后</h3><p>_IO_str_finish中的相对地址引用被free替换，_IO_str_overflow中的相对引用也被malloc和free替换了</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.24\libio\strops.c</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span></span><br><span class="line">_IO_str_finish (FILE *fp, <span class="type">int</span> dummy)</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">//用free替换了相对地址引用</span></span><br><span class="line">  <span class="keyword">if</span> (fp-&gt;_IO_buf_base &amp;&amp; !(fp-&gt;_flags &amp; _IO_USER_BUF))</span><br><span class="line">    <span class="built_in">free</span> (fp-&gt;_IO_buf_base);</span><br><span class="line">  fp-&gt;_IO_buf_base = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">  _IO_default_finish (fp, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h2><h3 id="东华杯2016-pwn450-note（2-23）"><a href="#东华杯2016-pwn450-note（2-23）" class="headerlink" title="东华杯2016-pwn450 note（2.23）"></a>东华杯2016-pwn450 note（2.23）</h3><p>很坐牢也很涨姿势的一道题</p>
@@ -305,7 +307,7 @@
 <p>倒推一下堆布局： </p>
 <ul>
 <li>由于我们需要放一个0x60的chunk（chunk2）到small bin里（后面再解释为什么），这个0x60的chunk同时也将用于unsorted bin attack，要绕开检查，unsorted bin中还得有一个chunk（chunk1），同时必须还有一个chunk在使用中（用于控制chunk2）<img src="/2023/02/20/FSOP/1.jpg" class title="步骤一"></li>
-<li>chunk1只能来自于free掉的chunk插入，如果是来自于切割那chunk2已经进入small bin（切割unsorted bin中的chunk只有一种情况，就是unsorted bin中仅有一个chunk且是last remainder）   <img src="/2023/02/20/FSOP/2.jpg" class title="步骤二">     
+<li>chunk1只能来自于free掉的chunk插入，如果是来自于切割那chunk2已经进入small bin（切割unsorted bin中的chunk只有一种情况，就是unsorted bin中仅有一个chunk且是last remainder） <img src="/2023/02/20/FSOP/2.jpg" class title="步骤二"> 
 这样的话使用中的chunk必须在遍历unsorted bin之前就能得到。遍历unsorted bin之前会先在fastbin和small bin中找一样的，所以small bin中得有一个chunk<br>这样堆布局过程就很清楚了</li>
 <li>从unsorted bin中的旧top chunk中切割一个small chunk返回<img src="/2023/02/20/FSOP/3.jpg" class title="步骤三"> </li>
 <li>切割chunk2剩下一个0x60的chunk，返回剩下的，此时chunk1已进入small bin<img src="/2023/02/20/FSOP/4.jpg" class title="步骤四"></li>
@@ -316,9 +318,10 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">      <span class="keyword">if</span> (((fp-&gt;_mode &lt;= <span class="number">0</span> &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base)</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined _LIBC || defined _GLIBCPP_USE_WCHAR_T</span></span><br><span class="line">	   || (_IO_vtable_offset (fp) == <span class="number">0</span></span><br><span class="line">	       &amp;&amp; fp-&gt;_mode &gt; <span class="number">0</span> &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_ptr</span><br><span class="line">				    &gt; fp-&gt;_wide_data-&gt;_IO_write_base))</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	   )</span><br><span class="line">	  &amp;&amp; _IO_OVERFLOW (fp, EOF) == EOF)</span><br><span class="line">	result = EOF;</span><br></pre></td></tr></table></figure>
 <p>拆分一下两个条件</p>
 <ul>
-<li><code>fp-&gt;_mode &lt;= 0 &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base</code></li>
-<li><code>_IO_vtable_offset (fp) == 0 &amp;&amp; fp-&gt;_mode &gt; 0 &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_ptr &gt; fp-&gt;_wide_data-&gt;_IO_write_base)</code><br>||的关系，满足其中一个就会调用_IO_OVERFLOW<br>main arena中的fake _IO_FILE_plus肯定不满足第一个条件中的<code>fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base</code><img src="/2023/02/20/FSOP/fake.png" class title="fake">
-第二个条件中<code>fp-&gt;_wide_data-&gt;_IO_write_ptr &gt; fp-&gt;_wide_data-&gt;_IO_write_base</code>肯定满足，<code>fp-&gt;_mode &gt; 0</code>有满足的可能性（不知道为什么实测没有判断<code>_IO_vtable_offset (fp) == 0</code>），需要爆破<br>布置在heap中的fake _IO_FILE_plus时要保证fp-&gt;_mode&lt;&#x3D;0（exp中设为-1），fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base（exp中分别设为1和0）并设置vtable指针，开头写’&#x2F;bin&#x2F;sh’<img src="/2023/02/20/FSOP/IO_FILE.png" class title="IO_FILE">
+<li>&#96;&#96;&#96;c<br>fp-&gt;_mode &lt;&#x3D; 0 &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* ```c</span><br><span class="line">  _IO_<span class="function"><span class="title">vtable_offset</span> (fp) == 0 &amp;&amp; fp-&gt;</span>_<span class="function"><span class="title">mode</span> &gt; 0 &amp;&amp; (fp-&gt;</span>_<span class="function"><span class="title">wide_data</span>-&gt;</span>_IO_<span class="function"><span class="title">write_ptr</span> &gt; fp-&gt;</span>_<span class="function"><span class="title">wide_data</span>-&gt;</span>_IO_write_base)</span><br></pre></td></tr></table></figure>
+
+||的关系，满足其中一个就会调用_IO_OVERFLOW<br>main arena中的fake _IO_FILE_plus肯定不满足第一个条件中的 fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base<img src="/2023/02/20/FSOP/fake.png" class title="fake">
+第二个条件中 fp-&gt;_wide_data-&gt;_IO_write_ptr &gt; fp-&gt;_wide_data-&gt;_IO_write_base肯定满足，fp-&gt;_mode &gt; 0有满足的可能性（不知道为什么实测没有判断IO_vtable_offset (fp) &#x3D;&#x3D; 0），需要爆破<br>布置在heap中的fake _IO_FILE_plus时要保证fp-&gt;_mode&lt;&#x3D;0（exp中设为-1），fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base（exp中分别设为1和0）并设置vtable指针，开头写’&#x2F;bin&#x2F;sh’<img src="/2023/02/20/FSOP/IO_FILE.png" class title="IO_FILE">
 设置跳转表<img src="/2023/02/20/FSOP/vtable.png" class title="vtable">
 这样执行_IO_OVERFLOW (fp, EOF)的时候实际执行的就是system(‘&#x2F;bin&#x2F;sh’)</li>
 </ul>
@@ -427,7 +430,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -440,7 +443,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

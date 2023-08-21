@@ -32,7 +32,7 @@
 <meta property="og:image" content="http://akaieurus.github.io/2023/01/23/fastbin-dup/realloc.png">
 <meta property="og:image" content="http://akaieurus.github.io/2023/01/23/fastbin-dup/realloc_hook.png">
 <meta property="article:published_time" content="2023-01-23T05:26:50.000Z">
-<meta property="article:modified_time" content="2023-08-04T10:39:53.766Z">
+<meta property="article:modified_time" content="2023-08-21T12:12:49.874Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="how2heap">
 <meta name="twitter:card" content="summary">
@@ -202,7 +202,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-04 18:39:53" itemprop="dateModified" datetime="2023-08-04T18:39:53+08:00">2023-08-04</time>
+                <time title="Modified: 2023-08-21 20:12:49" itemprop="dateModified" datetime="2023-08-21T20:12:49+08:00">2023-08-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -245,18 +245,19 @@
 <li>fastbin的第一个chunk是不是插入的chunk（double free检查）<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (__builtin_expect (old == p, <span class="number">0</span>))</span><br><span class="line">  &#123;</span><br><span class="line">    errstr = <span class="string">&quot;double free or corruption (fasttop)&quot;</span>;</span><br><span class="line">    <span class="keyword">goto</span> errout;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></li>
 <li>以及chunk的大小合法性检查<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   <span class="keyword">if</span> (have_lock &amp;&amp; old != <span class="literal">NULL</span> &amp;&amp; __builtin_expect (old_idx != idx, <span class="number">0</span>))</span><br><span class="line">     &#123;</span><br><span class="line">errstr = <span class="string">&quot;invalid fastbin entry (free)&quot;</span>;</span><br><span class="line"><span class="keyword">goto</span> errout;</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><h4 id="2-23-2-25"><a href="#2-23-2-25" class="headerlink" title="2.23-2.25"></a>2.23-2.25</h4><p>为了避开free中double free的检查（只检查第一个chunk是不是正在free的chunk），一般在double free中间再free另一个chunk形成<code>a-&gt;b-&gt;a</code>的形式再通过申请回第一个a来改变最后一个a的fd指针指向fake chunk<br>一般会将fd指针指向<code>__malloc_hook-0x23</code>，这个地址+8有一个0x7f，可以作为合法的size。这样我们可以在申请chunk的时候申请0x60大小的chunk来绕开chunk的size的合法性检查，将malloc_hook改为one_gadget的地址（free_hook前面全是0）</p>
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><h4 id="2-23-2-25"><a href="#2-23-2-25" class="headerlink" title="2.23-2.25"></a>2.23-2.25</h4><p>为了避开free中double free的检查（只检查第一个chunk是不是正在free的chunk），一般在double free中间再free另一个chunk形成a-&gt;b-&gt;a的形式再通过申请回第一个a来改变最后一个a的fd指针指向fake chunk<br>一般会将fd指针指向__malloc_hook-0x23，这个地址+8有一个0x7f，可以作为合法的size。这样我们可以在申请chunk的时候申请0x60大小的chunk来绕开chunk的size的合法性检查，将malloc_hook改为one_gadget的地址（free_hook前面全是0）</p>
 <img src="/2023/01/23/fastbin-dup/fake_chunk.png" class title="fake chunk">
+
 <h4 id="2-27-2-31"><a href="#2-27-2-31" class="headerlink" title="2.27-2.31"></a>2.27-2.31</h4><p>2.26比之前最大的变化就是在fastbin之前增加了tcache，利用方法也发（bian）生（jian）了（dan）变（le）化（ne）    </p>
 <ul>
 <li>先申请7个chunk填满tcache</li>
-<li>再在fastbin中形成<code>a-&gt;b-&gt;a</code></li>
+<li>再在fastbin中形成a-&gt;b-&gt;a</li>
 <li>再把tcache清空</li>
-<li>再申请一个chunk就可以申请到a，同时b和a（2）就会被放进tcache，这时tcache是这样的<code>b-&gt;a</code>（fastbin的chunk放进tcache是每次取最后一个chunk再执行tcache_put）</li>
+<li>再申请一个chunk就可以申请到a，同时b和a（2）就会被放进tcache，这时tcache是这样的b-&gt;a（fastbin的chunk放进tcache是每次取最后一个chunk再执行tcache_put）</li>
 <li>由于tcache中没有size的检查，所以直接改free_hook就行（注意tcache中的指针指向的是chunk中的data）</li>
 </ul>
 <h4 id="2-32以上"><a href="#2-32以上" class="headerlink" title="2.32以上"></a>2.32以上</h4><p>增加了单链表的指针保护机制以及地址0x10对齐检查（错位找0x7f打fastbin不行了）</p>
-<h3 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h3><h4 id="hgame2023-week2-fast-note"><a href="#hgame2023-week2-fast-note" class="headerlink" title="hgame2023 week2 fast_note"></a>hgame2023 week2 fast_note</h4><h5 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h5><p>libc版本2.23<br>金典的菜单题，有UAF。思路就是先填满tcache利用unsorted bin泄露libc基址，再用fastbin double free将malloc_hook改为one_gadget<br>这道题麻烦的地方在于四个one_gadget都不可用   </p>
+<h3 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h3><h4 id="hgame2023-week2-fast-note"><a href="#hgame2023-week2-fast-note" class="headerlink" title="hgame2023 week2 fast_note"></a>hgame2023 week2 fast_note</h4><h5 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h5><p>libc版本2.23<br>金典的菜单题，有UAF。思路就是先填满tcache利用unsorted bin泄露libc基址，再用fastbin double free将malloc_hook改为one_gadget<br>这道题麻烦的地方在于四个one_gadget都不可用 </p>
 <img src="/2023/01/23/fastbin-dup/one_gadget.png" class title="one_gadget">
 <p>其中后三个one_gadget限定的是栈空间，那我们就可以通过realloc调节栈内容</p>
 <h5 id="realloc调节栈内容"><a href="#realloc调节栈内容" class="headerlink" title="realloc调节栈内容"></a>realloc调节栈内容</h5><p>realloc的执行流程和malloc一样也是先检查hook是否为null，如果不为null就调用hook<br>realloc函数开头有很多push指令，可以通过push指令抬高栈，push指令的数量可以通过偏移调整</p>
@@ -366,7 +367,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -379,7 +380,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

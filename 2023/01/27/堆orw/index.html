@@ -28,7 +28,7 @@
 <meta property="og:description" content="之前做栈上的orw时看到过堆上的orw，这次就碰到了。安排！o(￣▽￣)ブ">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-01-27T03:15:57.000Z">
-<meta property="article:modified_time" content="2023-08-04T10:55:12.219Z">
+<meta property="article:modified_time" content="2023-08-21T11:37:10.593Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="how2heap">
 <meta property="article:tag" content="orw">
@@ -198,7 +198,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-04 18:55:12" itemprop="dateModified" datetime="2023-08-04T18:55:12+08:00">2023-08-04</time>
+                <time title="Modified: 2023-08-21 19:37:10" itemprop="dateModified" datetime="2023-08-21T19:37:10+08:00">2023-08-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -235,22 +235,27 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;setcontext+<span class="number">53</span>&gt;:  mov    rsp,QWORD PTR [rdi+<span class="number">0xa0</span>]</span><br><span class="line">&lt;setcontext+<span class="number">60</span>&gt;:  mov    rbx,QWORD PTR [rdi+<span class="number">0x80</span>]</span><br><span class="line">&lt;setcontext+<span class="number">67</span>&gt;:  mov    rbp,QWORD PTR [rdi+<span class="number">0x78</span>]</span><br><span class="line">&lt;setcontext+<span class="number">71</span>&gt;:  mov    r12,QWORD PTR [rdi+<span class="number">0x48</span>]</span><br><span class="line">&lt;setcontext+<span class="number">75</span>&gt;:  mov    r13,QWORD PTR [rdi+<span class="number">0x50</span>]</span><br><span class="line">&lt;setcontext+<span class="number">79</span>&gt;:  mov    r14,QWORD PTR [rdi+<span class="number">0x58</span>]</span><br><span class="line">&lt;setcontext+<span class="number">83</span>&gt;:  mov    r15,QWORD PTR [rdi+<span class="number">0x60</span>]</span><br><span class="line">&lt;setcontext+<span class="number">87</span>&gt;:  mov    rcx,QWORD PTR [rdi+<span class="number">0xa8</span>]</span><br><span class="line">&lt;setcontext+<span class="number">94</span>&gt;:  push   rcx</span><br><span class="line">&lt;setcontext+<span class="number">95</span>&gt;:  mov    rsi,QWORD PTR [rdi+<span class="number">0x70</span>]</span><br><span class="line">&lt;setcontext+<span class="number">99</span>&gt;:  mov    rdx,QWORD PTR [rdi+<span class="number">0x88</span>]</span><br><span class="line">&lt;setcontext+<span class="number">106</span>&gt;: mov    rcx,QWORD PTR [rdi+<span class="number">0x98</span>]</span><br><span class="line">&lt;setcontext+<span class="number">113</span>&gt;: mov    r8,QWORD PTR [rdi+<span class="number">0x28</span>]</span><br><span class="line">&lt;setcontext+<span class="number">117</span>&gt;: mov    r9,QWORD PTR [rdi+<span class="number">0x30</span>]</span><br><span class="line">&lt;setcontext+<span class="number">121</span>&gt;: mov    rdi,QWORD PTR [rdi+<span class="number">0x68</span>]</span><br><span class="line">&lt;setcontext+<span class="number">125</span>&gt;: xor    eax,eax</span><br><span class="line">&lt;setcontext+<span class="number">127</span>&gt;: ret</span><br></pre></td></tr></table></figure>
 <p>我们将setcontext+53的地址写入free_hook中，当我们执行free(chunk1)时，chunk1的地址（data段地址）会被传入rdi，这样我们就控制了rdi，并且可以通过rdi控制寄存器<br>我们需要控制的寄存器就是rsp和rcx：    </p>
 <ul>
-<li>我们需要将已经写好的orw链的地址写在<code>rdi+0xa0</code>处，这样就能通过<code>&lt;setcontext+53&gt;:  mov    rsp,QWORD PTR [rdi+0xa0]</code>实现栈迁移</li>
-<li>我们还需要将一个ret指令的地址写在<code>rdi+0xa8</code>处，因为<code>push rcx</code>会将rcx入栈，ret执行的就是rcx的地址</li>
+<li><p>我们需要将已经写好的orw链的地址写在rdi+0xa0处，这样就能通过</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;setcontext+<span class="number">53</span>&gt;:  mov    rsp,QWORD PTR [rdi+<span class="number">0xa0</span>]</span><br></pre></td></tr></table></figure>
+
+<p>实现栈迁移</p>
+</li>
+<li><p>我们还需要将一个ret指令的地址写在rdi+0xa8处，因为push rcx会将rcx入栈，ret执行的就是rcx的地址</p>
+</li>
 </ul>
 <h3 id="2-29以上"><a href="#2-29以上" class="headerlink" title="2.29以上"></a>2.29以上</h3><h4 id="gadget-setcontext"><a href="#gadget-setcontext" class="headerlink" title="gadget+setcontext"></a>gadget+setcontext</h4><p>2.29之后setcontext中的gadget变成了以rdx索引，因此我们需要找一些能控制rdx的gadget</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">.text:<span class="number">00000000000580</span>DD                 mov     rsp, [rdx+<span class="number">0</span>A0h]</span><br><span class="line">.text:<span class="number">00000000000580E4</span>                 mov     rbx, [rdx+<span class="number">80</span>h]</span><br><span class="line">.text:<span class="number">00000000000580</span>EB                 mov     rbp, [rdx+<span class="number">78</span>h]</span><br><span class="line">.text:<span class="number">00000000000580</span>EF                 mov     r12, [rdx+<span class="number">48</span>h]</span><br><span class="line">.text:<span class="number">00000000000580F</span>3                 mov     r13, [rdx+<span class="number">50</span>h]</span><br><span class="line">.text:<span class="number">00000000000580F</span>7                 mov     r14, [rdx+<span class="number">58</span>h]</span><br><span class="line">.text:<span class="number">00000000000580F</span>B                 mov     r15, [rdx+<span class="number">60</span>h]</span><br><span class="line">.text:<span class="number">00000000000580F</span>F                 test    dword ptr fs:<span class="number">48</span>h, <span class="number">2</span></span><br><span class="line">    ....</span><br><span class="line">.text:<span class="number">00000000000581</span>C6                 mov     rcx, [rdx+<span class="number">0</span>A8h]</span><br><span class="line">.text:<span class="number">00000000000581</span>CD                 push    rcx</span><br><span class="line">.text:<span class="number">00000000000581</span>CE                 mov     rsi, [rdx+<span class="number">70</span>h]</span><br><span class="line">.text:<span class="number">00000000000581</span>D2                 mov     rdi, [rdx+<span class="number">68</span>h]</span><br><span class="line">.text:<span class="number">00000000000581</span>D6                 mov     rcx, [rdx+<span class="number">98</span>h]</span><br><span class="line">.text:<span class="number">00000000000581</span>DD                 mov     r8, [rdx+<span class="number">28</span>h]</span><br><span class="line">.text:<span class="number">00000000000581E1</span>                 mov     r9, [rdx+<span class="number">30</span>h]</span><br><span class="line">.text:<span class="number">00000000000581E5</span>                 mov     rdx, [rdx+<span class="number">88</span>h]</span><br><span class="line">.text:<span class="number">00000000000581</span>EC                 xor     eax, eax</span><br><span class="line">.text:<span class="number">00000000000581</span>EE                 retn</span><br></pre></td></tr></table></figure>
-<p><code>getkeyserv_handle+576</code>有一段gadget</p>
+<p>getkeyserv_handle+576有一段gadget</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov     rdx, [rdi+<span class="number">8</span>]</span><br><span class="line">mov     [rsp+<span class="number">0</span>C8h+var_C8], rax</span><br><span class="line">call    qword ptr [rdx+<span class="number">20</span>h]</span><br></pre></td></tr></table></figure>
 <p>可以通过rdi控制rdx，从2.29到2.32都可以用     </p>
 <ul>
-<li>free_hook写入<code>getkeyserv_handle+576</code></li>
-<li><code>rdi+8</code>写入rdx的值</li>
-<li><code>rdx+0x20</code>写入<code>setcontext+53</code>的值</li>
-<li><code>rdx+0xa0</code>写入orw链的地址</li>
-<li><code>rdi+0xa8</code>写入一个ret指令的地址</li>
+<li>free_hook写入getkeyserv_handle+576</li>
+<li>rdi+8写入rdx的值</li>
+<li>rdx+0x20写入setcontext+53的值</li>
+<li>rdx+0xa0写入orw链的地址</li>
+<li>rdi+0xa8写入一个ret指令的地址</li>
 </ul>
-<h4 id="gadget-栈迁移"><a href="#gadget-栈迁移" class="headerlink" title="gadget+栈迁移"></a>gadget+栈迁移</h4><p>gadget<code>svcudp_reply+26</code>：</p>
+<h4 id="gadget-栈迁移"><a href="#gadget-栈迁移" class="headerlink" title="gadget+栈迁移"></a>gadget+栈迁移</h4><p>gadget svcudp_reply+26：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mov rbp, qword ptr [rdi + <span class="number">0x48</span>]; </span><br><span class="line">mov rax, qword ptr [rbp + <span class="number">0x18</span>]; </span><br><span class="line">lea r13, [rbp + <span class="number">0x10</span>]; </span><br><span class="line">mov dword ptr [rbp + <span class="number">0x10</span>], <span class="number">0</span>; </span><br><span class="line">mov rdi, r13; </span><br><span class="line">call qword ptr [rax + <span class="number">0x28</span>];</span><br></pre></td></tr></table></figure>
 <p>可以通过rdi控制rbp的值实现栈迁移，还可以通过rbp控制rax实现程序的跳转</p>
 <h3 id="hgame-2023-week3-note-context"><a href="#hgame-2023-week3-note-context" class="headerlink" title="hgame 2023 week3 note_context"></a>hgame 2023 week3 note_context</h3><p>思路见上👆，直接放exp了</p>
@@ -354,7 +359,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -367,7 +372,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

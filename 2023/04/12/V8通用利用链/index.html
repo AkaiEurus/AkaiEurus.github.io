@@ -42,7 +42,7 @@
 <meta property="og:image" content="http://akaieurus.github.io/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/backstore.png">
 <meta property="og:image" content="http://akaieurus.github.io/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/bufbuf.png">
 <meta property="article:published_time" content="2023-04-12T15:32:07.000Z">
-<meta property="article:modified_time" content="2023-08-04T10:54:41.189Z">
+<meta property="article:modified_time" content="2023-08-21T11:38:54.479Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="V8">
 <meta name="twitter:card" content="summary">
@@ -212,7 +212,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-04 18:54:41" itemprop="dateModified" datetime="2023-08-04T18:54:41+08:00">2023-08-04</time>
+                <time title="Modified: 2023-08-21 19:38:54" itemprop="dateModified" datetime="2023-08-21T19:38:54+08:00">2023-08-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -237,6 +237,7 @@
       
         <p>（咕咕咕了好久……）基础pwn暂时告一段落了，本来打算开kernel的，但XCTF见到了V8所以研究一下。配环境真坐牢……本来都配好了虚拟机不小心被我玩崩了还没备份(╯▔皿▔)╯还因为一些很屑的原因（少加了双引号(ˉ▽ˉ；)…）又花了好久再配了一遍……<br>ps：目前的学习按照从“0开始学V8漏洞利用”系列进行</p>
 <span id="more"></span>
+
 <h3 id="WASM"><a href="#WASM" class="headerlink" title="WASM"></a>WASM</h3><p>做pwn题的时候我们的目标往往就是执行system(‘&#x2F;bin&#x2F;sh’)，V8利用的目标就是执行任意shellcode，要达成这个目标我们就需要读写相关漏洞+一段rwx的内存<br>wasm可以为我们制造rwx的内存<br>ps：wasm无法执行shellcode（还不清楚为啥，之后再研究），所以直接写shellcode什么的别想了o( ￣▽￣)ブ<br>pps：在别的博客里还有用常规堆题思路做的，之后再研究<br>所以我们的思路就是先生成一段合法的wasm再写入非法的shellcode<br>test.js如下：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">%<span class="title class_">SystemBreak</span>();</span><br><span class="line"><span class="keyword">var</span> wasmCode = <span class="keyword">new</span> <span class="title class_">Uint8Array</span>([<span class="number">0</span>,<span class="number">97</span>,<span class="number">115</span>,<span class="number">109</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">133</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">96</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">127</span>,<span class="number">3</span>,<span class="number">130</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">4</span>,<span class="number">132</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">112</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">5</span>,<span class="number">131</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">6</span>,<span class="number">129</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">7</span>,<span class="number">145</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">0</span>,<span class="number">2</span>,<span class="number">6</span>,<span class="number">109</span>,<span class="number">101</span>,<span class="number">109</span>,<span class="number">111</span>,<span class="number">114</span>,<span class="number">121</span>,<span class="number">2</span>,<span class="number">0</span>,<span class="number">4</span>,<span class="number">109</span>,<span class="number">97</span>,<span class="number">105</span>,<span class="number">110</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">10</span>,<span class="number">138</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">132</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">128</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">65</span>,<span class="number">42</span>,<span class="number">11</span>]);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> wasmModule = <span class="keyword">new</span> <span class="title class_">WebAssembly</span>.<span class="title class_">Module</span>(wasmCode);</span><br><span class="line"><span class="keyword">var</span> wasmInstance = <span class="keyword">new</span> <span class="title class_">WebAssembly</span>.<span class="title class_">Instance</span>(wasmModule, &#123;&#125;);</span><br><span class="line"><span class="keyword">var</span> f = wasmInstance.<span class="property">exports</span>.<span class="property">main</span>;</span><br><span class="line">%<span class="title class_">DebugPrint</span>(f);</span><br><span class="line">%<span class="title class_">DebugPrint</span>(wasmInstance);</span><br><span class="line">%<span class="title class_">SystemBreak</span>();</span><br></pre></td></tr></table></figure>
 <p>第二个断点时vmmap一下有一段rwx的内存</p>
@@ -258,11 +259,20 @@
 <img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/a.png" class title="a">
 <img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/aa.png" class title="aa">
 <ul>
-<li>0x142508049970-0x142508049980的部分是a的结构体</li>
-<li>V8将最后一位置1表示指针，置0表示SMI当前版本的V8对地址进行了压缩，因为高32bit的地址值是一样的</li>
-<li>所以a的结构如下：<br><code>|32 bit map addr|32 bit properties addr|32 bit elements addr|32 bit length|</code><br>elements结构内存布局如下：<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/elements.png" class title="elements"></li>
-<li>0x142508049960-0x142508049970的部分是elements结构</li>
-<li>elements的结构如下：<br><code>|32 bit map addr|32 bit length|value|</code></li>
+<li><p>0x142508049970-0x142508049980的部分是a的结构体</p>
+</li>
+<li><p>V8将最后一位置1表示指针，置0表示SMI当前版本的V8对地址进行了压缩，因为高32bit的地址值是一样的</p>
+</li>
+<li><p>所以a的结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">|<span class="number">32</span> bit <span class="built_in">map</span> addr|<span class="number">32</span> bit properties addr|<span class="number">32</span> bit elements addr|<span class="number">32</span> bit length|</span><br></pre></td></tr></table></figure>
+
+<p>elements结构内存布局如下：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/elements.png" class title="elements">
+</li>
+<li><p>0x142508049960-0x142508049970的部分是elements结构</p>
+</li>
+<li><p>elements的结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">|<span class="number">32</span> bit <span class="built_in">map</span> addr|<span class="number">32</span> bit length|value|</span><br></pre></td></tr></table></figure></li>
 </ul>
 <p>发现elements结构之后是紧接着就是a的结构，如果让elements溢出我们就能控制a的map和length结构<br>b的内存：</p>
 <img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/b.png" class title="b">
@@ -398,7 +408,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -411,7 +421,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

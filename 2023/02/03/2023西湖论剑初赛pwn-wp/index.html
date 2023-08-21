@@ -32,7 +32,7 @@
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/03/2023%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%E5%88%9D%E8%B5%9Bpwn-wp/input.png">
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/03/2023%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%E5%88%9D%E8%B5%9Bpwn-wp/aaaa.png">
 <meta property="article:published_time" content="2023-02-03T13:43:29.000Z">
-<meta property="article:modified_time" content="2023-08-04T10:37:47.017Z">
+<meta property="article:modified_time" content="2023-08-21T12:06:40.249Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="wp">
 <meta name="twitter:card" content="summary">
@@ -202,7 +202,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-04 18:37:47" itemprop="dateModified" datetime="2023-08-04T18:37:47+08:00">2023-08-04</time>
+                <time title="Modified: 2023-08-21 20:06:40" itemprop="dateModified" datetime="2023-08-21T20:06:40+08:00">2023-08-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -231,7 +231,8 @@
       
         <p>感想：虽然在电脑前坐了八小时才写出来一道题而且从中午开始头疼止痛药还在阳的时候吃完了导致晚上头疼失眠还没吃午饭但出flag的时候感觉值了！！！<br>真正的感想：好坐牢好坐牢但终于没有爆零了啊哈哈哈哈哈哈我不是fw我好快乐哈哈哈哈哈哈哈（一些发疯文学）</p>
 <span id="more"></span>
-<h3 id="babycalc"><a href="#babycalc" class="headerlink" title="babycalc"></a>babycalc</h3><p>你懂8小时一道题的含金量~~~&#x2F;&#x2F;&#x2F;(^v^)\~~~</p>
+
+<h3 id="babycalc"><a href="#babycalc" class="headerlink" title="babycalc"></a>babycalc</h3><p>你懂8小时一道题的含金量~o( &#x3D;∩ω∩&#x3D; )m</p>
 <h4 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h4><img src="/2023/02/03/2023%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%E5%88%9D%E8%B5%9Bpwn-wp/main.png" class title="main">
 <p>main函数，init_设置缓冲区，output输出一些东西，真正的主函数是cal</p>
 <img src="/2023/02/03/2023%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%E5%88%9D%E8%B5%9Bpwn-wp/cal.png" class title="cal">
@@ -253,7 +254,7 @@
 <li>向buf输入0x100字节时能实现of by null将rbp的最低位置零</li>
 </ul>
 <p>在最开始做的时候我有想到of by null将rbp最低位置零会是一个利用点，但因为栈地址未知所以把这个想法否了。后来因为想不到控制i怎么利用又找回了这个想法，进一步想到利用栈迁移有几率让rsp落在buf内，但由于本人对爆破有偏见所以又将这个想法搁置了(╯▔皿▔)╯。后来实在没法推进跟学长说了这个想法才发现思想有问题(╯‵□′)╯︵┻━┻，记录一下学长的至理名言警醒自己o(TヘTo)</p>
-<img src="/2023/02/03/2023%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%E5%88%9D%E8%B5%9Bpwn-wp/aaaa.png" class title="aaaa">  
+<img src="/2023/02/03/2023%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%E5%88%9D%E8%B5%9Bpwn-wp/aaaa.png" class title="aaaa"> 
 <p>最后推进这个想法证明可行（浪费好多时间越想越气╰（‵□′）╯）</p>
 <h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><ul>
 <li>第一次栈迁移泄露libc基址然后返回0x400c1b（需要有正常的rbp所以不能直接返回cal，返回0x400c1a会导致后面的printf无法正常执行不知道为啥）</li>
@@ -360,7 +361,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -373,7 +374,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
