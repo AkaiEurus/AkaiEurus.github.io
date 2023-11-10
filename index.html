@@ -163,7 +163,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/10/07/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%BA%8C%EF%BC%89-md/">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/11/08/kernel-userfaultfd/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -177,7 +177,93 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/10/07/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%BA%8C%EF%BC%89-md/" class="post-title-link" itemprop="url">Kernel源码分析-系统启动（二）</a>
+            <a href="/2023/11/08/kernel-userfaultfd/" class="post-title-link" itemprop="url">userfaultfd</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-08 19:02:38" itemprop="dateCreated datePublished" datetime="2023-11-08T19:02:38+08:00">2023-11-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-10 23:59:05" itemprop="dateModified" datetime="2023-11-10T23:59:05+08:00">2023-11-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/" itemprop="url" rel="index"><span itemprop="name">条件竞争</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>重启kernel！</p>
+<p>发现我真的很容易钻牛角尖(ˉ▽ˉ；)…，之后的学习会以做出题为第一目标</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/11/08/kernel-userfaultfd/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/10/07/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%BA%8C%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Eurus">
+      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eurus禁止摆烂！">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/07/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%BA%8C%EF%BC%89/" class="post-title-link" itemprop="url">Kernel源码分析-系统启动（二）</a>
         </h2>
 
         <div class="post-meta">
@@ -220,7 +306,7 @@
 <p>ps：还是主要关注内存相关的部分</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/10/07/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%BA%8C%EF%BC%89-md/#more" rel="contents">
+              <a class="btn" href="/2023/10/07/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%BA%8C%EF%BC%89/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -440,7 +526,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-21 19:30:27" itemprop="dateModified" datetime="2023-08-21T19:30:27+08:00">2023-08-21</time>
+                <time title="Modified: 2023-11-09 20:39:15" itemprop="dateModified" datetime="2023-11-09T20:39:15+08:00">2023-11-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -468,6 +554,7 @@
 
       
           <p>这题的代码真的是……一言难尽(ˉ▽ˉ；)…</p>
+<p>ps：解包要用root</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/08/20/kernel-heap-heap-overflow/#more" rel="contents">
@@ -921,91 +1008,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/08/04/kernel-rop-ret2usr/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Eurus">
-      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Eurus禁止摆烂！">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/04/kernel-rop-ret2usr/" class="post-title-link" itemprop="url">Kernel ROP ret2usr</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-08-04 00:08:30" itemprop="dateCreated datePublished" datetime="2023-08-04T00:08:30+08:00">2023-08-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-11 16:10:00" itemprop="dateModified" datetime="2023-08-11T16:10:00+08:00">2023-08-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-                  , 
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/ROP/" itemprop="url" rel="index"><span itemprop="name">ROP</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>针对SMAP&#x2F;SMEP绕过的ret2usr</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/08/04/kernel-rop-ret2usr/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1077,20 +1079,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-count">40</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
