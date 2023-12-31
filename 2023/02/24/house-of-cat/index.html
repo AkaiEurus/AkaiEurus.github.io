@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/24/house-of-cat/IO_FILE_plus.png">
 <meta property="og:image" content="http://akaieurus.github.io/2023/02/24/house-of-cat/IO_wide_data.png">
 <meta property="article:published_time" content="2023-02-24T13:08:41.000Z">
-<meta property="article:modified_time" content="2023-08-21T11:58:49.373Z">
+<meta property="article:modified_time" content="2023-12-14T08:09:48.503Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="IO">
 <meta name="twitter:card" content="summary">
@@ -203,7 +203,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-21 19:58:49" itemprop="dateModified" datetime="2023-08-21T19:58:49+08:00">2023-08-21</time>
+                <time title="Modified: 2023-12-14 16:09:48" itemprop="dateModified" datetime="2023-12-14T16:09:48+08:00">2023-12-14</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -262,7 +262,7 @@
 </ul>
 <h4 id="关于vtable"><a href="#关于vtable" class="headerlink" title="关于vtable"></a>关于vtable</h4><p>2.24增加了对vtable位置的检查，2.28又将常利用的相对地址引用替换成了malloc和free，堵死了这条调用链<br>看一眼跳转表的宏定义，发现只有JUMP跳转有vtable检查，而WJUMP没有</p>
 <img src="/2023/02/24/house-of-cat/jump.png" class title="jump">
-<p>_IO_wfile_jumps结构体使用JUMP，那么我们可以考虑伪造_IO_wfile_jumps的vtable，_IO_wfile_jumps结构体如下：</p>
+<p>_IO_wfile_jumps结构体使用WJUMP，那么我们可以考虑伪造_IO_wfile_jumps的vtable，_IO_wfile_jumps结构体如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.37\libio\wfileops.c</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IO_jump_t</span> _<span class="title">IO_wfile_jumps</span> <span class="title">libio_vtable</span> =</span></span><br><span class="line">&#123;</span><br><span class="line">  JUMP_INIT_DUMMY,</span><br><span class="line">  JUMP_INIT(finish, _IO_new_file_finish),</span><br><span class="line">  JUMP_INIT(overflow, (_IO_overflow_t) _IO_wfile_overflow),</span><br><span class="line">  JUMP_INIT(underflow, (_IO_underflow_t) _IO_wfile_underflow),</span><br><span class="line">  JUMP_INIT(uflow, (_IO_underflow_t) _IO_wdefault_uflow),</span><br><span class="line">  JUMP_INIT(pbackfail, (_IO_pbackfail_t) _IO_wdefault_pbackfail),</span><br><span class="line">  JUMP_INIT(xsputn, _IO_wfile_xsputn),</span><br><span class="line">  JUMP_INIT(xsgetn, _IO_file_xsgetn),</span><br><span class="line">  JUMP_INIT(seekoff, _IO_wfile_seekoff),</span><br><span class="line">  JUMP_INIT(seekpos, _IO_default_seekpos),</span><br><span class="line">  JUMP_INIT(setbuf, _IO_new_file_setbuf),</span><br><span class="line">  JUMP_INIT(sync, (_IO_sync_t) _IO_wfile_sync),</span><br><span class="line">  JUMP_INIT(doallocate, _IO_wfile_doallocate),</span><br><span class="line">  JUMP_INIT(read, _IO_file_read),</span><br><span class="line">  JUMP_INIT(write, _IO_new_file_write),</span><br><span class="line">  JUMP_INIT(seek, _IO_file_seek),</span><br><span class="line">  JUMP_INIT(close, _IO_file_close),</span><br><span class="line">  JUMP_INIT(stat, _IO_file_stat),</span><br><span class="line">  JUMP_INIT(showmanyc, _IO_default_showmanyc),</span><br><span class="line">  JUMP_INIT(imbue, _IO_default_imbue)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h3 id="house-of-cat"><a href="#house-of-cat" class="headerlink" title="house of cat"></a>house of cat</h3><p>_IO_wfile_jumps结构体中的_IO_wfile_seekoff源码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.37\libio\wfileops.c</span></span><br><span class="line"></span><br><span class="line"><span class="type">off64_t</span></span><br><span class="line">_IO_wfile_seekoff (FILE *fp, <span class="type">off64_t</span> offset, <span class="type">int</span> dir, <span class="type">int</span> mode)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">off64_t</span> result;</span><br><span class="line">  <span class="type">off64_t</span> delta, new_offset;</span><br><span class="line">  <span class="type">long</span> <span class="type">int</span> count;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (mode == <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> do_ftell_wide (fp);</span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> must_be_exact = ((fp-&gt;_wide_data-&gt;_IO_read_base</span><br><span class="line">			== fp-&gt;_wide_data-&gt;_IO_read_end)</span><br><span class="line">		       &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_base</span><br><span class="line">			   == fp-&gt;_wide_data-&gt;_IO_write_ptr));</span><br><span class="line"></span><br><span class="line">  <span class="type">bool</span> was_writing = ((fp-&gt;_wide_data-&gt;_IO_write_ptr</span><br><span class="line">		       &gt; fp-&gt;_wide_data-&gt;_IO_write_base)</span><br><span class="line">		      || _IO_in_put_mode (fp));</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (was_writing &amp;&amp; _IO_switch_to_wget_mode (fp))</span><br><span class="line">    <span class="keyword">return</span> WEOF;</span><br><span class="line">	……</span><br></pre></td></tr></table></figure>
@@ -278,7 +278,7 @@
 <li>fp-&gt;_mode&lt;&#x3D;0，fp-&gt;_IO_write_ptr&gt;fp-&gt;_IO_write_base</li>
 <li>vtable指向_IO_wfile_jumps+48（利用偏移使_IO_flush_all_lockp调用_IO_OVERFLOW实际进入_IO_wfile_seekoff</li>
 <li>函数进入_IO_switch_to_wget_mode，要求伪造fp-&gt;_wide_data<img src="/2023/02/24/house-of-cat/IO_FILE_plus.png" class title="IO_FILE_plus"></li>
-<li>伪造_IO_wide_data结构体，_wide_data-&gt;_IO_write_ptr-&gt;_wide_data-&gt;_IO_write_base</li>
+<li>伪造_IO_wide_data结构体，_wide_data-&gt;_IO_write_ptr&gt;_wide_data-&gt;_IO_write_base</li>
 <li>伪造vtable指向堆地址，利用_IO_WOVERFLOW指向setcontext+53<img src="/2023/02/24/house-of-cat/IO_wide_data.png" class title="IO_wide_data"></li>
 <li>寄存器布置边调试边改就行</li>
 </ul>
@@ -381,20 +381,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-count">43</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
