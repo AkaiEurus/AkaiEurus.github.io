@@ -1,0 +1,1099 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="wjy又双叒叕开始走支线了……经典学新东西一本书起步">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《UEFI原理与编程》读书笔记">
+<meta property="og:url" content="http://akaieurus.github.io/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="wjy又双叒叕开始走支线了……经典学新东西一本书起步">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc48.jpg">
+<meta property="article:published_time" content="2024-03-27T05:03:33.000Z">
+<meta property="article:modified_time" content="2025-01-03T09:55:45.583Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="uefi">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc48.jpg">
+  
+  
+  
+  <title>《UEFI原理与编程》读书笔记 - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc48.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="《UEFI原理与编程》读书笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-03-27 13:03" pubdate>
+          2024年3月27日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">《UEFI原理与编程》读书笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>wjy又双叒叕开始走支线了……经典学新东西一本书起步</p>
+<span id="more"></span>
+
+<h1 id="UEFI概述"><a href="#UEFI概述" class="headerlink" title="UEFI概述"></a>UEFI概述</h1><h2 id="UEFI系统组成"><a href="#UEFI系统组成" class="headerlink" title="UEFI系统组成"></a>UEFI系统组成</h2><img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%B3%BB%E7%BB%9F%E7%BB%84%E6%88%90.png" srcset="/img/loading.gif" lazyload class title="系统组成">
+
+<ul>
+<li>TSL阶段BS提供的服务：<ul>
+<li>事件服务</li>
+<li>内存管理</li>
+<li>Protocol管理</li>
+<li>Protocol使用类服务</li>
+<li>驱动管理</li>
+<li>Image管理</li>
+<li>ExitBootService</li>
+</ul>
+</li>
+<li>RT提供的服务：<ul>
+<li>时间服务</li>
+<li>读写UEFI系统变量</li>
+<li>虚拟内存服务</li>
+<li>其他服务，如重启系统的ResetSystem</li>
+</ul>
+</li>
+</ul>
+<h2 id="UEFI启动过程"><a href="#UEFI启动过程" class="headerlink" title="UEFI启动过程"></a>UEFI启动过程</h2><img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/uefi7.png" srcset="/img/loading.gif" lazyload class title="uefi7">
+
+<h3 id="SEC"><a href="#SEC" class="headerlink" title="SEC"></a>SEC</h3><h4 id="SEC阶段功能"><a href="#SEC阶段功能" class="headerlink" title="SEC阶段功能"></a>SEC阶段功能</h4><ul>
+<li>接受并处理系统启动和重启信号</li>
+<li>初始化临时存储区域</li>
+<li>作为可信系统的根</li>
+<li>传递系统参数给下一阶段PEI<ul>
+<li>系统当前状态</li>
+<li>BFM的地址和大小</li>
+<li>临时RAM的地址和大小</li>
+<li>栈的地址和大小</li>
+</ul>
+</li>
+</ul>
+<h4 id="SEC执行流程"><a href="#SEC执行流程" class="headerlink" title="SEC执行流程"></a>SEC执行流程</h4><img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/sec.png" srcset="/img/loading.gif" lazyload class title="sec">
+
+<p>以初始化临时RAM为界，SEC分为两部分：</p>
+<ul>
+<li>Reset Vector</li>
+<li>SEC功能区</li>
+</ul>
+<p>Reset Vector执行流程：</p>
+<ul>
+<li>进入固件入口</li>
+<li>从实模式转32位平坦模式</li>
+<li>定位固件中的BFV</li>
+<li>定位固件中的SEC映像</li>
+<li>若是64位系统，从32位模式转换到64位模式</li>
+<li>调用SEC入口函数</li>
+</ul>
+<h3 id="PEI"><a href="#PEI" class="headerlink" title="PEI"></a>PEI</h3><p>主要功能是为DXE准备执行环境，将需要传递到DXE的信息组成HOB列表</p>
+<p>从功能上讲PEI分为两部分：</p>
+<ul>
+<li>PEI内核：负责PEI基础服务和执行流程</li>
+<li>PEIM派遣器：找出系统中所有PEIM，根据依赖关系顺序执行</li>
+</ul>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/pei.png" srcset="/img/loading.gif" lazyload class title="pei">
+
+<p>PEIM之间通过PPI通信，可通过GUID定位</p>
+<h3 id="DXE"><a href="#DXE" class="headerlink" title="DXE"></a>DXE</h3><p>从功能上讲DXE分为两部分：</p>
+<ul>
+<li>DXE内核：负责DXE基础服务和执行流程</li>
+<li>DXE派遣器：负责调度执行DXE驱动，初始化系统设备</li>
+</ul>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/dxe.png" srcset="/img/loading.gif" lazyload class title="dxe">
+
+<p>DXE之间通过Protocol通信，可通过GUID定位</p>
+<h3 id="BDS"><a href="#BDS" class="headerlink" title="BDS"></a>BDS</h3><p>主要功能是执行启动策略，包括：</p>
+<ul>
+<li>初始化控制台设备</li>
+<li>加载必要的设备驱动</li>
+<li>根据系统设置加载和执行启动项</li>
+</ul>
+<p>加载启动项失败，系统将重新执行DXE dispatcher以加载更多的驱动，然后重新尝试加载启动项</p>
+<h3 id="TSL"><a href="#TSL" class="headerlink" title="TSL"></a>TSL</h3><p>OS Loader执行的第一个阶段</p>
+<ul>
+<li>OS Loader作为一个UEFI应用程序运行，系统资源仍然由UEFI内核控制</li>
+<li>ExitBootServices服务被调用后，系统进入RT阶段</li>
+</ul>
+<p>TSL是一个临时系统，UEFI Shell是这个临时系统的人机交互界面</p>
+<h3 id="RT"><a href="#RT" class="headerlink" title="RT"></a>RT</h3><ul>
+<li>系统控制权和资源由UEFI内核转交到OS Loader手中</li>
+<li>运行时服务保留给OS和OS Loader使用</li>
+<li>最终OS取得系统的控制权</li>
+</ul>
+<h3 id="AL"><a href="#AL" class="headerlink" title="AL"></a>AL</h3><p>RT阶段错误处理，未定义</p>
+<h1 id="UEFI工程模块文件"><a href="#UEFI工程模块文件" class="headerlink" title="UEFI工程模块文件"></a>UEFI工程模块文件</h1><p>各UEFI工程文件之间的关系</p>
+<p>*Pkg：包</p>
+<ul>
+<li>.dsc：平台描述文件</li>
+<li>.dec：包申明文件</li>
+<li>模块（编译完就是.efi）<ul>
+<li>.inf：元数据文件</li>
+<li>源文件</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">模块类型</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">标准应用程序工程模块</td>
+<td align="left">在DXE阶段运行的应用程序（Shell环境下也可以运行）</td>
+</tr>
+<tr>
+<td align="left">ShellAppMain应用程序工程模块</td>
+<td align="left">Shell环境下运行的应用程序</td>
+</tr>
+<tr>
+<td align="left">UEFI驱动模块</td>
+<td align="left">符合UEFI驱动模型的驱动，仅在BS期间有效</td>
+</tr>
+<tr>
+<td align="left">库模块</td>
+<td align="left">作为静态库被其他模块调用</td>
+</tr>
+<tr>
+<td align="left">DXE驱动模块</td>
+<td align="left">DXE环境下运行的驱动，此类驱动不遵循UEFI驱动模型</td>
+</tr>
+<tr>
+<td align="left">DXE运行时驱动模型</td>
+<td align="left">进入RT依然有效的驱动</td>
+</tr>
+<tr>
+<td align="left">DXE SAL驱动模块</td>
+<td align="left">仅对安腾CPU有效的一种驱动</td>
+</tr>
+<tr>
+<td align="left">DXE SMM驱动模块</td>
+<td align="left">系统管理模式驱动，模块被加载到系统管理内存区，系统进入RT仍然有效</td>
+</tr>
+<tr>
+<td align="left">PEIM模块</td>
+<td align="left">PEI阶段的模块</td>
+</tr>
+<tr>
+<td align="left">SEC模块</td>
+<td align="left">固件的SEC阶段</td>
+</tr>
+<tr>
+<td align="left">PEI_CORE模块</td>
+<td align="left">固件的PEI阶段</td>
+</tr>
+<tr>
+<td align="left">DXE_CORE模块</td>
+<td align="left">固件的DXE模块</td>
+</tr>
+</tbody></table>
+<h2 id="工程文件"><a href="#工程文件" class="headerlink" title="工程文件"></a>工程文件</h2><p>edk2文件与edk2工具链命令之间的关系：</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/file.png" srcset="/img/loading.gif" lazyload class title="file">
+
+<h3 id="inf"><a href="#inf" class="headerlink" title=".inf"></a>.inf</h3><ul>
+<li>作用相当于Makefile</li>
+<li>分很多个块，以”[块名]\n”开头</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>必需块</th>
+<th>块描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[Defines]</td>
+<td>定义本模块的属性变量及其他变量，这些变量可在工程文件其他块中使用</td>
+</tr>
+<tr>
+<td>[Sources]</td>
+<td>列出本模块所有源文件及资源文件</td>
+</tr>
+<tr>
+<td>[Packages]</td>
+<td>列出本模块引用到的所有包的包声明文件，可能引用到的资源包括头文件、GUID、Protocol等，这些资源都声明在包的包声明文件.dec中</td>
+</tr>
+<tr>
+<td>[LibraryClasses]</td>
+<td>列出本模块要链接的库模块</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>非必需块</th>
+<th>块描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[Protocols]</td>
+<td>列出本模块用到的Protocol</td>
+</tr>
+<tr>
+<td>[Guids]</td>
+<td>列出本模块用到的GUID</td>
+</tr>
+<tr>
+<td>[BuildOptions]</td>
+<td>指定编译和链接选项</td>
+</tr>
+<tr>
+<td>[Pcd]</td>
+<td>平台配置数据库，用于列出本模块用到的Pcd变量，这些Pcd变量可被整个UEFI系统访问</td>
+</tr>
+<tr>
+<td>[PcdEx]</td>
+<td>用于列出本模块用到的Pcd变量，这些Pcd变量可被整个UEFI系统访问</td>
+</tr>
+<tr>
+<td>[FixedPcd]</td>
+<td>用于列出本模块用到的Pcd编译期常量</td>
+</tr>
+<tr>
+<td>[FeaturePcd]</td>
+<td>用于列出本模块用到的Pcd常量</td>
+</tr>
+<tr>
+<td>[PatchPcd]</td>
+<td>列出的Pcd变量仅本模块可用</td>
+</tr>
+</tbody></table>
+<h3 id="dsc"><a href="#dsc" class="headerlink" title=".dsc"></a>.dsc</h3><p>用于编译一个Package，分为好几个块：</p>
+<ul>
+<li><p>[Define]</p>
+<ul>
+<li><p>用于设置build相关的全局宏变量，可被.dsc其他块使用</p>
+</li>
+<li><p>通过DEFINE和EDK_GLOBAL定义的宏可以在.dsc和.fdf中通过$+宏变量名使用</p>
+</li>
+<li><p>必须定义的宏变量</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/must.png" srcset="/img/loading.gif" lazyload class title="must">
+</li>
+<li><p>可选宏变量</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/need1.png" srcset="/img/loading.gif" lazyload class title="need1">
+
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/need2.png" srcset="/img/loading.gif" lazyload class title="need2"></li>
+</ul>
+</li>
+<li><p>[LibraryClasses]</p>
+<ul>
+<li>定义了模块的名字和模块.inf文件的路径</li>
+</ul>
+</li>
+<li><p>[Components]</p>
+<ul>
+<li>该区域内定义的模块都会被build工具编译生成.efi文件</li>
+</ul>
+</li>
+<li><p>[BuildOptions]</p>
+<ul>
+<li>编译和链接选项</li>
+</ul>
+</li>
+<li><p>[PCD]</p>
+<ul>
+<li>定义平台配置数据</li>
+</ul>
+</li>
+</ul>
+<h3 id="dec"><a href="#dec" class="headerlink" title=".dec"></a>.dec</h3><p>定义了公开的数据和的接口，供其他模块使用</p>
+<ul>
+<li>[Defines]<ul>
+<li>用于提供package的名称，GUID，版本号等信息</li>
+</ul>
+</li>
+<li>[Includes]<ul>
+<li>列出本package提供的头文件所在目录</li>
+</ul>
+</li>
+<li>[LibraryClasses]<ul>
+<li>对外提供库，每个库都必须包含一个头文件</li>
+</ul>
+</li>
+<li>[Guids]<ul>
+<li>各个.inf文件中的GUID的常量定义</li>
+</ul>
+</li>
+<li>[Protocols]<ul>
+<li>Protocol的GUID值的定义</li>
+</ul>
+</li>
+<li>[Ppis]<ul>
+<li>源文件中用到的PPI的GUID值的定义</li>
+</ul>
+</li>
+<li>[PCD]<ul>
+<li>.dsc文件中[PCD]块的补充</li>
+</ul>
+</li>
+</ul>
+<h2 id="标准应用程序工程模块"><a href="#标准应用程序工程模块" class="headerlink" title="标准应用程序工程模块"></a>标准应用程序工程模块</h2><h3 id="入口函数"><a href="#入口函数" class="headerlink" title="入口函数"></a>入口函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;Uefi.h&gt;</span>	<span class="hljs-comment">// 包含基本数据类型和核心数据结构</span></span><br><br>EFI_STATUS<br>EFIAPI<br><span class="hljs-title function_">UefiMain</span> <span class="hljs-params">(	<span class="hljs-comment">// UEFI标准应用程序通常的入口函数名，由.inf中的ENTRY_POINT定义</span></span><br><span class="hljs-params">  IN EFI_HANDLE        ImageHandle,</span><br><span class="hljs-params">  IN EFI_SYSTEM_TABLE  *SystemTable</span><br><span class="hljs-params">  )</span><br>&#123;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>返回类型EFI_STATUS<ul>
+<li>本质无符号长整数</li>
+<li>最高位1错误值，最高位0非错误值</li>
+<li>EFI_SUCCESS&#x3D;0，表示没有错误的返回值</li>
+</ul>
+</li>
+<li>参数<ul>
+<li>ImageHandle：<ul>
+<li>.efi加载到内存后生成的对象为Image</li>
+<li>ImageHandle是Image的句柄</li>
+</ul>
+</li>
+<li>SystemTable：<ul>
+<li>获取UEFI的各种服务</li>
+<li>全局结构体</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Shell应用程序工程模块"><a href="#Shell应用程序工程模块" class="headerlink" title="Shell应用程序工程模块"></a>Shell应用程序工程模块</h2><h3 id="入口函数-1"><a href="#入口函数-1" class="headerlink" title="入口函数"></a>入口函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">INTN<br>EFIAPI<br><span class="hljs-title function_">ShellAppMain</span> <span class="hljs-params">(</span><br><span class="hljs-params">  IN UINTN   Argc,</span><br><span class="hljs-params">  IN CHAR16  **Argv</span><br><span class="hljs-params">  )</span><br>&#123;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>没有SystemTable参数，通过全局变量gST使用系统表</p>
+<h2 id="UEFI驱动模块"><a href="#UEFI驱动模块" class="headerlink" title="UEFI驱动模块"></a>UEFI驱动模块</h2><ul>
+<li>驱动常驻内存</li>
+<li>应用程序执行完毕后会从内存清楚</li>
+</ul>
+<h3 id="入口函数-2"><a href="#入口函数-2" class="headerlink" title="入口函数"></a>入口函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">EFI_STATUS<br>EFIAPI<br><span class="hljs-title function_">InitializePciSioSerial</span> <span class="hljs-params">(</span><br><span class="hljs-params">  IN EFI_HANDLE        ImageHandle,</span><br><span class="hljs-params">  IN EFI_SYSTEM_TABLE  *SystemTable</span><br><span class="hljs-params">  )</span><br>&#123;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="UEFI中的Protocol"><a href="#UEFI中的Protocol" class="headerlink" title="UEFI中的Protocol"></a>UEFI中的Protocol</h1><p>UEFI中的Protocol引入了面向对象的思想：</p>
+<ul>
+<li>用struct模拟class</li>
+<li>用函数指针模拟成员函数<ul>
+<li>这种函数的第一参数必须是指向Protocol的指针</li>
+<li>用来模拟this指针</li>
+</ul>
+</li>
+</ul>
+<p>一个Protocol实例例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// MdePkg\Include\Protocol\BlockIo.h</span><br><br><span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">EFI_BLOCK_IO_PROTOCOL</span> &#123;</span><br>  UINT64                Revision;<br>  EFI_BLOCK_IO_MEDIA    *Media;<br><br>  EFI_BLOCK_RESET       Reset;<br>  EFI_BLOCK_READ        ReadBlocks;<br>  EFI_BLOCK_WRITE       WriteBlocks;<br>  EFI_BLOCK_FLUSH       FlushBlocks;<br>&#125;;<br><br><span class="hljs-keyword">extern</span> EFI_GUID  gEfiBlockIoProtocolGuid;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// MdePkg\MdePkg.dec</span><br><br>  ## Include/Protocol/BlockIo.h<br>  gEfiBlockIoProtocolGuid        = &#123; <span class="hljs-number">0x964E5B21</span>, <span class="hljs-number">0x6459</span>, <span class="hljs-number">0x11D2</span>, &#123; <span class="hljs-number">0x8E</span>, <span class="hljs-number">0x39</span>, <span class="hljs-number">0x00</span>, <span class="hljs-number">0xA0</span>, <span class="hljs-number">0xC9</span>, <span class="hljs-number">0x69</span>, <span class="hljs-number">0x72</span>, <span class="hljs-number">0x3B</span> &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// MdePkg\Include\Protocol\BlockIo.h</span><br><br><span class="hljs-keyword">typedef</span><br><span class="hljs-title function_">EFI_STATUS</span><br><span class="hljs-params">(EFIAPI *EFI_BLOCK_READ)</span><span class="hljs-params">(</span><br><span class="hljs-params">  IN EFI_BLOCK_IO_PROTOCOL          *This,</span><br><span class="hljs-params">  IN UINT32                         MediaId,</span><br><span class="hljs-params">  IN EFI_LBA                        Lba,</span><br><span class="hljs-params">  IN UINTN                          BufferSize,</span><br><span class="hljs-params">  OUT VOID                          *Buffer</span><br><span class="hljs-params">  )</span>;<br></code></pre></td></tr></table></figure>
+
+<h2 id="Protocol在UEFI内核中的表示"><a href="#Protocol在UEFI内核中的表示" class="headerlink" title="Protocol在UEFI内核中的表示"></a>Protocol在UEFI内核中的表示</h2><ul>
+<li><p>EFI_HANDLE：UEFI用于表示指向一个对象的指针</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> VOID *EFI_HANDLE;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>Controller：一个EFI_HANDLE对象<ul>
+<li>用于控制设备</li>
+<li>UEFI扫描总线后会为所有设备建立一个Controller</li>
+</ul>
+</li>
+<li>Image：也是一个EFI_HANDLE对象<ul>
+<li>.efi文件被加载进内存后建立</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>IHANDLE：EFI_HANDLE指向的对象表示结构体</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>  UINTN         Signature;<br>  <span class="hljs-comment">/// All handles list of IHANDLE</span><br>  LIST_ENTRY    AllHandles;<br>  <span class="hljs-comment">/// List of PROTOCOL_INTERFACE&#x27;s for this handle</span><br>  LIST_ENTRY    Protocols;<br>  UINTN         LocateRequest;<br>  <span class="hljs-comment">/// The Handle Database Key value when this handle was last created or modified</span><br>  UINT64        Key;<br>&#125; IHANDLE;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>PROTOCOL_INTERFACE：表示handle和Protocol的接口</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>  UINTN             Signature;<br>  <span class="hljs-comment">/// Link on IHANDLE.Protocols</span><br>  LIST_ENTRY        Link;<br>  <span class="hljs-comment">/// Back pointer</span><br>  IHANDLE           *Handle;<br>  <span class="hljs-comment">/// Link on PROTOCOL_ENTRY.Protocols</span><br>  LIST_ENTRY        ByProtocol;<br>  <span class="hljs-comment">/// The protocol ID</span><br>  PROTOCOL_ENTRY    *Protocol;<br>  <span class="hljs-comment">/// The interface value</span><br>  VOID              *Interface;<br>  <span class="hljs-comment">/// OPEN_PROTOCOL_DATA list</span><br>  LIST_ENTRY        OpenList;<br>  UINTN             OpenListCount;<br>&#125; PROTOCOL_INTERFACE;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>PROTOCOL_ENTRY：表示Protocol的GUID</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>  UINTN         Signature;<br>  <span class="hljs-comment">/// Link Entry inserted to mProtocolDatabase</span><br>  LIST_ENTRY    AllEntries;<br>  <span class="hljs-comment">/// ID of the protocol</span><br>  EFI_GUID      ProtocolID;<br>  <span class="hljs-comment">/// All protocol interfaces</span><br>  LIST_ENTRY    Protocols;<br>  <span class="hljs-comment">/// Registerd notification handlers</span><br>  LIST_ENTRY    Notify;<br>&#125; PROTOCOL_ENTRY;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>几个结构体之间的关系：</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/handle.png" srcset="/img/loading.gif" lazyload class title="handle">
+
+<h2 id="如何使用Protocol"><a href="#如何使用Protocol" class="headerlink" title="如何使用Protocol"></a>如何使用Protocol</h2><p>使用Protocol的一般步骤：</p>
+<ul>
+<li><p>找出Protocol对象</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">gBS-&gt;OpenProtocol / HandleProtocol / LocateProtocol<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>使用这个Protocol提供的服务</p>
+</li>
+<li><p>关闭打开的Protocol</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">gBs-&gt;CloseProtocol<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="OpenProtocol"><a href="#OpenProtocol" class="headerlink" title="OpenProtocol"></a>OpenProtocol</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span><br><span class="hljs-title function_">EFI_STATUS</span><br><span class="hljs-params">(EFIAPI *EFI_OPEN_PROTOCOL)</span><span class="hljs-params">(</span><br><span class="hljs-params">  IN  EFI_HANDLE                Handle,		<span class="hljs-comment">// 指定的Handle，将查询并打开此Handle中安装的Protocol</span></span><br><span class="hljs-params">  IN  EFI_GUID                  *Protocol,	<span class="hljs-comment">// 要打开的Protocol GUID</span></span><br><span class="hljs-params">  OUT VOID                      **Interface  OPTIONAL,	<span class="hljs-comment">// 返回打开的Protocol对象</span></span><br><span class="hljs-params">  IN  EFI_HANDLE                AgentHandle,		<span class="hljs-comment">// 打开此Protocol的Image</span></span><br><span class="hljs-params">  IN  EFI_HANDLE                ControllerHandle,	<span class="hljs-comment">// 使用此Protocol的控制器</span></span><br><span class="hljs-params">  IN  UINT32                    Attributes			<span class="hljs-comment">// 打开Protocol的方式</span></span><br><span class="hljs-params">  )</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="HandleProtocol"><a href="#HandleProtocol" class="headerlink" title="HandleProtocol"></a>HandleProtocol</h3><p>OpenProtocol的简化</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span><br><span class="hljs-title function_">EFI_STATUS</span><br><span class="hljs-params">(EFIAPI *EFI_HANDLE_PROTOCOL)</span><span class="hljs-params">(</span><br><span class="hljs-params">  IN  EFI_HANDLE               Handle,</span><br><span class="hljs-params">  IN  EFI_GUID                 *Protocol,</span><br><span class="hljs-params">  OUT VOID                     **Interface</span><br><span class="hljs-params">  )</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="LocateProtocol"><a href="#LocateProtocol" class="headerlink" title="LocateProtocol"></a>LocateProtocol</h3><p>从UEFI内核中找出指定Protocol的第一个实例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span><br><span class="hljs-title function_">EFI_STATUS</span><br><span class="hljs-params">(EFIAPI *EFI_LOCATE_PROTOCOL)</span><span class="hljs-params">(</span><br><span class="hljs-params">  IN  EFI_GUID  *Protocol,</span><br><span class="hljs-params">  IN  VOID      *Registration  OPTIONAL,</span><br><span class="hljs-params">  OUT VOID      **Interface</span><br><span class="hljs-params">  )</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="CloseProtocol"><a href="#CloseProtocol" class="headerlink" title="CloseProtocol"></a>CloseProtocol</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span><br><span class="hljs-title function_">EFI_STATUS</span><br><span class="hljs-params">(EFIAPI *EFI_CLOSE_PROTOCOL)</span><span class="hljs-params">(</span><br><span class="hljs-params">  IN EFI_HANDLE               Handle,</span><br><span class="hljs-params">  IN EFI_GUID                 *Protocol,</span><br><span class="hljs-params">  IN EFI_HANDLE               AgentHandle,</span><br><span class="hljs-params">  IN EFI_HANDLE               ControllerHandle</span><br><span class="hljs-params">  )</span>;<br></code></pre></td></tr></table></figure>
+
+<h1 id="UEFI基础服务"><a href="#UEFI基础服务" class="headerlink" title="UEFI基础服务"></a>UEFI基础服务</h1><h2 id="系统表"><a href="#系统表" class="headerlink" title="系统表"></a>系统表</h2><ul>
+<li>用户空间通向系统空间的通道</li>
+<li>DXE阶段初始化</li>
+<li>全局结构体</li>
+</ul>
+<h3 id="应用程序和驱动如何访问"><a href="#应用程序和驱动如何访问" class="headerlink" title="应用程序和驱动如何访问"></a>应用程序和驱动如何访问</h3><p>系统表指针作为Image入口函数的参数传递到用户空间</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span><br><span class="hljs-title function_">EFI_STATUS</span><br><span class="hljs-params">(EFIAPI *EFI_IMAGE_ENTRY_POINT)</span><span class="hljs-params">(</span><br><span class="hljs-params">  IN  EFI_HANDLE                   ImageHandle,	<span class="hljs-comment">// Image的句柄</span></span><br><span class="hljs-params">  IN  EFI_SYSTEM_TABLE             *SystemTable <span class="hljs-comment">// 系统表指针</span></span><br><span class="hljs-params">  )</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="系统表构成"><a href="#系统表构成" class="headerlink" title="系统表构成"></a>系统表构成</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>  EFI_TABLE_HEADER                   Hdr;					<span class="hljs-comment">// 标准UEFI表头</span><br>  CHAR16                             *FirmwareVendor;		 <span class="hljs-comment">// 固件提供商</span><br>  UINT32                             FirmwareRevision;		 <span class="hljs-comment">// 固件版本号</span><br>  EFI_HANDLE                         ConsoleInHandle;		 <span class="hljs-comment">// 输入控制台的句柄</span><br>  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *ConIn;<br>  EFI_HANDLE                         ConsoleOutHandle;		 <span class="hljs-comment">// 输出控制台的句柄</span><br>  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *ConOut;<br>  EFI_HANDLE                         StandardErrorHandle;	  <span class="hljs-comment">// 标准错误控制台的句柄</span><br>  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *StdErr;<br>  EFI_RUNTIME_SERVICES               *RuntimeServices;		 <span class="hljs-comment">// RT服务表</span><br>  EFI_BOOT_SERVICES                  *BootServices;			 <span class="hljs-comment">// BS服务表</span><br>  UINTN                              NumberOfTableEntries;	  <span class="hljs-comment">// ConfigurationTable数组大小</span><br>  EFI_CONFIGURATION_TABLE            *ConfigurationTable;	  <span class="hljs-comment">// 系统配置表数组</span><br>&#125; EFI_SYSTEM_TABLE;<br></code></pre></td></tr></table></figure>
+
+<h2 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a>启动服务</h2><p>启动服务分为以下几类：</p>
+<ul>
+<li><p>UEFI事件服务</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/event.png" srcset="/img/loading.gif" lazyload class title="event">
+</li>
+<li><p>内存管理服务</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/mem.png" srcset="/img/loading.gif" lazyload class title="mem">
+</li>
+<li><p>Protocol管理服务</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/protocol.png" srcset="/img/loading.gif" lazyload class title="protocol">
+</li>
+<li><p>Protocol使用类服务</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/use.png" srcset="/img/loading.gif" lazyload class title="use">
+</li>
+<li><p>驱动管理服务</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/drive.png" srcset="/img/loading.gif" lazyload class title="drive">
+</li>
+<li><p>Image管理服务</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/image.png" srcset="/img/loading.gif" lazyload class title="image">
+</li>
+<li><p>ExitBootService服务</p>
+</li>
+<li><p>其他</p>
+<img src="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/etc.png" srcset="/img/loading.gif" lazyload class title="etc"></li>
+</ul>
+<h2 id="运行时服务"><a href="#运行时服务" class="headerlink" title="运行时服务"></a>运行时服务</h2><ul>
+<li>时间服务<ul>
+<li>读取 &#x2F; 设定系统时间</li>
+<li>读取 &#x2F; 设定系统从睡眠中唤醒的时间</li>
+</ul>
+</li>
+<li>读写系统变量服务<ul>
+<li>读取 &#x2F; 设置系统变量</li>
+</ul>
+</li>
+<li>虚拟内存服务<ul>
+<li>将物理内存转化为虚拟内存</li>
+</ul>
+</li>
+<li>其他服务</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/UEFI/" class="category-chain-item">UEFI</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/uefi/" class="print-no-link">#uefi</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>《UEFI原理与编程》读书笔记</div>
+      <div>http://akaieurus.github.io/2024/03/27/UEFI原理与编程读书笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年3月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/" title="2024 阿里云CTF klang wp">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2024 阿里云CTF klang wp</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/" title="2024 DubheCTF pwn wp">
+                        <span class="hidden-mobile">2024 DubheCTF pwn wp</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

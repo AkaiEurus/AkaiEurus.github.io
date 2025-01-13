@@ -1,0 +1,1019 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="研究了好几天终于搞清楚llvm的结构了，其实没必要但……一些pwn手对数据结构和内存分布的执着 过程及其坎坷，光编译一个带符号的.so文件就编译了好几次(╯‵□′)╯︵┻━┻（因为想看内存分布）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLVM IR数据结构分析">
+<meta property="og:url" content="http://akaieurus.github.io/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="研究了好几天终于搞清楚llvm的结构了，其实没必要但……一些pwn手对数据结构和内存分布的执着 过程及其坎坷，光编译一个带符号的.so文件就编译了好几次(╯‵□′)╯︵┻━┻（因为想看内存分布）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc32.jpg">
+<meta property="article:published_time" content="2023-10-01T16:50:44.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:52:32.473Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="llvm">
+<meta property="article:tag" content="ir">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc32.jpg">
+  
+  
+  
+  <title>LLVM IR数据结构分析 - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc32.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="LLVM IR数据结构分析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-10-02 00:50" pubdate>
+          2023年10月2日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          36 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">LLVM IR数据结构分析</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>研究了好几天终于搞清楚llvm的结构了，其实没必要但……一些pwn手对数据结构和内存分布的执着</p>
+<p>过程及其坎坷，光编译一个带符号的.so文件就编译了好几次(╯‵□′)╯︵┻━┻（因为想看内存分布）</p>
+<img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/wjx.png" srcset="/img/loading.gif" lazyload class title="wjx">
+
+<span id="more"></span>
+
+<p>先放一张复杂的图（</p>
+<img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/LLVM-IR.png" srcset="/img/loading.gif" lazyload class title="LLVM-IR">
+
+<h2 id="LLVMContext"><a href="#LLVMContext" class="headerlink" title="LLVMContext"></a>LLVMContext</h2><ul>
+<li><p>一个黑盒，管理llvm中基础的、核心的“全局”数据，如类型、标准化的常量表</p>
+</li>
+<li><p>LLVMContext包含了llvm在一个线程中正常运行（比如一个编译任务）所需要的数据，在老版本中这些都是全局数据，现在他们被打包成了一个类LLVMContext，这样llvm就可以支持多线程的编译任务了</p>
+</li>
+<li><p>之后会作为传入参数多次用到，不需要具体知道是什么（</p>
+</li>
+<li><p>Module类中有context成员</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Module</span> &#123;  <br><span class="hljs-keyword">private</span>:<br>  LLVMContext &amp;Context;    <br></code></pre></td></tr></table></figure>
+</li>
+<li><p>创建一个LLVMContext</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">LLVMContext &amp; context = llvm::<span class="hljs-built_in">getGlobalContext</span>();<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>LLVMContext删除了拷贝构造函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-built_in">LLVMContext</span>(LLVMContext &amp;) = <span class="hljs-keyword">delete</span>;<br></code></pre></td></tr></table></figure>
+
+<p>这样就不行</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">LLVMContext context1;<br><span class="hljs-function">LLVMContext <span class="hljs-title">context2</span><span class="hljs-params">(context1)</span></span>;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>LLVMContext删除了拷贝赋值运算符</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">LLVMContext &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> LLVMContext &amp;) = <span class="hljs-keyword">delete</span>;<br></code></pre></td></tr></table></figure>
+
+<p>这样会不行</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp">LLVMContext context1;<br>LLVMContext context2;<br>context2 = context1<br></code></pre></td></tr></table></figure>
+
+<p>要注意使用引用</p>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="Module"><a href="#Module" class="headerlink" title="Module"></a>Module</h1><p>一些碎碎念：c++太恶心了，嵌套n层类就是一个双链表</p>
+<img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/%E6%81%B6%E5%BF%83%E7%9A%84c++.png" srcset="/img/loading.gif" lazyload class title="恶心的c++">
+
+<p>Module主要的成员主要是函数和全局变量的两个链表</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Module</span> &#123;<br>  <span class="hljs-keyword">using</span> GlobalListType = SymbolTableList&lt;GlobalVariable&gt;;<br>  <span class="hljs-keyword">using</span> FunctionListType = SymbolTableList&lt;Function&gt;;<br>    <br><span class="hljs-keyword">private</span>:<br>  GlobalListType GlobalList;<br>  FunctionListType FunctionList; <br></code></pre></td></tr></table></figure>
+
+<p>内存分布大概长这样👇</p>
+<img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/Module.png" srcset="/img/loading.gif" lazyload class title="Module">
+
+<h2 id="创建一个Module"><a href="#创建一个Module" class="headerlink" title="创建一个Module"></a>创建一个Module</h2><p>创建一个Module，需要一个名字和一个LLVMContext</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-built_in">Module</span>(StringRef ModuleID, LLVMContext&amp; C);<br></code></pre></td></tr></table></figure>
+
+<p>一个🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">LLVMContext &amp; context = llvm::<span class="hljs-built_in">getGlobalContext</span>();<br>Module* <span class="hljs-keyword">module</span> = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Module</span>(<span class="hljs-string">&quot;test&quot;</span>, context);<br></code></pre></td></tr></table></figure>
+
+<h2 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h2><ul>
+<li><p>Function</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/// @&#125;</span><br><span class="hljs-comment">/// @name Function Iteration</span><br><span class="hljs-comment">/// @&#123;</span><br><br>  <span class="hljs-function">iterator                <span class="hljs-title">begin</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">begin</span>(); &#125;<br>  <span class="hljs-function">const_iterator          <span class="hljs-title">begin</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">begin</span>(); &#125;<br>  <span class="hljs-function">iterator                <span class="hljs-title">end</span>  <span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">end</span>();   &#125;<br>  <span class="hljs-function">const_iterator          <span class="hljs-title">end</span>  <span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">end</span>();   &#125;<br>  <span class="hljs-function">reverse_iterator        <span class="hljs-title">rbegin</span><span class="hljs-params">()</span>      </span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">rbegin</span>(); &#125;<br>  <span class="hljs-function">const_reverse_iterator  <span class="hljs-title">rbegin</span><span class="hljs-params">()</span> <span class="hljs-type">const</span></span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">rbegin</span>(); &#125;<br>  <span class="hljs-function">reverse_iterator        <span class="hljs-title">rend</span><span class="hljs-params">()</span>        </span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">rend</span>(); &#125;<br>  <span class="hljs-function">const_reverse_iterator  <span class="hljs-title">rend</span><span class="hljs-params">()</span> <span class="hljs-type">const</span>  </span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">rend</span>(); &#125;<br>  <span class="hljs-function"><span class="hljs-type">size_t</span>                  <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-type">const</span>  </span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">size</span>(); &#125;<br>  <span class="hljs-function"><span class="hljs-type">bool</span>                    <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> FunctionList.<span class="hljs-built_in">empty</span>(); &#125;<br><br>  <span class="hljs-function">iterator_range&lt;iterator&gt; <span class="hljs-title">functions</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">make_range</span>(<span class="hljs-built_in">begin</span>(), <span class="hljs-built_in">end</span>());<br>  &#125;<br>  <span class="hljs-function">iterator_range&lt;const_iterator&gt; <span class="hljs-title">functions</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">make_range</span>(<span class="hljs-built_in">begin</span>(), <span class="hljs-built_in">end</span>());<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Module *<span class="hljs-keyword">module</span>;<br><span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> &amp;func : *<span class="hljs-keyword">module</span>);<br><span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> &amp;func : <span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">functions</span>());<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>Global Variable</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/// @&#125;</span><br><span class="hljs-comment">/// @name Global Variable Iteration</span><br><span class="hljs-comment">/// @&#123;</span><br><br>  <span class="hljs-function">global_iterator       <span class="hljs-title">global_begin</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> GlobalList.<span class="hljs-built_in">begin</span>(); &#125;<br>  <span class="hljs-function">const_global_iterator <span class="hljs-title">global_begin</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> GlobalList.<span class="hljs-built_in">begin</span>(); &#125;<br>  <span class="hljs-function">global_iterator       <span class="hljs-title">global_end</span>  <span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> GlobalList.<span class="hljs-built_in">end</span>(); &#125;<br>  <span class="hljs-function">const_global_iterator <span class="hljs-title">global_end</span>  <span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> GlobalList.<span class="hljs-built_in">end</span>(); &#125;<br>  <span class="hljs-function"><span class="hljs-type">size_t</span>                <span class="hljs-title">global_size</span> <span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> GlobalList.<span class="hljs-built_in">size</span>(); &#125;<br>  <span class="hljs-function"><span class="hljs-type">bool</span>                  <span class="hljs-title">global_empty</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> GlobalList.<span class="hljs-built_in">empty</span>(); &#125;<br><br>  <span class="hljs-function">iterator_range&lt;global_iterator&gt; <span class="hljs-title">globals</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">make_range</span>(<span class="hljs-built_in">global_begin</span>(), <span class="hljs-built_in">global_end</span>());<br>  &#125;<br>  <span class="hljs-function">iterator_range&lt;const_global_iterator&gt; <span class="hljs-title">globals</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">make_range</span>(<span class="hljs-built_in">global_begin</span>(), <span class="hljs-built_in">global_end</span>());<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Module *<span class="hljs-keyword">module</span>;<br><span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> &amp;var : <span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">globals</span>());<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="获取列表"><a href="#获取列表" class="headerlink" title="获取列表"></a>获取列表</h2><ul>
+<li><p>Function</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/// Get the Module&#x27;s list of functions (constant).</span><br><span class="hljs-function"><span class="hljs-type">const</span> FunctionListType &amp;<span class="hljs-title">getFunctionList</span><span class="hljs-params">()</span> <span class="hljs-type">const</span>     </span>&#123; <span class="hljs-keyword">return</span> FunctionList; &#125;<br><span class="hljs-comment">/// Get the Module&#x27;s list of functions.</span><br><span class="hljs-function">FunctionListType       &amp;<span class="hljs-title">getFunctionList</span><span class="hljs-params">()</span>           </span>&#123; <span class="hljs-keyword">return</span> FunctionList; &#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>Global Variable</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/// Get the Module&#x27;s list of global variables (constant).</span><br><span class="hljs-function"><span class="hljs-type">const</span> GlobalListType   &amp;<span class="hljs-title">getGlobalList</span><span class="hljs-params">()</span> <span class="hljs-type">const</span>       </span>&#123; <span class="hljs-keyword">return</span> GlobalList; &#125;<br><span class="hljs-comment">/// Get the Module&#x27;s list of global variables.</span><br><span class="hljs-function">GlobalListType         &amp;<span class="hljs-title">getGlobalList</span><span class="hljs-params">()</span>             </span>&#123; <span class="hljs-keyword">return</span> GlobalList; &#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="函数操作"><a href="#函数操作" class="headerlink" title="函数操作"></a>函数操作</h2><p>查找函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">Function *<span class="hljs-title">getFunction</span><span class="hljs-params">(StringRef Name)</span> <span class="hljs-type">const</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Module *<span class="hljs-keyword">module</span>;<br>Function *pmain = <span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getFunction</span>(<span class="hljs-string">&quot;main&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<h3 id="查找Or插入函数"><a href="#查找Or插入函数" class="headerlink" title="查找Or插入函数"></a>查找Or插入函数</h3><p>Module中提供了一系列插入or查找Function的函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">FunctionCallee <span class="hljs-title">getOrInsertFunction</span><span class="hljs-params">(StringRef Name, FunctionType *T,</span></span><br><span class="hljs-params"><span class="hljs-function">                                     AttributeList AttributeList)</span></span>;<br><span class="hljs-function">FunctionCallee <span class="hljs-title">getOrInsertFunction</span><span class="hljs-params">(StringRef Name, FunctionType *T)</span></span>;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... ArgsTy&gt;<br><span class="hljs-function">FunctionCallee <span class="hljs-title">getOrInsertFunction</span><span class="hljs-params">(StringRef Name,</span></span><br><span class="hljs-params"><span class="hljs-function">                                     AttributeList AttributeList, Type *RetTy,</span></span><br><span class="hljs-params"><span class="hljs-function">                                     ArgsTy... Args)</span></span>;<br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... ArgsTy&gt;<br><span class="hljs-function">FunctionCallee <span class="hljs-title">getOrInsertFunction</span><span class="hljs-params">(StringRef Name, Type *RetTy,</span></span><br><span class="hljs-params"><span class="hljs-function">                                     ArgsTy... Args)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>需要</p>
+<ul>
+<li><p>StringRef Name：函数名</p>
+</li>
+<li><p>Type *RetTy：返回值类型</p>
+<p>Type类型提供了构造各种类型的静态函数，只需要提供Module的Context</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getVoidTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getLabelTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getHalfTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getBFloatTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getFloatTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getDoubleTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getMetadataTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getX86_FP80Ty</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getFP128Ty</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getPPC_FP128Ty</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getX86_MMXTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getX86_AMXTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> Type *<span class="hljs-title">getTokenTy</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> IntegerType *<span class="hljs-title">getIntNTy</span><span class="hljs-params">(LLVMContext &amp;C, <span class="hljs-type">unsigned</span> N)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> IntegerType *<span class="hljs-title">getInt1Ty</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> IntegerType *<span class="hljs-title">getInt8Ty</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> IntegerType *<span class="hljs-title">getInt16Ty</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> IntegerType *<span class="hljs-title">getInt32Ty</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> IntegerType *<span class="hljs-title">getInt64Ty</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br><span class="hljs-function"><span class="hljs-type">static</span> IntegerType *<span class="hljs-title">getInt128Ty</span><span class="hljs-params">(LLVMContext &amp;C)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>🌰，记得命名空间</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>())<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>ArgsTy… Args：每个参数的类型</p>
+</li>
+<li><p>FunctionType *T：函数类型（其实就是参数类型和返回值类型的集合），可以通过get方法构造</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">FunctionType</span> : <span class="hljs-keyword">public</span> Type &#123;<br>  <span class="hljs-function"><span class="hljs-type">static</span> FunctionType *<span class="hljs-title">get</span><span class="hljs-params">(Type *Result,</span></span><br><span class="hljs-params"><span class="hljs-function">                           ArrayRef&lt;Type*&gt; Params, <span class="hljs-type">bool</span> isVarArg)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>🌰，isVarArg是是否支持可变参数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">FunctionType *funcTy = FunctionType::<span class="hljs-built_in">get</span>(ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>()), &#123;ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>()), ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>())&#125;, <span class="hljs-literal">false</span>);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>AttributeList AttributeList：先忽略（</p>
+</li>
+</ul>
+<p>🌰🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">FunctionType *funcTy = FunctionType::<span class="hljs-built_in">get</span>(ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>()), &#123;ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>()), ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>())&#125;, <span class="hljs-literal">false</span>);<br>FunctionCallee callee = <span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getOrInsertFunction</span>(<span class="hljs-string">&quot;myadd&quot;</span>, funcTy);<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">FunctionCallee callee = <span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getOrInsertFunction</span>(<span class="hljs-string">&quot;myadd&quot;</span>, ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>()), ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>()),ArrayType::<span class="hljs-built_in">getInt32Ty</span>(<span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getContext</span>()));<br></code></pre></td></tr></table></figure>
+
+<p>返回值类型是FunctionCallee，成员为一个Value指针和一个FunctionType指针</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">FunctionCallee</span> &#123;<br><br><span class="hljs-keyword">private</span>:<br>  FunctionType *FnTy = <span class="hljs-literal">nullptr</span>;<br>  Value *Callee = <span class="hljs-literal">nullptr</span>;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>可以通过public方法获取这两个成员</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">FunctionType *<span class="hljs-title">getFunctionType</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> FnTy; &#125;<br><span class="hljs-function">Value *<span class="hljs-title">getCallee</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> Callee; &#125;<br></code></pre></td></tr></table></figure>
+
+<p>这个Value指针实际上就是指向构造的Function，从getOrInsertFunction源码可以看出来</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">FunctionCallee <span class="hljs-title">Module::getOrInsertFunction</span><span class="hljs-params">(StringRef Name, FunctionType *Ty,</span></span><br><span class="hljs-params"><span class="hljs-function">                                           AttributeList AttributeList)</span> </span>&#123;<br>  <span class="hljs-comment">// See if we have a definition for the specified function already.</span><br>  GlobalValue *F = <span class="hljs-built_in">getNamedValue</span>(Name);<br>  <span class="hljs-keyword">if</span> (!F) &#123;<br>    <span class="hljs-comment">// Nope, add it</span><br>    Function *New = Function::<span class="hljs-built_in">Create</span>(Ty, GlobalVariable::ExternalLinkage,<br>                                     DL.<span class="hljs-built_in">getProgramAddressSpace</span>(), Name);<br>    <span class="hljs-keyword">if</span> (!New-&gt;<span class="hljs-built_in">isIntrinsic</span>())       <span class="hljs-comment">// Intrinsics get attrs set on construction</span><br>      New-&gt;<span class="hljs-built_in">setAttributes</span>(AttributeList);<br>    FunctionList.<span class="hljs-built_in">push_back</span>(New);<br>    <span class="hljs-keyword">return</span> &#123;Ty, New&#125;; <span class="hljs-comment">// Return the new prototype.</span><br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>使用的时候需要类型转换</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Function *customFunc = <span class="hljs-built_in">dyn_cast</span>&lt;Function&gt;(callee.<span class="hljs-built_in">getCallee</span>());<br></code></pre></td></tr></table></figure>
+
+<h1 id="Value，User和Use"><a href="#Value，User和Use" class="headerlink" title="Value，User和Use"></a>Value，User和Use</h1><img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/def-use.png" srcset="/img/loading.gif" lazyload class title="def-use">
+
+<p>一个形如<code>%1 = add i32 %2, %3</code>这里这个Instruction就是User（Value的使用者），%2、%3就是被使用的Value，Use就是这个使用的行为，在数据结构中体现为两点（User和Value）之间的一条边</p>
+<h2 id="Value"><a href="#Value" class="headerlink" title="Value"></a>Value</h2><p>Value类中有一个UseList成员</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Value</span> &#123;<br>  Use *UseList;<br></code></pre></td></tr></table></figure>
+
+<p>指向第一个Use</p>
+<h2 id="Use"><a href="#Use" class="headerlink" title="Use"></a>Use</h2><p>一个Value被使用的所有Use以链表的形式连在一起</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Use</span> &#123;<br><span class="hljs-keyword">private</span>:<br>  Value *Val = <span class="hljs-literal">nullptr</span>;<br>  Use *Next = <span class="hljs-literal">nullptr</span>;<br>  Use **Prev = <span class="hljs-literal">nullptr</span>;<br>  User *Parent = <span class="hljs-literal">nullptr</span>;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>Val：指向被使用的Value</li>
+<li>Next：指向下一个Use</li>
+<li>Prev：指向上一个Prev</li>
+<li>Parent：指向User</li>
+</ul>
+<h2 id="User"><a href="#User" class="headerlink" title="User"></a>User</h2><p>Use会放在User结构体前，如上图所示👆</p>
+<p>Use结构体有两种放置方式</p>
+<ul>
+<li><p>固定个数的Use，以数组的形式放在User前</p>
+<img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/use1.png" srcset="/img/loading.gif" lazyload class title="use1">
+</li>
+<li><p>不定个数的Use，一个Use放在User前，这个Use的Prev指针指向Use数组</p>
+<img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/use2.png" srcset="/img/loading.gif" lazyload class title="use2"></li>
+</ul>
+<p>这点可以通过getOperandList函数看出来</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// HasHungOffUses是Value的成员  </span><br><br><span class="hljs-function"><span class="hljs-type">const</span> Use *<span class="hljs-title">getOperandList</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> HasHungOffUses ? <span class="hljs-built_in">getHungOffOperands</span>() : <span class="hljs-built_in">getIntrusiveOperands</span>();<br>  &#125;<br><br><span class="hljs-function"><span class="hljs-type">const</span> Use *<span class="hljs-title">getHungOffOperands</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> *(<span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">const</span> Use *<span class="hljs-type">const</span> *&gt;(<span class="hljs-keyword">this</span>) - <span class="hljs-number">1</span>);<br>  &#125;<br><span class="hljs-function"><span class="hljs-type">const</span> Use *<span class="hljs-title">getIntrusiveOperands</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">const</span> Use *&gt;(<span class="hljs-keyword">this</span>) - NumUserOperands;<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>当HasHungOffUses为0时，Use的Prev指向前一个Use的Next，由于Prev是Use**类型所以其实还是指向自己（</p>
+<h1 id="GlobalVariable"><a href="#GlobalVariable" class="headerlink" title="GlobalVariable"></a>GlobalVariable</h1><p>储存全局变量相关信息</p>
+<img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/GlobalVariable.png" srcset="/img/loading.gif" lazyload class title="GlobalVariable">
+
+<h2 id="相关操作"><a href="#相关操作" class="headerlink" title="相关操作"></a>相关操作</h2><ul>
+<li><p>创建一个GlobalVariable</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-built_in">GlobalVariable</span>(Type *Ty, <span class="hljs-type">bool</span> isConstant, LinkageTypes Linkage,<br>               Constant *Initializer = <span class="hljs-literal">nullptr</span>, <span class="hljs-type">const</span> Twine &amp;Name = <span class="hljs-string">&quot;&quot;</span>,<br>               ThreadLocalMode = NotThreadLocal, <span class="hljs-type">unsigned</span> AddressSpace = <span class="hljs-number">0</span>,<br>               <span class="hljs-type">bool</span> isExternallyInitialized = <span class="hljs-literal">false</span>);<br>  <br><span class="hljs-built_in">GlobalVariable</span>(Module &amp;M, Type *Ty, <span class="hljs-type">bool</span> isConstant, LinkageTypes Linkage,<br>               Constant *Initializer, <span class="hljs-type">const</span> Twine &amp;Name = <span class="hljs-string">&quot;&quot;</span>,<br>               GlobalVariable *InsertBefore = <span class="hljs-literal">nullptr</span>,<br>               ThreadLocalMode = NotThreadLocal,<br>               Optional&lt;<span class="hljs-type">unsigned</span>&gt; AddressSpace = None,<br>               <span class="hljs-type">bool</span> isExternallyInitialized = <span class="hljs-literal">false</span>);<br>  <br><span class="hljs-built_in">GlobalVariable</span>(<span class="hljs-type">const</span> GlobalVariable &amp;) = <span class="hljs-keyword">delete</span>;<br>GlobalVariable &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> GlobalVariable &amp;) = <span class="hljs-keyword">delete</span>;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>判断是否能在运行时修改</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">isConstant</span><span class="hljs-params">()</span> <span class="hljs-type">const</span></span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h1><p>主要成员有</p>
+<ul>
+<li>一个Arguments指针，指向Argument数组</li>
+<li>一个BasicBlock双链表</li>
+</ul>
+<img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/Function.png" srcset="/img/loading.gif" lazyload class title="Function">
+
+<h2 id="相关操作-1"><a href="#相关操作-1" class="headerlink" title="相关操作"></a>相关操作</h2><ul>
+<li><p>迭代器，相关操作同Module</p>
+<ul>
+<li><p>BasicBlock迭代器</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//===--------------------------------------------------------------------===//</span><br><span class="hljs-comment">// BasicBlock iterator forwarding functions</span><br><span class="hljs-comment">//</span><br><span class="hljs-function">iterator                <span class="hljs-title">begin</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">begin</span>(); &#125;<br><span class="hljs-function">const_iterator          <span class="hljs-title">begin</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">begin</span>(); &#125;<br><span class="hljs-function">iterator                <span class="hljs-title">end</span>  <span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">end</span>();   &#125;<br><span class="hljs-function">const_iterator          <span class="hljs-title">end</span>  <span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">end</span>();   &#125;<br>    <br><span class="hljs-function"><span class="hljs-type">size_t</span>                   <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">size</span>();  &#125;<br><span class="hljs-function"><span class="hljs-type">bool</span>                    <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">empty</span>(); &#125;<br><span class="hljs-function"><span class="hljs-type">const</span> BasicBlock       &amp;<span class="hljs-title">front</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">front</span>(); &#125;<br>      <span class="hljs-function">BasicBlock       &amp;<span class="hljs-title">front</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">front</span>(); &#125;<br><span class="hljs-function"><span class="hljs-type">const</span> BasicBlock        &amp;<span class="hljs-title">back</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">back</span>();  &#125;<br>      <span class="hljs-function">BasicBlock        &amp;<span class="hljs-title">back</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> BasicBlocks.<span class="hljs-built_in">back</span>();  &#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>Argument迭代器</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">arg_iterator <span class="hljs-title">arg_begin</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-built_in">CheckLazyArguments</span>();<br>  <span class="hljs-keyword">return</span> Arguments;<br>&#125;<br><span class="hljs-function">const_arg_iterator <span class="hljs-title">arg_begin</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>  <span class="hljs-built_in">CheckLazyArguments</span>();<br>  <span class="hljs-keyword">return</span> Arguments;<br>&#125;<br>    <br><span class="hljs-function">arg_iterator <span class="hljs-title">arg_end</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-built_in">CheckLazyArguments</span>();<br>  <span class="hljs-keyword">return</span> Arguments + NumArgs;<br>&#125;<br><span class="hljs-function">const_arg_iterator <span class="hljs-title">arg_end</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>  <span class="hljs-built_in">CheckLazyArguments</span>();<br>  <span class="hljs-keyword">return</span> Arguments + NumArgs;<br>&#125;<br>    <br><span class="hljs-function">Argument* <span class="hljs-title">getArg</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> i)</span> <span class="hljs-type">const</span> </span>&#123;<br>  <span class="hljs-built_in">assert</span> (i &lt; NumArgs &amp;&amp; <span class="hljs-string">&quot;getArg() out of range!&quot;</span>);<br>  <span class="hljs-built_in">CheckLazyArguments</span>();<br>  <span class="hljs-keyword">return</span> Arguments + i;<br>&#125;<br>    <br><span class="hljs-function">iterator_range&lt;arg_iterator&gt; <span class="hljs-title">args</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">make_range</span>(<span class="hljs-built_in">arg_begin</span>(), <span class="hljs-built_in">arg_end</span>());<br>&#125;<br><span class="hljs-function">iterator_range&lt;const_arg_iterator&gt; <span class="hljs-title">args</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">make_range</span>(<span class="hljs-built_in">arg_begin</span>(), <span class="hljs-built_in">arg_end</span>());<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>创建一个Function</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">static</span> Function *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionType *Ty, LinkageTypes Linkage,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;N, Module &amp;M)</span></span>;<br><br><span class="hljs-function"><span class="hljs-type">static</span> Function *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionType *Ty, LinkageTypes Linkage,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">unsigned</span> AddrSpace, <span class="hljs-type">const</span> Twine &amp;N = <span class="hljs-string">&quot;&quot;</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Module *M = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Function</span>(Ty, Linkage, AddrSpace, N, M);<br>  &#125;<br><br><br><span class="hljs-function"><span class="hljs-type">static</span> Function *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionType *Ty, LinkageTypes Linkage,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;N = <span class="hljs-string">&quot;&quot;</span>, Module *M = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Function</span>(Ty, Linkage, <span class="hljs-built_in">static_cast</span>&lt;<span class="hljs-type">unsigned</span>&gt;(<span class="hljs-number">-1</span>), N, M);<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>FunctionType的构造见上，getOrInsertFunction函数其实也是Create的封装</p>
+</li>
+<li><p>获取函数返回类型</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">Type *<span class="hljs-title">getReturnType</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">getFunctionType</span>()-&gt;<span class="hljs-built_in">getReturnType</span>(); &#125;<br></code></pre></td></tr></table></figure>
+
+<p>FunctionType是Type的子类，ReturnType和ParamType都存在Type类型的ContainedTys成员里，这是一个Type数组</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Type</span> &#123;<br><span class="hljs-keyword">protected</span>:<br>  <span class="hljs-type">unsigned</span> NumContainedTys = <span class="hljs-number">0</span>;<br>  Type * <span class="hljs-type">const</span> *ContainedTys = <span class="hljs-literal">nullptr</span>;<br></code></pre></td></tr></table></figure>
+
+<p>可以从getXXXType函数中看出来</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// Function</span><br><span class="hljs-function">Type *<span class="hljs-title">getReturnType</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">getFunctionType</span>()-&gt;<span class="hljs-built_in">getReturnType</span>(); &#125;<br><br><span class="hljs-comment">// FunctionType</span><br><span class="hljs-function">FunctionType *<span class="hljs-title">getFunctionType</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">cast</span>&lt;FunctionType&gt;(<span class="hljs-built_in">getValueType</span>());<br>&#125;<br><span class="hljs-function">Type *<span class="hljs-title">getReturnType</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> ContainedTys[<span class="hljs-number">0</span>]; &#125;<br><span class="hljs-function">Type *<span class="hljs-title">getParamType</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> i)</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> ContainedTys[i+<span class="hljs-number">1</span>]; &#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>返回函数的入口BasicBlock</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">const</span> BasicBlock       &amp;<span class="hljs-title">getEntryBlock</span><span class="hljs-params">()</span> <span class="hljs-type">const</span>   </span>&#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">front</span>(); &#125;<br>      <span class="hljs-function">BasicBlock       &amp;<span class="hljs-title">getEntryBlock</span><span class="hljs-params">()</span>         </span>&#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">front</span>(); &#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>设置&amp;获取调用规则</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">CallingConv::ID <span class="hljs-title">getCallingConv</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">static_cast</span>&lt;CallingConv::ID&gt;((<span class="hljs-built_in">getSubclassDataFromValue</span>() &gt;&gt; <span class="hljs-number">4</span>) &amp;<br>                                      CallingConv::MaxID);<br>&#125;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setCallingConv</span><span class="hljs-params">(CallingConv::ID CC)</span> </span>&#123;<br>  <span class="hljs-keyword">auto</span> ID = <span class="hljs-built_in">static_cast</span>&lt;<span class="hljs-type">unsigned</span>&gt;(CC);<br>  <span class="hljs-built_in">assert</span>(!(ID &amp; ~CallingConv::MaxID) &amp;&amp; <span class="hljs-string">&quot;Unsupported calling convention&quot;</span>);<br>  <span class="hljs-built_in">setValueSubclassData</span>((<span class="hljs-built_in">getSubclassDataFromValue</span>() &amp; <span class="hljs-number">0xc00f</span>) | (ID &lt;&lt; <span class="hljs-number">4</span>));<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>🌰，不设置好像也没啥问题（</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Function *foo;<br>foo-&gt;<span class="hljs-built_in">setCallingConv</span>(CallingConv::C);<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="BasicBlock"><a href="#BasicBlock" class="headerlink" title="BasicBlock"></a>BasicBlock</h1><img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/BasicBlock.png" srcset="/img/loading.gif" lazyload class title="BasicBlock">
+
+<h2 id="相关操作-2"><a href="#相关操作-2" class="headerlink" title="相关操作"></a>相关操作</h2><ul>
+<li><p>创建一个BasicBlock</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">static</span> BasicBlock *<span class="hljs-title">Create</span><span class="hljs-params">(LLVMContext &amp;Context, <span class="hljs-type">const</span> Twine &amp;Name = <span class="hljs-string">&quot;&quot;</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Function *Parent = <span class="hljs-literal">nullptr</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">                          BasicBlock *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">BasicBlock</span>(Context, Name, Parent, InsertBefore);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>当InsertBefore为NULL时默认插入Function末尾</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp">BasicBlock::<span class="hljs-built_in">BasicBlock</span>(LLVMContext &amp;C, <span class="hljs-type">const</span> Twine &amp;Name, Function *NewParent,<br>                       BasicBlock *InsertBefore)<br>  : <span class="hljs-built_in">Value</span>(Type::<span class="hljs-built_in">getLabelTy</span>(C), Value::BasicBlockVal), <span class="hljs-built_in">Parent</span>(<span class="hljs-literal">nullptr</span>) &#123;<br><br>  <span class="hljs-keyword">if</span> (NewParent)<br>      <span class="hljs-comment">// Insert unlinked basic block into a function. Inserts an unlinked basic block into Parent. If InsertBefore is provided, inserts before that basic block, otherwise inserts at the end.</span><br>    <span class="hljs-built_in">insertInto</span>(NewParent, InsertBefore);<br>  <span class="hljs-keyword">else</span><br>    <span class="hljs-built_in">assert</span>(!InsertBefore &amp;&amp;<br>           <span class="hljs-string">&quot;Cannot insert block before another block with no function!&quot;</span>);<br><br>  <span class="hljs-built_in">setName</span>(Name);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Function *customFunc;<br>BasicBlock *entryBlock = BasicBlock::<span class="hljs-built_in">Create</span>(context, <span class="hljs-string">&quot;&quot;</span>, customFunc, <span class="hljs-number">0</span>);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>Instruction迭代器</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//===--------------------------------------------------------------------===//</span><br><span class="hljs-comment">/// Instruction iterator methods</span><br><span class="hljs-comment">///</span><br><span class="hljs-function"><span class="hljs-keyword">inline</span> iterator                <span class="hljs-title">begin</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">begin</span>(); &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span> const_iterator          <span class="hljs-title">begin</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">begin</span>(); &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span> iterator                <span class="hljs-title">end</span>  <span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">end</span>();   &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span> const_iterator          <span class="hljs-title">end</span>  <span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">end</span>();   &#125;<br>  <br><span class="hljs-function"><span class="hljs-keyword">inline</span> reverse_iterator        <span class="hljs-title">rbegin</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">rbegin</span>(); &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span> const_reverse_iterator  <span class="hljs-title">rbegin</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">rbegin</span>(); &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span> reverse_iterator        <span class="hljs-title">rend</span>  <span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">rend</span>();   &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span> const_reverse_iterator  <span class="hljs-title">rend</span>  <span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">rend</span>();   &#125;<br>  <br><span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">size_t</span>                   <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">size</span>();  &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span>                    <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">empty</span>(); &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">const</span> Instruction      &amp;<span class="hljs-title">front</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">front</span>(); &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span>       Instruction      &amp;<span class="hljs-title">front</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">front</span>(); &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">const</span> Instruction       &amp;<span class="hljs-title">back</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">back</span>();  &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span>       Instruction       &amp;<span class="hljs-title">back</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> InstList.<span class="hljs-built_in">back</span>();  &#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>获取所属Function</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">const</span> Function *<span class="hljs-title">getParent</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> Parent; &#125;<br>      <span class="hljs-function">Function *<span class="hljs-title">getParent</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> Parent; &#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="Instruction"><a href="#Instruction" class="headerlink" title="Instruction"></a>Instruction</h1><img src="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/Instruction.png" srcset="/img/loading.gif" lazyload class title="Instruction">
+
+<h2 id="相关操作-3"><a href="#相关操作-3" class="headerlink" title="相关操作"></a>相关操作</h2><ul>
+<li><p>获取父BasicBlock</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">const</span> BasicBlock *<span class="hljs-title">getParent</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> Parent; &#125;<br><span class="hljs-function"><span class="hljs-keyword">inline</span>       BasicBlock *<span class="hljs-title">getParent</span><span class="hljs-params">()</span>       </span>&#123; <span class="hljs-keyword">return</span> Parent; &#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>获取指令操作码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">unsigned</span> <span class="hljs-title">getOpcode</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">getValueID</span>() - InstructionVal; &#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>返回指令的另一个实例</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">Instruction *<span class="hljs-title">clone</span><span class="hljs-params">()</span> <span class="hljs-type">const</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>但这个指令</p>
+<ul>
+<li>没有名字</li>
+<li>没有Parent</li>
+</ul>
+</li>
+<li><p>指令替换</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">ReplaceInstWithInst</span><span class="hljs-params">(BasicBlock::InstListType &amp;BIL,</span></span><br><span class="hljs-params"><span class="hljs-function">                         BasicBlock::iterator &amp;BI, Instruction *I)</span></span>;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">ReplaceInstWithInst</span><span class="hljs-params">(Instruction *From, Instruction *To)</span></span>;	<span class="hljs-comment">// 不更新迭代器，会段错误</span><br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> it = bas.<span class="hljs-built_in">begin</span>(); it != bas.<span class="hljs-built_in">end</span>(); it++)&#123;<br>    ……<br>	<span class="hljs-built_in">ReplaceInstWithInst</span>(old_ope-&gt;<span class="hljs-built_in">getParent</span>()-&gt;<span class="hljs-built_in">getInstList</span>(), it, myaddCall);<br>    old_ope-&gt;<span class="hljs-built_in">replaceAllUsesWith</span>(myaddCall);<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="不同Instruction的创建"><a href="#不同Instruction的创建" class="headerlink" title="不同Instruction的创建"></a>不同Instruction的创建</h1><p>只列出来了写作业的时候使用的</p>
+<h2 id="alloca"><a href="#alloca" class="headerlink" title="alloca"></a>alloca</h2><p>alloca命令是AllocaInst类型，继承关系是</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">AllocaInst-&gt;</span><span class="language-bash">UnaryInstruction-&gt;Instruction</span><br></code></pre></td></tr></table></figure>
+
+<p>只比Instruction多了一个成员，表示储存数据的类型</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs cpp">$<span class="hljs-number">2</span> = &#123;<br>  &lt;llvm::UnaryInstruction&gt; = &#123;<br>    &lt;llvm::Instruction&gt; = &#123;<br>      &lt;llvm::User&gt; = &#123;<br>        &lt;llvm::Value&gt; = &#123;<br>          VTy = <span class="hljs-number">0x46af60</span>,<br>          UseList = <span class="hljs-number">0x0</span>,<br>          SubclassID = <span class="hljs-number">57</span> <span class="hljs-string">&#x27;9&#x27;</span>,<br>          HasValueHandle = <span class="hljs-number">0</span> <span class="hljs-string">&#x27;\000&#x27;</span>,<br>          SubclassOptionalData = <span class="hljs-number">0</span> <span class="hljs-string">&#x27;\000&#x27;</span>,<br>          SubclassData = <span class="hljs-number">2</span>,<br>          NumUserOperands = <span class="hljs-number">1</span>,<br>          IsUsedByMD = <span class="hljs-number">0</span>,<br>          HasName = <span class="hljs-number">0</span>,<br>          HasMetadata = <span class="hljs-number">0</span>,<br>          HasHungOffUses = <span class="hljs-number">0</span>,<br>          HasDescriptor = <span class="hljs-number">0</span>,<br>          <span class="hljs-type">static</span> MaxAlignmentExponent = <span class="hljs-number">29</span>,<br>          <span class="hljs-type">static</span> MaximumAlignment = <span class="hljs-number">536870912</span><br>        &#125;, &lt;No data fields&gt;&#125;, <br>      &lt;llvm::ilist_node_with_parent&lt;llvm::Instruction, llvm::BasicBlock&gt;&gt; = &#123;<br>        &lt;llvm::ilist_node&lt;llvm::Instruction&gt;&gt; = &#123;<br>          &lt;llvm::ilist_node_impl&lt;llvm::ilist_detail::node_options&lt;llvm::Instruction, <span class="hljs-literal">false</span>, <span class="hljs-literal">false</span>, <span class="hljs-type">void</span>&gt; &gt;&gt; = &#123;<br>            &lt;llvm::ilist_node_base&lt;<span class="hljs-literal">false</span>&gt;&gt; = &#123;<br>              Prev = <span class="hljs-number">0x46abd8</span>,<br>              Next = <span class="hljs-number">0x46abd8</span><br>            &#125;, &lt;No data fields&gt;&#125;, &lt;No data fields&gt;&#125;, &lt;No data fields&gt;&#125;, <br>      members of llvm::Instruction:<br>      Parent = <span class="hljs-number">0x46abb0</span>,<br>      DbgLoc = &#123;<br>        Loc = &#123;<br>          Ref = &#123;<br>            MD = <span class="hljs-number">0x0</span><br>          &#125;<br>        &#125;<br>      &#125;,<br>      Order = <span class="hljs-number">0</span><br>    &#125;, &lt;No data fields&gt;&#125;, <br>  members of llvm::AllocaInst:<br>  AllocatedType = <span class="hljs-number">0x466d80</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>用new新建一个AllocaInst</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">public</span>:<br>  <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">AllocaInst</span><span class="hljs-params">(Type *Ty, <span class="hljs-type">unsigned</span> AddrSpace, Value *ArraySize,</span></span><br><span class="hljs-params"><span class="hljs-function">                      <span class="hljs-type">const</span> Twine &amp;Name, Instruction *InsertBefore)</span></span>;<br>  <span class="hljs-built_in">AllocaInst</span>(Type *Ty, <span class="hljs-type">unsigned</span> AddrSpace, Value *ArraySize,<br>             <span class="hljs-type">const</span> Twine &amp;Name, BasicBlock *InsertAtEnd);<br><br>  <span class="hljs-built_in">AllocaInst</span>(Type *Ty, <span class="hljs-type">unsigned</span> AddrSpace, <span class="hljs-type">const</span> Twine &amp;Name,<br>             Instruction *InsertBefore);<br>  <span class="hljs-built_in">AllocaInst</span>(Type *Ty, <span class="hljs-type">unsigned</span> AddrSpace,<br>             <span class="hljs-type">const</span> Twine &amp;Name, BasicBlock *InsertAtEnd);<br><br>  <span class="hljs-built_in">AllocaInst</span>(Type *Ty, <span class="hljs-type">unsigned</span> AddrSpace, Value *ArraySize, Align Align,<br>             <span class="hljs-type">const</span> Twine &amp;Name = <span class="hljs-string">&quot;&quot;</span>, Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>);<br>  <span class="hljs-built_in">AllocaInst</span>(Type *Ty, <span class="hljs-type">unsigned</span> AddrSpace, Value *ArraySize, Align Align,<br>             <span class="hljs-type">const</span> Twine &amp;Name, BasicBlock *InsertAtEnd);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>AddrSpace：可以通过Module获取</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Module *<span class="hljs-keyword">module</span>;<br><span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getDataLayout</span>().<span class="hljs-built_in">getAllocaAddrSpace</span>()<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>DataLayout就是</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">target datalayout = <span class="hljs-string">&quot;e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128&quot;</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>DataLayout有AllocaAddrSpace成员，getAllocaAddrSpace方法可以获取这个成员</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">DataLayout</span> &#123;<br><span class="hljs-keyword">private</span>:<br>  <span class="hljs-type">unsigned</span> AllocaAddrSpace;<br>  <span class="hljs-function"><span class="hljs-type">unsigned</span> <span class="hljs-title">getAllocaAddrSpace</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> AllocaAddrSpace; &#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>Name：形如以下语句的返回值名称</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">%<span class="hljs-number">1</span> = alloca i32, align <span class="hljs-number">4</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>BasicBlock：所属基本块</p>
+</li>
+<li><p>InsertBefore：新建的Instruction会插在InsertBefore之前</p>
+</li>
+<li><p>ArraySize：数组大小，可以通过新建一个ConstantInt实现</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">static</span> ConstantInt *<span class="hljs-title">get</span><span class="hljs-params">(LLVMContext &amp;Context, <span class="hljs-type">const</span> APInt &amp;V)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>APInt可以通过new新建</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-built_in">APInt</span>(<span class="hljs-type">uint64_t</span> *val, <span class="hljs-type">unsigned</span> bits) : <span class="hljs-built_in">BitWidth</span>(bits) &#123;<br>  U.pVal = val;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Value* intValue = ConstantInt::<span class="hljs-built_in">get</span>(context, <span class="hljs-built_in">APInt</span>(<span class="hljs-number">32</span>, <span class="hljs-number">1</span>));<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>Align：可以通过Align创建</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Align</span><span class="hljs-params">(<span class="hljs-type">uint64_t</span> Value)</span> </span>&#123;<br>  <span class="hljs-built_in">assert</span>(Value &gt; <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-string">&quot;Value must not be 0&quot;</span>);<br>  <span class="hljs-built_in">assert</span>(llvm::<span class="hljs-built_in">isPowerOf2_64</span>(Value) &amp;&amp; <span class="hljs-string">&quot;Alignment is not a power of 2&quot;</span>);<br>  ShiftValue = <span class="hljs-built_in">Log2_64</span>(Value);<br>  <span class="hljs-built_in">assert</span>(ShiftValue &lt; <span class="hljs-number">64</span> &amp;&amp; <span class="hljs-string">&quot;Broken invariant&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>🌰，Align也可以在创建AllocaInst之后设置</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">ptr3-&gt;<span class="hljs-built_in">setAlignment</span>(<span class="hljs-built_in">Align</span>(<span class="hljs-number">4</span>));<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">AllocaInst *ptr3 = <span class="hljs-keyword">new</span> <span class="hljs-built_in">AllocaInst</span>(IntegerType::<span class="hljs-built_in">get</span>(context, <span class="hljs-number">32</span>), <span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getDataLayout</span>().<span class="hljs-built_in">getAllocaAddrSpace</span>(),<span class="hljs-string">&quot;&quot;</span>,entryBlock);<br>ptr3-&gt;<span class="hljs-built_in">setAlignment</span>(<span class="hljs-built_in">Align</span>(<span class="hljs-number">4</span>));<br></code></pre></td></tr></table></figure>
+
+<h2 id="store"><a href="#store" class="headerlink" title="store"></a>store</h2><p>store命令是StoreInst类型</p>
+<p>比Instruction多了一个SSID</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs cpp">$<span class="hljs-number">4</span> = &#123;<br>  &lt;llvm::Instruction&gt; = &#123;<br>    &lt;llvm::User&gt; = &#123;<br>      &lt;llvm::Value&gt; = &#123;<br>        VTy = <span class="hljs-number">0x466c00</span>,<br>        UseList = <span class="hljs-number">0x0</span>,<br>        SubclassID = <span class="hljs-number">59</span> <span class="hljs-string">&#x27;;&#x27;</span>,<br>        HasValueHandle = <span class="hljs-number">0</span> <span class="hljs-string">&#x27;\000&#x27;</span>,<br>        SubclassOptionalData = <span class="hljs-number">0</span> <span class="hljs-string">&#x27;\000&#x27;</span>,<br>        SubclassData = <span class="hljs-number">4</span>,<br>        NumUserOperands = <span class="hljs-number">2</span>,<br>        IsUsedByMD = <span class="hljs-number">0</span>,<br>        HasName = <span class="hljs-number">0</span>,<br>        HasMetadata = <span class="hljs-number">0</span>,<br>        HasHungOffUses = <span class="hljs-number">0</span>,<br>        HasDescriptor = <span class="hljs-number">0</span>,<br>        <span class="hljs-type">static</span> MaxAlignmentExponent = <span class="hljs-number">29</span>,<br>        <span class="hljs-type">static</span> MaximumAlignment = <span class="hljs-number">536870912</span><br>      &#125;, &lt;No data fields&gt;&#125;, <br>    &lt;llvm::ilist_node_with_parent&lt;llvm::Instruction, llvm::BasicBlock&gt;&gt; = &#123;<br>      &lt;llvm::ilist_node&lt;llvm::Instruction&gt;&gt; = &#123;<br>        &lt;llvm::ilist_node_impl&lt;llvm::ilist_detail::node_options&lt;llvm::Instruction, <span class="hljs-literal">false</span>, <span class="hljs-literal">false</span>, <span class="hljs-type">void</span>&gt; &gt;&gt; = &#123;<br>          &lt;llvm::ilist_node_base&lt;<span class="hljs-literal">false</span>&gt;&gt; = &#123;<br>            Prev = <span class="hljs-number">0x470d48</span>,<br>            Next = <span class="hljs-number">0x46abd8</span><br>          &#125;, &lt;No data fields&gt;&#125;, &lt;No data fields&gt;&#125;, &lt;No data fields&gt;&#125;, <br>    members of llvm::Instruction:<br>    Parent = <span class="hljs-number">0x46abb0</span>,<br>    DbgLoc = &#123;<br>      Loc = &#123;<br>        Ref = &#123;<br>          MD = <span class="hljs-number">0x0</span><br>        &#125;<br>      &#125;<br>    &#125;,<br>    Order = <span class="hljs-number">0</span><br>  &#125;, <br>  members of llvm::StoreInst:<br>  SSID = <span class="hljs-number">1</span> <span class="hljs-string">&#x27;\001&#x27;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以通过构造函数新建一个StoreInst</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">public</span>:<br>  <span class="hljs-built_in">StoreInst</span>(Value *Val, Value *Ptr, Instruction *InsertBefore);<br>  <span class="hljs-built_in">StoreInst</span>(Value *Val, Value *Ptr, BasicBlock *InsertAtEnd);<br>  <span class="hljs-built_in">StoreInst</span>(Value *Val, Value *Ptr, <span class="hljs-type">bool</span> isVolatile, Instruction *InsertBefore);<br>  <span class="hljs-built_in">StoreInst</span>(Value *Val, Value *Ptr, <span class="hljs-type">bool</span> isVolatile, BasicBlock *InsertAtEnd);<br>  <span class="hljs-built_in">StoreInst</span>(Value *Val, Value *Ptr, <span class="hljs-type">bool</span> isVolatile, Align Align,<br>            Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>);<br>  <span class="hljs-built_in">StoreInst</span>(Value *Val, Value *Ptr, <span class="hljs-type">bool</span> isVolatile, Align Align,<br>            BasicBlock *InsertAtEnd);<br>  <span class="hljs-built_in">StoreInst</span>(Value *Val, Value *Ptr, <span class="hljs-type">bool</span> isVolatile, Align Align,<br>            AtomicOrdering Order, SyncScope::ID SSID = SyncScope::System,<br>            Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>);<br>  <span class="hljs-built_in">StoreInst</span>(Value *Val, Value *Ptr, <span class="hljs-type">bool</span> isVolatile, Align Align,<br>            AtomicOrdering Order, SyncScope::ID SSID, BasicBlock *InsertAtEnd);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>将Val存入Ptr</li>
+<li>isVolatile表示是否优化</li>
+</ul>
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">StoreInst *st0 = <span class="hljs-keyword">new</span> <span class="hljs-built_in">StoreInst</span>(param1, ptr4, <span class="hljs-literal">false</span>, entryBlock);<br>st0-&gt;<span class="hljs-built_in">setAlignment</span>(<span class="hljs-built_in">Align</span>(<span class="hljs-number">4</span>));<br></code></pre></td></tr></table></figure>
+
+<h2 id="load"><a href="#load" class="headerlink" title="load"></a>load</h2><p>load是LoadInst类型，也比Instruction多一个SSID</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs cpp">$<span class="hljs-number">5</span> = &#123;<br>  &lt;llvm::UnaryInstruction&gt; = &#123;<br>    &lt;llvm::Instruction&gt; = &#123;<br>      &lt;llvm::User&gt; = &#123;<br>        &lt;llvm::Value&gt; = &#123;<br>          VTy = <span class="hljs-number">0x466d80</span>,<br>          UseList = <span class="hljs-number">0x0</span>,<br>          SubclassID = <span class="hljs-number">58</span> <span class="hljs-string">&#x27;:&#x27;</span>,<br>          HasValueHandle = <span class="hljs-number">0</span> <span class="hljs-string">&#x27;\000&#x27;</span>,<br>          SubclassOptionalData = <span class="hljs-number">0</span> <span class="hljs-string">&#x27;\000&#x27;</span>,<br>          SubclassData = <span class="hljs-number">4</span>,<br>          NumUserOperands = <span class="hljs-number">1</span>,<br>          IsUsedByMD = <span class="hljs-number">0</span>,<br>          HasName = <span class="hljs-number">0</span>,<br>          HasMetadata = <span class="hljs-number">0</span>,<br>          HasHungOffUses = <span class="hljs-number">0</span>,<br>          HasDescriptor = <span class="hljs-number">0</span>,<br>          <span class="hljs-type">static</span> MaxAlignmentExponent = <span class="hljs-number">29</span>,<br>          <span class="hljs-type">static</span> MaximumAlignment = <span class="hljs-number">536870912</span><br>        &#125;, &lt;No data fields&gt;&#125;, <br>      &lt;llvm::ilist_node_with_parent&lt;llvm::Instruction, llvm::BasicBlock&gt;&gt; = &#123;<br>        &lt;llvm::ilist_node&lt;llvm::Instruction&gt;&gt; = &#123;<br>          &lt;llvm::ilist_node_impl&lt;llvm::ilist_detail::node_options&lt;llvm::Instruction, <span class="hljs-literal">false</span>, <span class="hljs-literal">false</span>, <span class="hljs-type">void</span>&gt; &gt;&gt; = &#123;<br>            &lt;llvm::ilist_node_base&lt;<span class="hljs-literal">false</span>&gt;&gt; = &#123;<br>              Prev = <span class="hljs-number">0x4686c8</span>,<br>              Next = <span class="hljs-number">0x46abd8</span><br>            &#125;, &lt;No data fields&gt;&#125;, &lt;No data fields&gt;&#125;, &lt;No data fields&gt;&#125;, <br>      members of llvm::Instruction:<br>      Parent = <span class="hljs-number">0x46abb0</span>,<br>      DbgLoc = &#123;<br>        Loc = &#123;<br>          Ref = &#123;<br>            MD = <span class="hljs-number">0x0</span><br>          &#125;<br>        &#125;<br>      &#125;,<br>      Order = <span class="hljs-number">0</span><br>    &#125;, &lt;No data fields&gt;&#125;, <br>  members of llvm::LoadInst:<br>  SSID = <span class="hljs-number">1</span> <span class="hljs-string">&#x27;\001&#x27;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>构造函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">public</span>:<br>  <span class="hljs-built_in">LoadInst</span>(Type *Ty, Value *Ptr, <span class="hljs-type">const</span> Twine &amp;NameStr,<br>           Instruction *InsertBefore);<br>  <span class="hljs-built_in">LoadInst</span>(Type *Ty, Value *Ptr, <span class="hljs-type">const</span> Twine &amp;NameStr, BasicBlock *InsertAtEnd);<br>  <span class="hljs-built_in">LoadInst</span>(Type *Ty, Value *Ptr, <span class="hljs-type">const</span> Twine &amp;NameStr, <span class="hljs-type">bool</span> isVolatile,<br>           Instruction *InsertBefore);<br>  <span class="hljs-built_in">LoadInst</span>(Type *Ty, Value *Ptr, <span class="hljs-type">const</span> Twine &amp;NameStr, <span class="hljs-type">bool</span> isVolatile,<br>           BasicBlock *InsertAtEnd);<br>  <span class="hljs-built_in">LoadInst</span>(Type *Ty, Value *Ptr, <span class="hljs-type">const</span> Twine &amp;NameStr, <span class="hljs-type">bool</span> isVolatile,<br>           Align Align, Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>);<br>  <span class="hljs-built_in">LoadInst</span>(Type *Ty, Value *Ptr, <span class="hljs-type">const</span> Twine &amp;NameStr, <span class="hljs-type">bool</span> isVolatile,<br>           Align Align, BasicBlock *InsertAtEnd);<br>  <span class="hljs-built_in">LoadInst</span>(Type *Ty, Value *Ptr, <span class="hljs-type">const</span> Twine &amp;NameStr, <span class="hljs-type">bool</span> isVolatile,<br>           Align Align, AtomicOrdering Order,<br>           SyncScope::ID SSID = SyncScope::System,<br>           Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>);<br>  <span class="hljs-built_in">LoadInst</span>(Type *Ty, Value *Ptr, <span class="hljs-type">const</span> Twine &amp;NameStr, <span class="hljs-type">bool</span> isVolatile,<br>           Align Align, AtomicOrdering Order, SyncScope::ID SSID,<br>           BasicBlock *InsertAtEnd);<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">LoadInst *ld0 = <span class="hljs-keyword">new</span> <span class="hljs-built_in">LoadInst</span>(IntegerType::<span class="hljs-built_in">get</span>(context, <span class="hljs-number">32</span>), ptr4, <span class="hljs-string">&quot;&quot;</span>,<span class="hljs-literal">false</span>, entryBlock);<br>ld0-&gt;<span class="hljs-built_in">setAlignment</span>(<span class="hljs-built_in">Align</span>(<span class="hljs-number">4</span>));<br></code></pre></td></tr></table></figure>
+
+<h2 id="add"><a href="#add" class="headerlink" title="add"></a>add</h2><p>add的类型是BinaryOperator，没有自己的data域</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">static</span> BinaryOperator *<span class="hljs-title">Create</span><span class="hljs-params">(BinaryOps Op, Value *S1, Value *S2,</span></span><br><span class="hljs-params"><span class="hljs-function">                              <span class="hljs-type">const</span> Twine &amp;Name = Twine(),</span></span><br><span class="hljs-params"><span class="hljs-function">                              Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span></span>;<br><br><span class="hljs-function"><span class="hljs-type">static</span> BinaryOperator *<span class="hljs-title">Create</span><span class="hljs-params">(BinaryOps Op, Value *S1, Value *S2,</span></span><br><span class="hljs-params"><span class="hljs-function">                              <span class="hljs-type">const</span> Twine &amp;Name, BasicBlock *InsertAtEnd)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>BinaryOps</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp">  <span class="hljs-keyword">enum</span> <span class="hljs-title class_">BinaryOps</span> &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">define</span>  FIRST_BINARY_INST(N)             BinaryOpsBegin = N,</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> HANDLE_BINARY_INST(N, OPC, CLASS) OPC = N,</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>   LAST_BINARY_INST(N)             BinaryOpsEnd = N+1</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;llvm/IR/Instruction.def&quot;</span></span><br>  &#125;;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">BinaryOperator *add1 = BinaryOperator::<span class="hljs-built_in">Create</span>(Instruction::Add, ld0, ld1, <span class="hljs-string">&quot;&quot;</span>, entryBlock);<br></code></pre></td></tr></table></figure>
+
+<h2 id="icmp"><a href="#icmp" class="headerlink" title="icmp"></a>icmp</h2><p>icmp的类型是ICmpInst，没有自己的data域</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">public</span>:<br>  <span class="hljs-comment">/// Constructor with insert-before-instruction semantics.</span><br>  <span class="hljs-built_in">ICmpInst</span>(<br>    Instruction *InsertBefore,  <span class="hljs-comment">///&lt; Where to insert</span><br>    Predicate pred,  <span class="hljs-comment">///&lt; The predicate to use for the comparison</span><br>    Value *LHS,      <span class="hljs-comment">///&lt; The left-hand-side of the expression</span><br>    Value *RHS,      <span class="hljs-comment">///&lt; The right-hand-side of the expression</span><br>    <span class="hljs-type">const</span> Twine &amp;NameStr = <span class="hljs-string">&quot;&quot;</span>  <span class="hljs-comment">///&lt; Name of the instruction</span><br>  ) : <span class="hljs-built_in">CmpInst</span>(<span class="hljs-built_in">makeCmpResultType</span>(LHS-&gt;<span class="hljs-built_in">getType</span>()),<br>              Instruction::ICmp, pred, LHS, RHS, NameStr,<br>              InsertBefore) &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> NDEBUG</span><br>  <span class="hljs-built_in">AssertOK</span>();<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>  &#125;<br><br>  <span class="hljs-comment">/// Constructor with insert-at-end semantics.</span><br>  <span class="hljs-built_in">ICmpInst</span>(<br>    BasicBlock &amp;InsertAtEnd, <span class="hljs-comment">///&lt; Block to insert into.</span><br>    Predicate pred,  <span class="hljs-comment">///&lt; The predicate to use for the comparison</span><br>    Value *LHS,      <span class="hljs-comment">///&lt; The left-hand-side of the expression</span><br>    Value *RHS,      <span class="hljs-comment">///&lt; The right-hand-side of the expression</span><br>    <span class="hljs-type">const</span> Twine &amp;NameStr = <span class="hljs-string">&quot;&quot;</span>  <span class="hljs-comment">///&lt; Name of the instruction</span><br>  ) : <span class="hljs-built_in">CmpInst</span>(<span class="hljs-built_in">makeCmpResultType</span>(LHS-&gt;<span class="hljs-built_in">getType</span>()),<br>              Instruction::ICmp, pred, LHS, RHS, NameStr,<br>              &amp;InsertAtEnd) &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> NDEBUG</span><br>  <span class="hljs-built_in">AssertOK</span>();<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>  &#125;<br><br>  <span class="hljs-comment">/// Constructor with no-insertion semantics</span><br>  <span class="hljs-built_in">ICmpInst</span>(<br>    Predicate pred, <span class="hljs-comment">///&lt; The predicate to use for the comparison</span><br>    Value *LHS,     <span class="hljs-comment">///&lt; The left-hand-side of the expression</span><br>    Value *RHS,     <span class="hljs-comment">///&lt; The right-hand-side of the expression</span><br>    <span class="hljs-type">const</span> Twine &amp;NameStr = <span class="hljs-string">&quot;&quot;</span> <span class="hljs-comment">///&lt; Name of the instruction</span><br>  ) : <span class="hljs-built_in">CmpInst</span>(<span class="hljs-built_in">makeCmpResultType</span>(LHS-&gt;<span class="hljs-built_in">getType</span>()),<br>              Instruction::ICmp, pred, LHS, RHS, NameStr) &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> NDEBUG</span><br>  <span class="hljs-built_in">AssertOK</span>();<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>Predicate是比较的类型</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">enum</span> <span class="hljs-title class_">Predicate</span> : <span class="hljs-type">unsigned</span> &#123;<br>  <span class="hljs-comment">// Opcode            U L G E    Intuitive operation</span><br>  FCMP_FALSE = <span class="hljs-number">0</span>, <span class="hljs-comment">///&lt; 0 0 0 0    Always false (always folded)</span><br>  FCMP_OEQ = <span class="hljs-number">1</span>,   <span class="hljs-comment">///&lt; 0 0 0 1    True if ordered and equal</span><br>  FCMP_OGT = <span class="hljs-number">2</span>,   <span class="hljs-comment">///&lt; 0 0 1 0    True if ordered and greater than</span><br>  FCMP_OGE = <span class="hljs-number">3</span>,   <span class="hljs-comment">///&lt; 0 0 1 1    True if ordered and greater than or equal</span><br>  FCMP_OLT = <span class="hljs-number">4</span>,   <span class="hljs-comment">///&lt; 0 1 0 0    True if ordered and less than</span><br>  FCMP_OLE = <span class="hljs-number">5</span>,   <span class="hljs-comment">///&lt; 0 1 0 1    True if ordered and less than or equal</span><br>  FCMP_ONE = <span class="hljs-number">6</span>,   <span class="hljs-comment">///&lt; 0 1 1 0    True if ordered and operands are unequal</span><br>  FCMP_ORD = <span class="hljs-number">7</span>,   <span class="hljs-comment">///&lt; 0 1 1 1    True if ordered (no nans)</span><br>  FCMP_UNO = <span class="hljs-number">8</span>,   <span class="hljs-comment">///&lt; 1 0 0 0    True if unordered: isnan(X) | isnan(Y)</span><br>  FCMP_UEQ = <span class="hljs-number">9</span>,   <span class="hljs-comment">///&lt; 1 0 0 1    True if unordered or equal</span><br>  FCMP_UGT = <span class="hljs-number">10</span>,  <span class="hljs-comment">///&lt; 1 0 1 0    True if unordered or greater than</span><br>  FCMP_UGE = <span class="hljs-number">11</span>,  <span class="hljs-comment">///&lt; 1 0 1 1    True if unordered, greater than, or equal</span><br>  FCMP_ULT = <span class="hljs-number">12</span>,  <span class="hljs-comment">///&lt; 1 1 0 0    True if unordered or less than</span><br>  FCMP_ULE = <span class="hljs-number">13</span>,  <span class="hljs-comment">///&lt; 1 1 0 1    True if unordered, less than, or equal</span><br>  FCMP_UNE = <span class="hljs-number">14</span>,  <span class="hljs-comment">///&lt; 1 1 1 0    True if unordered or not equal</span><br>  FCMP_TRUE = <span class="hljs-number">15</span>, <span class="hljs-comment">///&lt; 1 1 1 1    Always true (always folded)</span><br>  FIRST_FCMP_PREDICATE = FCMP_FALSE,<br>  LAST_FCMP_PREDICATE = FCMP_TRUE,<br>  BAD_FCMP_PREDICATE = FCMP_TRUE + <span class="hljs-number">1</span>,<br>  ICMP_EQ = <span class="hljs-number">32</span>,  <span class="hljs-comment">///&lt; equal</span><br>  ICMP_NE = <span class="hljs-number">33</span>,  <span class="hljs-comment">///&lt; not equal</span><br>  ICMP_UGT = <span class="hljs-number">34</span>, <span class="hljs-comment">///&lt; unsigned greater than</span><br>  ICMP_UGE = <span class="hljs-number">35</span>, <span class="hljs-comment">///&lt; unsigned greater or equal</span><br>  ICMP_ULT = <span class="hljs-number">36</span>, <span class="hljs-comment">///&lt; unsigned less than</span><br>  ICMP_ULE = <span class="hljs-number">37</span>, <span class="hljs-comment">///&lt; unsigned less or equal</span><br>  ICMP_SGT = <span class="hljs-number">38</span>, <span class="hljs-comment">///&lt; signed greater than</span><br>  ICMP_SGE = <span class="hljs-number">39</span>, <span class="hljs-comment">///&lt; signed greater or equal</span><br>  ICMP_SLT = <span class="hljs-number">40</span>, <span class="hljs-comment">///&lt; signed less than</span><br>  ICMP_SLE = <span class="hljs-number">41</span>, <span class="hljs-comment">///&lt; signed less or equal</span><br>  FIRST_ICMP_PREDICATE = ICMP_EQ,<br>  LAST_ICMP_PREDICATE = ICMP_SLE,<br>  BAD_ICMP_PREDICATE = ICMP_SLE + <span class="hljs-number">1</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">ICmpInst *icmp = <span class="hljs-keyword">new</span> <span class="hljs-built_in">ICmpInst</span>(*entryBlock, ICmpInst::ICMP_SGT, add1, ConstantInt::<span class="hljs-built_in">get</span>(context, <span class="hljs-built_in">APInt</span>(<span class="hljs-number">32</span>, <span class="hljs-number">100</span>));<br></code></pre></td></tr></table></figure>
+
+<p>需要常数可以创建ConstantInt</p>
+<h2 id="br"><a href="#br" class="headerlink" title="br"></a>br</h2><p>BranchInst，无data域</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">static</span> BranchInst *<span class="hljs-title">Create</span><span class="hljs-params">(BasicBlock *IfTrue,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(<span class="hljs-number">1</span>) <span class="hljs-built_in">BranchInst</span>(IfTrue, InsertBefore);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">static</span> BranchInst *<span class="hljs-title">Create</span><span class="hljs-params">(BasicBlock *IfTrue, BasicBlock *IfFalse,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Value *Cond, Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(<span class="hljs-number">3</span>) <span class="hljs-built_in">BranchInst</span>(IfTrue, IfFalse, Cond, InsertBefore);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">static</span> BranchInst *<span class="hljs-title">Create</span><span class="hljs-params">(BasicBlock *IfTrue, BasicBlock *InsertAtEnd)</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(<span class="hljs-number">1</span>) <span class="hljs-built_in">BranchInst</span>(IfTrue, InsertAtEnd);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">static</span> BranchInst *<span class="hljs-title">Create</span><span class="hljs-params">(BasicBlock *IfTrue, BasicBlock *IfFalse,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Value *Cond, BasicBlock *InsertAtEnd)</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(<span class="hljs-number">3</span>) <span class="hljs-built_in">BranchInst</span>(IfTrue, IfFalse, Cond, InsertAtEnd);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">BranchInst::<span class="hljs-built_in">Create</span>(block10,block19,icmp,entryBlock);<br></code></pre></td></tr></table></figure>
+
+<h2 id="ret"><a href="#ret" class="headerlink" title="ret"></a>ret</h2><p>ReturnInst，无data域</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">public</span>:<br>  <span class="hljs-function"><span class="hljs-type">static</span> ReturnInst* <span class="hljs-title">Create</span><span class="hljs-params">(LLVMContext &amp;C, Value *retVal = <span class="hljs-literal">nullptr</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">                            Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(!!retVal) <span class="hljs-built_in">ReturnInst</span>(C, retVal, InsertBefore);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> ReturnInst* <span class="hljs-title">Create</span><span class="hljs-params">(LLVMContext &amp;C, Value *retVal,</span></span><br><span class="hljs-params"><span class="hljs-function">                            BasicBlock *InsertAtEnd)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(!!retVal) <span class="hljs-built_in">ReturnInst</span>(C, retVal, InsertAtEnd);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> ReturnInst* <span class="hljs-title">Create</span><span class="hljs-params">(LLVMContext &amp;C, BasicBlock *InsertAtEnd)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span>(<span class="hljs-number">0</span>) <span class="hljs-built_in">ReturnInst</span>(C, InsertAtEnd);<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">ReturnInst::<span class="hljs-built_in">Create</span>(context, ld20, block15);<br></code></pre></td></tr></table></figure>
+
+<h2 id="call"><a href="#call" class="headerlink" title="call"></a>call</h2><p>CallInst，CallBase有自己的data域</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs cpp">$<span class="hljs-number">3</span> = &#123;<br>  &lt;llvm::CallBase&gt; = &#123;<br>    &lt;llvm::Instruction&gt; = &#123;<br>      &lt;llvm::User&gt; = &#123;<br>        &lt;llvm::Value&gt; = &#123;<br>          VTy = <span class="hljs-number">0x466d80</span>,<br>          UseList = <span class="hljs-number">0x0</span>,<br>          SubclassID = <span class="hljs-number">82</span> <span class="hljs-string">&#x27;R&#x27;</span>,<br>          HasValueHandle = <span class="hljs-number">0</span> <span class="hljs-string">&#x27;\000&#x27;</span>,<br>          SubclassOptionalData = <span class="hljs-number">0</span> <span class="hljs-string">&#x27;\000&#x27;</span>,<br>          SubclassData = <span class="hljs-number">0</span>,<br>          NumUserOperands = <span class="hljs-number">3</span>,<br>          IsUsedByMD = <span class="hljs-number">0</span>,<br>          HasName = <span class="hljs-number">0</span>,<br>          HasMetadata = <span class="hljs-number">0</span>,<br>          HasHungOffUses = <span class="hljs-number">0</span>,<br>          HasDescriptor = <span class="hljs-number">0</span>,<br>          <span class="hljs-type">static</span> MaxAlignmentExponent = <span class="hljs-number">29</span>,<br>          <span class="hljs-type">static</span> MaximumAlignment = <span class="hljs-number">536870912</span><br>        &#125;, &lt;No data fields&gt;&#125;, <br>      &lt;llvm::ilist_node_with_parent&lt;llvm::Instruction, llvm::BasicBlock&gt;&gt; = &#123;<br>        &lt;llvm::ilist_node&lt;llvm::Instruction&gt;&gt; = &#123;<br>          &lt;llvm::ilist_node_impl&lt;llvm::ilist_detail::node_options&lt;llvm::Instruction, <span class="hljs-literal">false</span>, <span class="hljs-literal">false</span>, <span class="hljs-type">void</span>&gt; &gt;&gt; = &#123;<br>            &lt;llvm::ilist_node_base&lt;<span class="hljs-literal">false</span>&gt;&gt; = &#123;<br>              Prev = <span class="hljs-number">0x0</span>,<br>              Next = <span class="hljs-number">0x0</span><br>            &#125;, &lt;No data fields&gt;&#125;, &lt;No data fields&gt;&#125;, &lt;No data fields&gt;&#125;, <br>      members of llvm::Instruction:<br>      Parent = <span class="hljs-number">0x0</span>,<br>      DbgLoc = &#123;<br>        Loc = &#123;<br>          Ref = &#123;<br>            MD = <span class="hljs-number">0x0</span><br>          &#125;<br>        &#125;<br>      &#125;,<br>      Order = <span class="hljs-number">0</span><br>    &#125;, <br>    members of llvm::CallBase:<br>    <span class="hljs-type">static</span> CalledOperandOpEndIdx = <span class="hljs-number">-1</span>,<br>    Attrs = &#123;<br>      pImpl = <span class="hljs-number">0x0</span><br>    &#125;,<br>    FTy = <span class="hljs-number">0x46aed0</span><br>  &#125;, &lt;No data fields&gt;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>好多重载（</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">public</span>:<br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionType *Ty, Value *F, <span class="hljs-type">const</span> Twine &amp;NameStr = <span class="hljs-string">&quot;&quot;</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span> (<span class="hljs-built_in">ComputeNumOperands</span>(<span class="hljs-number">0</span>)) <span class="hljs-built_in">CallInst</span>(Ty, F, NameStr, InsertBefore);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionType *Ty, Value *Func, ArrayRef&lt;Value *&gt; Args,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;NameStr,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span> (<span class="hljs-built_in">ComputeNumOperands</span>(Args.<span class="hljs-built_in">size</span>()))<br>        <span class="hljs-built_in">CallInst</span>(Ty, Func, Args, None, NameStr, InsertBefore);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionType *Ty, Value *Func, ArrayRef&lt;Value *&gt; Args,</span></span><br><span class="hljs-params"><span class="hljs-function">                          ArrayRef&lt;OperandBundleDef&gt; Bundles = None,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;NameStr = <span class="hljs-string">&quot;&quot;</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>    <span class="hljs-type">const</span> <span class="hljs-type">int</span> NumOperands =<br>        <span class="hljs-built_in">ComputeNumOperands</span>(Args.<span class="hljs-built_in">size</span>(), <span class="hljs-built_in">CountBundleInputs</span>(Bundles));<br>    <span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> DescriptorBytes = Bundles.<span class="hljs-built_in">size</span>() * <span class="hljs-built_in">sizeof</span>(BundleOpInfo);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span> (NumOperands, DescriptorBytes)<br>        <span class="hljs-built_in">CallInst</span>(Ty, Func, Args, Bundles, NameStr, InsertBefore);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionType *Ty, Value *F, <span class="hljs-type">const</span> Twine &amp;NameStr,</span></span><br><span class="hljs-params"><span class="hljs-function">                          BasicBlock *InsertAtEnd)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span> (<span class="hljs-built_in">ComputeNumOperands</span>(<span class="hljs-number">0</span>)) <span class="hljs-built_in">CallInst</span>(Ty, F, NameStr, InsertAtEnd);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionType *Ty, Value *Func, ArrayRef&lt;Value *&gt; Args,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;NameStr, BasicBlock *InsertAtEnd)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span> (<span class="hljs-built_in">ComputeNumOperands</span>(Args.<span class="hljs-built_in">size</span>()))<br>        <span class="hljs-built_in">CallInst</span>(Ty, Func, Args, None, NameStr, InsertAtEnd);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionType *Ty, Value *Func, ArrayRef&lt;Value *&gt; Args,</span></span><br><span class="hljs-params"><span class="hljs-function">                          ArrayRef&lt;OperandBundleDef&gt; Bundles,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;NameStr, BasicBlock *InsertAtEnd)</span> </span>&#123;<br>    <span class="hljs-type">const</span> <span class="hljs-type">int</span> NumOperands =<br>        <span class="hljs-built_in">ComputeNumOperands</span>(Args.<span class="hljs-built_in">size</span>(), <span class="hljs-built_in">CountBundleInputs</span>(Bundles));<br>    <span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> DescriptorBytes = Bundles.<span class="hljs-built_in">size</span>() * <span class="hljs-built_in">sizeof</span>(BundleOpInfo);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">new</span> (NumOperands, DescriptorBytes)<br>        <span class="hljs-built_in">CallInst</span>(Ty, Func, Args, Bundles, NameStr, InsertAtEnd);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionCallee Func, <span class="hljs-type">const</span> Twine &amp;NameStr = <span class="hljs-string">&quot;&quot;</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Create</span>(Func.<span class="hljs-built_in">getFunctionType</span>(), Func.<span class="hljs-built_in">getCallee</span>(), NameStr,<br>                  InsertBefore);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionCallee Func, ArrayRef&lt;Value *&gt; Args,</span></span><br><span class="hljs-params"><span class="hljs-function">                          ArrayRef&lt;OperandBundleDef&gt; Bundles = None,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;NameStr = <span class="hljs-string">&quot;&quot;</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Create</span>(Func.<span class="hljs-built_in">getFunctionType</span>(), Func.<span class="hljs-built_in">getCallee</span>(), Args, Bundles,<br>                  NameStr, InsertBefore);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionCallee Func, ArrayRef&lt;Value *&gt; Args,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;NameStr,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Instruction *InsertBefore = <span class="hljs-literal">nullptr</span>)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Create</span>(Func.<span class="hljs-built_in">getFunctionType</span>(), Func.<span class="hljs-built_in">getCallee</span>(), Args, NameStr,<br>                  InsertBefore);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionCallee Func, <span class="hljs-type">const</span> Twine &amp;NameStr,</span></span><br><span class="hljs-params"><span class="hljs-function">                          BasicBlock *InsertAtEnd)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Create</span>(Func.<span class="hljs-built_in">getFunctionType</span>(), Func.<span class="hljs-built_in">getCallee</span>(), NameStr,<br>                  InsertAtEnd);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionCallee Func, ArrayRef&lt;Value *&gt; Args,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;NameStr, BasicBlock *InsertAtEnd)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Create</span>(Func.<span class="hljs-built_in">getFunctionType</span>(), Func.<span class="hljs-built_in">getCallee</span>(), Args, NameStr,<br>                  InsertAtEnd);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(FunctionCallee Func, ArrayRef&lt;Value *&gt; Args,</span></span><br><span class="hljs-params"><span class="hljs-function">                          ArrayRef&lt;OperandBundleDef&gt; Bundles,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-type">const</span> Twine &amp;NameStr, BasicBlock *InsertAtEnd)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Create</span>(Func.<span class="hljs-built_in">getFunctionType</span>(), Func.<span class="hljs-built_in">getCallee</span>(), Args, Bundles,<br>                  NameStr, InsertAtEnd);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">Create</span><span class="hljs-params">(CallInst *CI, ArrayRef&lt;OperandBundleDef&gt; Bundles,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Instruction *InsertPt = <span class="hljs-literal">nullptr</span>)</span></span>;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> CallInst *<span class="hljs-title">CreateWithReplacedBundle</span><span class="hljs-params">(CallInst *CI,</span></span><br><span class="hljs-params"><span class="hljs-function">                                            OperandBundleDef Bundle,</span></span><br><span class="hljs-params"><span class="hljs-function">                                            Instruction *InsertPt = <span class="hljs-literal">nullptr</span>)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>🌰</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Function* myAddFunc = <span class="hljs-keyword">module</span>-&gt;<span class="hljs-built_in">getFunction</span>(<span class="hljs-string">&quot;myadd&quot;</span>);<br>Value *arg[] = &#123;old_ope-&gt;<span class="hljs-built_in">getOperand</span>(<span class="hljs-number">0</span>), old_ope-&gt;<span class="hljs-built_in">getOperand</span>(<span class="hljs-number">1</span>)&#125;;<br>CallInst *myaddCall = CallInst::<span class="hljs-built_in">Create</span>(myAddFunc, arg, <span class="hljs-string">&quot;&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/LLVM/" class="category-chain-item">LLVM</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/LLVM/IR/" class="category-chain-item">IR</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/llvm/" class="print-no-link">#llvm</a>
+      
+        <a href="/tags/ir/" class="print-no-link">#ir</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>LLVM IR数据结构分析</div>
+      <div>http://akaieurus.github.io/2023/10/02/LLVM-IR数据结构分析/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年10月2日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/10/07/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%BA%8C%EF%BC%89/" title="Kernel源码分析-系统启动（二）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kernel源码分析-系统启动（二）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/08/23/house-of-blindness/" title="house of blindness">
+                        <span class="hidden-mobile">house of blindness</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

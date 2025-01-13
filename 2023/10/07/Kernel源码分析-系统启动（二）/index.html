@@ -1,0 +1,751 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="学userfaultfd→涉及mmap机制→为了mmap机制开始看linux内存管理系列源码解析→开始好奇类似于page结构体之类的东西是咋初始化的→继续研究系统启动 总结：万物的源头是系统启动doge（又在支线任务上越走越远了） ps：还是主要关注内存相关的部分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kernel源码分析-系统启动（二）">
+<meta property="og:url" content="http://akaieurus.github.io/2023/10/07/Kernel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="学userfaultfd→涉及mmap机制→为了mmap机制开始看linux内存管理系列源码解析→开始好奇类似于page结构体之类的东西是咋初始化的→继续研究系统启动 总结：万物的源头是系统启动doge（又在支线任务上越走越远了） ps：还是主要关注内存相关的部分">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc29.jpg">
+<meta property="article:published_time" content="2023-10-07T04:10:41.000Z">
+<meta property="article:modified_time" content="2025-01-05T09:27:40.642Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="source code">
+<meta property="article:tag" content="boot">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc29.jpg">
+  
+  
+  
+  <title>Kernel源码分析-系统启动（二） - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc29.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Kernel源码分析-系统启动（二）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-10-07 12:10" pubdate>
+          2023年10月7日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Kernel源码分析-系统启动（二）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>学userfaultfd→涉及mmap机制→为了mmap机制开始看linux内存管理系列源码解析→开始好奇类似于page结构体之类的东西是咋初始化的→继续研究系统启动</p>
+<p>总结：万物的源头是系统启动doge（又在支线任务上越走越远了）</p>
+<p>ps：还是主要关注内存相关的部分</p>
+<span id="more"></span>
+
+<p>内核版本4.15.8，x86_64</p>
+<h1 id="startup-64（书接上回）"><a href="#startup-64（书接上回）" class="headerlink" title="startup_64（书接上回）"></a>startup_64（书接上回）</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><code class="hljs assembly"># arch\x86\kernel\head_64.S<br>1:<br>	UNWIND_HINT_EMPTY<br><br>	/* 检查CPU是否支持NX位（获得处理器信息） */<br>	movl	$0x80000001, %eax<br>	cpuid<br>	movl	%edx,%edi<br><br>	/* 把MSR_EFER（0xc0000080）放入ecx，然后执行rdmsr指令来读取CPU中的Model Specific Register（MSR） */<br>	movl	$MSR_EFER, %ecx<br>	rdmsr<br>	btsl	$_EFER_SCE, %eax	/* 启用syscall和sysret */<br>	btl	$20,%edi		/* 不支持NX？ */<br>	jnc     1f<br>	btsl	$_EFER_NX, %eax<br>	btsq	$_PAGE_BIT_NX,early_pmd_flags(%rip)<br>1:	wrmsr				/* 启用以上变化 */<br><br>	/* 设置cr0 */<br>	movl	$CR0_STATE, %eax<br>	movq	%rax, %cr0<br><br>	/* 建立启动阶段栈 */<br>	movq initial_stack(%rip), %rsp<br><br>	/* 清空eflags */<br>	pushq $0<br>	popfq<br><br>	/* 更新全局描述符表 */<br>	lgdt	early_gdt_descr(%rip)<br><br>	/* 重新加载各个段 */<br>	xorl %eax,%eax<br>	movl %eax,%ds<br>	movl %eax,%ss<br>	movl %eax,%es<br>	movl %eax,%fs<br>	movl %eax,%gs<br><br>	/* 设置一下gs寄存器，令它指向一个特殊的栈irqstack，用于处理中断 */<br>	movl	$MSR_GS_BASE,%ecx<br>	movl	initial_gs(%rip),%eax<br>	movl	initial_gs+4(%rip),%edx<br>	wrmsr<br><br>	movq	%rsi, %rdi<br><br>.Ljump_to_C_code:<br>	pushq	$.Lafter_lret	# put return address on stack for unwinder<br>	xorq	%rbp, %rbp	# clear frame pointer<br>	movq	initial_code(%rip), %rax	# initial_code指向x86_64_start_kernel<br>	pushq	$__KERNEL_CS	# set correct cs<br>	pushq	%rax		# target address in negative space<br>	lretq	# 跳转至x86_64_start_kernel<br></code></pre></td></tr></table></figure>
+
+<h2 id="initial-stack"><a href="#initial-stack" class="headerlink" title="initial_stack"></a>initial_stack</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs assembly"># arch\x86\kernel\head_64.S<br>	GLOBAL(initial_stack)<br>	.quad  init_thread_union + THREAD_SIZE - SIZEOF_PTREGS<br></code></pre></td></tr></table></figure>
+
+<p>init_thread_union中thread_info在低地址（栈顶），以上的内存空间作为栈使用，预留了SIZEOF_PTREGS的空间</p>
+
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// include\linux\sched.h</span><br><span class="hljs-class"><span class="hljs-keyword">union</span> <span class="hljs-title">thread_union</span> &#123;</span><br><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> CONFIG_THREAD_INFO_IN_TASK</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">thread_info</span> <span class="hljs-title">thread_info</span>;</span><br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> <span class="hljs-built_in">stack</span>[THREAD_SIZE/<span class="hljs-keyword">sizeof</span>(<span class="hljs-type">long</span>)];<br>&#125;;<br><br><span class="hljs-comment">// include\linux\init_task.h</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> __init_task_data __attribute__((__section__(<span class="hljs-string">&quot;.data..init_task&quot;</span>)))</span><br><br><span class="hljs-comment">// arch\ia64\include\asm\thread_info.h</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> INIT_THREAD_INFO(tsk)			\</span><br><span class="hljs-meta">&#123;						\</span><br><span class="hljs-meta">	.task		= &amp;tsk,			\</span><br><span class="hljs-meta">	.flags		= 0,			\</span><br><span class="hljs-meta">	.cpu		= 0,			\</span><br><span class="hljs-meta">	.addr_limit	= KERNEL_DS,		\</span><br><span class="hljs-meta">	.preempt_count	= INIT_PREEMPT_COUNT,	\</span><br><span class="hljs-meta">&#125;</span><br><br><span class="hljs-comment">// init\init_task.c</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">task_struct</span> <span class="hljs-title">init_task</span> =</span> INIT_TASK(init_task);<br>EXPORT_SYMBOL(init_task);<br><br><span class="hljs-class"><span class="hljs-keyword">union</span> <span class="hljs-title">thread_union</span> <span class="hljs-title">init_thread_union</span> __<span class="hljs-title">init_task_data</span> =</span> &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> CONFIG_THREAD_INFO_IN_TASK</span><br>	INIT_THREAD_INFO(init_task)<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h2 id="early-gdt-descr"><a href="#early-gdt-descr" class="headerlink" title="early_gdt_descr"></a>early_gdt_descr</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs assembly"># arch\x86\kernel\head_64.S<br>	.data<br>	.align 16<br>	.globl early_gdt_descr<br>early_gdt_descr:<br>	.word	GDT_ENTRIES*8-1<br>early_gdt_descr_base:<br>	.quad	INIT_PER_CPU_VAR(gdt_page)<br></code></pre></td></tr></table></figure>
+
+<p>虽然目前内核工作在用户空间的低地址中，但很快内核将会在它自己的内存地址空间中运行，所以要重新加载全局描述符表</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\include\asm\segment.h</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> GDT_ENTRIES			16</span><br><br><span class="hljs-comment">// arch\x86\include\asm\desc.h</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">gdt_page</span> &#123;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">desc_struct</span> <span class="hljs-title">gdt</span>[<span class="hljs-title">GDT_ENTRIES</span>];</span><br>&#125; __attribute__((aligned(PAGE_SIZE)));<br><br><span class="hljs-comment">// arch\x86\include\asm\desc_defs.h</span><br><span class="hljs-comment">/* 8 byte segment descriptor */</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">desc_struct</span> &#123;</span><br>	u16	limit0;<br>	u16	base0;<br>	u16	base1: <span class="hljs-number">8</span>, type: <span class="hljs-number">4</span>, s: <span class="hljs-number">1</span>, dpl: <span class="hljs-number">2</span>, p: <span class="hljs-number">1</span>;<br>	u16	limit1: <span class="hljs-number">4</span>, avl: <span class="hljs-number">1</span>, l: <span class="hljs-number">1</span>, d: <span class="hljs-number">1</span>, g: <span class="hljs-number">1</span>, base2: <span class="hljs-number">8</span>;<br>&#125; __attribute__((packed));<br></code></pre></td></tr></table></figure>
+
+<h1 id="x86-64-start-kernel"><a href="#x86-64-start-kernel" class="headerlink" title="x86_64_start_kernel"></a>x86_64_start_kernel</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\kernel\head64.c</span><br>asmlinkage __visible <span class="hljs-type">void</span> __init <span class="hljs-title function_">x86_64_start_kernel</span><span class="hljs-params">(<span class="hljs-type">char</span> * real_mode_data)</span><br>&#123;<br>	<span class="hljs-comment">/* 一些检查 */</span><br>	BUILD_BUG_ON(MODULES_VADDR &lt; __START_KERNEL_map);<br>	BUILD_BUG_ON(MODULES_VADDR - __START_KERNEL_map &lt; KERNEL_IMAGE_SIZE);<br>	BUILD_BUG_ON(MODULES_LEN + KERNEL_IMAGE_SIZE &gt; <span class="hljs-number">2</span>*PUD_SIZE);<br>	BUILD_BUG_ON((__START_KERNEL_map &amp; ~PMD_MASK) != <span class="hljs-number">0</span>);<br>	BUILD_BUG_ON((MODULES_VADDR &amp; ~PMD_MASK) != <span class="hljs-number">0</span>);<br>	BUILD_BUG_ON(!(MODULES_VADDR &gt; __START_KERNEL));<br>	BUILD_BUG_ON(!(((MODULES_END - <span class="hljs-number">1</span>) &amp; PGDIR_MASK) ==<br>				(__START_KERNEL &amp; PGDIR_MASK)));<br>	BUILD_BUG_ON(__fix_to_virt(__end_of_fixed_addresses) &lt;= MODULES_END);<br>	<br>    <span class="hljs-comment">/* 存储了每个CPU中cr4的Shadow Copy */</span><br>	cr4_init_shadow();<br><br>	<span class="hljs-comment">/* 重置了所有的全局页目录项，同时向cr3中重新写入了的全局页目录表的地址 */</span><br>	reset_early_page_tables();<br>	<br>    <span class="hljs-comment">/* 清空bss段 */</span><br>	clear_bss();<br>	<br>    <span class="hljs-comment">/* 清空init_top_gpt页 */</span><br>	clear_page(init_top_pgt);<br><br>	<span class="hljs-comment">/* sme和kasan初始化 */</span><br>	sme_early_init();<br><br>	kasan_early_init();<br><br>    <span class="hljs-comment">/* 初期中断和异常处理初始化 */</span><br>	idt_setup_early_handler();<br><br>    <span class="hljs-comment">/* 处理boot_params */</span><br>	copy_bootdata(__va(real_mode_data));<br><br>    <span class="hljs-comment">/* 加载处理器微代码 */</span><br>	load_ucode_bsp();<br><br>	<span class="hljs-comment">/* 设置init_top_gpt */</span><br>	init_top_pgt[<span class="hljs-number">511</span>] = early_top_pgt[<span class="hljs-number">511</span>];<br><br>	x86_64_start_reservations(real_mode_data);	<span class="hljs-comment">// 这个函数的最后调用了start_kernel</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly"># arch\x86\kernel\head_64.S<br>NEXT_PGD_PAGE(init_top_pgt)<br>	.fill	512,8,0<br>	.fill	PTI_USER_PGD_FILL,8,0<br></code></pre></td></tr></table></figure>
+
+<h2 id="reset-early-page-tables"><a href="#reset-early-page-tables" class="headerlink" title="reset_early_page_tables"></a>reset_early_page_tables</h2><p>清空early_top_pgt，将early_top_pgt的物理地址写入cr3</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\kernel\head64.c</span><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> __init <span class="hljs-title function_">reset_early_page_tables</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-built_in">memset</span>(early_top_pgt, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">pgd_t</span>)*(PTRS_PER_PGD<span class="hljs-number">-1</span>));<br>	next_early_pgt = <span class="hljs-number">0</span>;<br>	write_cr3(__sme_pa_nodebug(early_top_pgt));<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>其实就是把之前的物理地址的映射清空了，early_top_pgt的前511项都不使用，相关内容见系统启动（一）</p>
+
+
+
+
+<h2 id="idt-setup-early-handler"><a href="#idt-setup-early-handler" class="headerlink" title="idt_setup_early_handler"></a>idt_setup_early_handler</h2><p>idt_setup_early_handler函数主要过程</p>
+<ul>
+<li>set_intr_gate函数设置每一个中断</li>
+<li>load_idt加载中断</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\kernel\idt.c</span><br><span class="hljs-type">void</span> __init <span class="hljs-title function_">idt_setup_early_handler</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-type">int</span> i;<br><br>	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; NUM_EXCEPTION_VECTORS; i++)<br>		set_intr_gate(i, early_idt_handler_array[i]);<br>	load_idt(&amp;idt_descr);<br>&#125;<br><br><span class="hljs-comment">// arch\x86\kernel\idt.c</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">desc_ptr</span> <span class="hljs-title">idt_descr</span> __<span class="hljs-title">ro_after_init</span> =</span> &#123;<br>	.size		= (IDT_ENTRIES * <span class="hljs-number">2</span> * <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)) - <span class="hljs-number">1</span>,<br>	.address	= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) idt_table,<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>early_idt_handler_array是一个32x9的数组，每一项9字节，其中2个字节的备用指令用于向栈中压入默认错误码（如果异常本身没有提供错误码的话），2个字节的指令用于向栈中压入向量号，剩余5个字节用于跳转到异常处理程序</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\include\asm\segment.h</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> NUM_EXCEPTION_VECTORS		32</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> EARLY_IDT_HANDLER_SIZE 9</span><br><span class="hljs-keyword">extern</span> <span class="hljs-type">const</span> <span class="hljs-type">char</span> early_idt_handler_array[NUM_EXCEPTION_VECTORS][EARLY_IDT_HANDLER_SIZE];<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs assembly"># arch\x86\kernel\head_64.S<br>ENTRY(early_idt_handler_array)<br>	i = 0<br>	.rept NUM_EXCEPTION_VECTORS<br>	.if ((EXCEPTION_ERRCODE_MASK &gt;&gt; i) &amp; 1) == 0	# 如果当前中断向量不需要错误码<br>		UNWIND_HINT_IRET_REGS<br>		pushq $0	# 将一个值为0的64位数据压入栈中，这是为了在栈帧中保持统一的结构，即使当前中断向量不需要错误码<br>	.else<br>		UNWIND_HINT_IRET_REGS offset=8<br>	.endif<br>	pushq $i		# 入栈中断向量号<br>	jmp early_idt_handler_common	# 跳转至同一异常处理程序<br>	UNWIND_HINT_IRET_REGS<br>	i = i + 1<br>	.fill early_idt_handler_array + i*EARLY_IDT_HANDLER_SIZE - ., 1, 0xcc	# 剩下的空间填充0xcc<br>	.endr<br>	UNWIND_HINT_IRET_REGS offset=16<br>END(early_idt_handler_array)<br></code></pre></td></tr></table></figure>
+
+<p>最后长这样</p>
+
+
+<p>set_intr_gate函数用一个idt_data结构体打包数据，然后传给idt_setup_from_table函数，同时把idt_table也传过去</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\include\asm\desc_defs.h</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">idt_bits</span> &#123;</span><br>	u16		ist	: <span class="hljs-number">3</span>,<br>			zero	: <span class="hljs-number">5</span>,<br>			type	: <span class="hljs-number">5</span>,<br>			dpl	: <span class="hljs-number">2</span>,<br>			p	: <span class="hljs-number">1</span>;<br>&#125; __attribute__((packed));<br><br><span class="hljs-comment">// arch\x86\kernel\idt.c</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">idt_data</span> &#123;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span>	<span class="hljs-built_in">vector</span>;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span>	segment;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">idt_bits</span>	<span class="hljs-title">bits</span>;</span><br>	<span class="hljs-type">const</span> <span class="hljs-type">void</span>	*addr;<br>&#125;;<br><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">set_intr_gate</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> n, <span class="hljs-type">const</span> <span class="hljs-type">void</span> *addr)</span><br>&#123;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">idt_data</span> <span class="hljs-title">data</span>;</span><br><br>	BUG_ON(n &gt; <span class="hljs-number">0xFF</span>);<br><br>	<span class="hljs-built_in">memset</span>(&amp;data, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(data));<br>	data.<span class="hljs-built_in">vector</span>	= n;<br>	data.addr	= addr;<br>	data.segment	= __KERNEL_CS;<br>	data.bits.type	= GATE_INTERRUPT;<br>	data.bits.p	= <span class="hljs-number">1</span>;<br><br>	idt_setup_from_table(idt_table, &amp;data, <span class="hljs-number">1</span>, <span class="hljs-literal">false</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>idt_setup_from_table主要过程</p>
+<ul>
+<li>idt_init_desc初始化gate_desc，基本上就是把idt_data结构体的内容填进gate_desc结构体</li>
+<li>write_idt_entry将gate_desc写入idt_table对应表项</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\include\asm\segment.h</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> IDT_ENTRIES			256</span><br><br><span class="hljs-comment">// arch\x86\kernel\idt.c</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">gate_struct</span> <span class="hljs-title">gate_desc</span>;</span><br><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">gate_struct</span> &#123;</span><br>	u16		offset_low;<br>	u16		segment;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">idt_bits</span>	<span class="hljs-title">bits</span>;</span><br>	u16		offset_middle;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> CONFIG_X86_64</span><br>	u32		offset_high;<br>	u32		reserved;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>&#125; __attribute__((packed));<br><br>gate_desc idt_table[IDT_ENTRIES] __page_aligned_bss;<br><br><span class="hljs-type">static</span> <span class="hljs-type">void</span><br><span class="hljs-title function_">idt_setup_from_table</span><span class="hljs-params">(gate_desc *idt, <span class="hljs-type">const</span> <span class="hljs-keyword">struct</span> idt_data *t, <span class="hljs-type">int</span> size, <span class="hljs-type">bool</span> sys)</span><br>&#123;<br>	gate_desc desc;<br><br>	<span class="hljs-keyword">for</span> (; size &gt; <span class="hljs-number">0</span>; t++, size--) &#123;<br>		idt_init_desc(&amp;desc, t);<br>		write_idt_entry(idt, t-&gt;<span class="hljs-built_in">vector</span>, &amp;desc);<br>		<span class="hljs-keyword">if</span> (sys)<br>			set_bit(t-&gt;<span class="hljs-built_in">vector</span>, system_vectors);<br>	&#125;<br>&#125;<br><br><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title function_">idt_init_desc</span><span class="hljs-params">(gate_desc *gate, <span class="hljs-type">const</span> <span class="hljs-keyword">struct</span> idt_data *d)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> addr = (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) d-&gt;addr;<br><br>	gate-&gt;offset_low	= (u16) addr;<br>	gate-&gt;segment		= (u16) d-&gt;segment;<br>	gate-&gt;bits		= d-&gt;bits;<br>	gate-&gt;offset_middle	= (u16) (addr &gt;&gt; <span class="hljs-number">16</span>);<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> CONFIG_X86_64</span><br>	gate-&gt;offset_high	= (u32) (addr &gt;&gt; <span class="hljs-number">32</span>);<br>	gate-&gt;reserved		= <span class="hljs-number">0</span>;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="early-idt-handler-common"><a href="#early-idt-handler-common" class="headerlink" title="early_idt_handler_common"></a>early_idt_handler_common</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs assembly"># arch\x86\kernel\head_64.S<br>early_idt_handler_common:<br>	cld<br>	<br>	# early_recursion_flag避免在early_idt_handler_common程序中递归地产生中断（有点类似于锁）<br>	incl early_recursion_flag(%rip)	<br><br>	/* 压栈通用寄存器 */<br>	pushq %rsi				/* pt_regs-&gt;si */<br>	movq 8(%rsp), %rsi			/* RSI = vector number */<br>	movq %rdi, 8(%rsp)			/* pt_regs-&gt;di = RDI */<br>	pushq %rdx				/* pt_regs-&gt;dx */<br>	pushq %rcx				/* pt_regs-&gt;cx */<br>	pushq %rax				/* pt_regs-&gt;ax */<br>	pushq %r8				/* pt_regs-&gt;r8 */<br>	pushq %r9				/* pt_regs-&gt;r9 */<br>	pushq %r10				/* pt_regs-&gt;r10 */<br>	pushq %r11				/* pt_regs-&gt;r11 */<br>	pushq %rbx				/* pt_regs-&gt;bx */<br>	pushq %rbp				/* pt_regs-&gt;bp */<br>	pushq %r12				/* pt_regs-&gt;r12 */<br>	pushq %r13				/* pt_regs-&gt;r13 */<br>	pushq %r14				/* pt_regs-&gt;r14 */<br>	pushq %r15				/* pt_regs-&gt;r15 */<br>	UNWIND_HINT_REGS<br><br>	cmpq $14,%rsi		/* 如果是缺页中断则把cr2寄存器中的值赋值给rdi，然后调用early_make_pgtable */<br>	jnz 10f<br>	GET_CR2_INTO(%rdi)<br>	call early_make_pgtable<br>	andl %eax,%eax<br>	jz 20f			/* All good */<br><br>10:<br>	movq %rsp,%rdi		/* RDI = pt_regs; RSI is already trapnr */<br>	call early_fixup_exception	/* 不是缺页中断则调用early_fixup_exception进行下面的步骤 */<br><br>20:<br>	decl early_recursion_flag(%rip)	/* 解锁 */<br>	jmp restore_regs_and_return_to_kernel	/* kernel人最熟悉的函数（，恢复寄存器并返回 */<br>END(early_idt_handler_common)<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\mm\extable.c</span><br><span class="hljs-type">void</span> __init <span class="hljs-title function_">early_fixup_exception</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> pt_regs *regs, <span class="hljs-type">int</span> trapnr)</span><br>&#123;<br>	<span class="hljs-comment">/* 忽略NMIs */</span><br>	<span class="hljs-keyword">if</span> (trapnr == X86_TRAP_NMI)<br>		<span class="hljs-keyword">return</span>;<br>	<br>    <span class="hljs-comment">/* 没有锁，挂起 */</span><br>	<span class="hljs-keyword">if</span> (early_recursion_flag &gt; <span class="hljs-number">2</span>)<br>		<span class="hljs-keyword">goto</span> halt_loop;<br>	<br>    <span class="hljs-comment">/* 检查cs寄存器 */</span><br>	<span class="hljs-keyword">if</span> (!xen_pv_domain() &amp;&amp; regs-&gt;cs != __KERNEL_CS)<br>		<span class="hljs-keyword">goto</span> fail;<br><br>    <span class="hljs-comment">/* 执行对应中断的handler，不展开了 */</span><br>	<span class="hljs-keyword">if</span> (fixup_exception(regs, trapnr))<br>		<span class="hljs-keyword">return</span>;<br><br>    <span class="hljs-comment">/* 报告bug */</span><br>	<span class="hljs-keyword">if</span> (fixup_bug(regs, trapnr))<br>		<span class="hljs-keyword">return</span>;<br><br>fail:<br>	early_printk(<span class="hljs-string">&quot;PANIC: early exception 0x%02x IP %lx:%lx error %lx cr2 0x%lx\n&quot;</span>,<br>		     (<span class="hljs-type">unsigned</span>)trapnr, (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)regs-&gt;cs, regs-&gt;ip,<br>		     regs-&gt;orig_ax, read_cr2());<br><br>	show_regs(regs);<br><br>halt_loop:<br>	<span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>)<br>		halt();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="early-make-pgtable"><a href="#early-make-pgtable" class="headerlink" title="early_make_pgtable"></a>early_make_pgtable</h3><p>传给early_make_pgtable的参数address是cr2的值，cr2中储存的是一个地址，这个地址引起了缺页中断</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> __init <span class="hljs-title function_">early_make_pgtable</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> address)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> physaddr = address - __PAGE_OFFSET;	<span class="hljs-comment">// __PAGE_OFFSET这里是0xffffffff80000000，获取物理地址</span><br>	<span class="hljs-type">pmdval_t</span> pmd;<br><br>	pmd = (physaddr &amp; PMD_MASK) + early_pmd_flags;<br><br>	<span class="hljs-keyword">return</span> __early_make_pgtable(address, pmd);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>先看一些定义</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\include\asm\pgtable_64_types.h</span><br><br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>	<span class="hljs-type">pteval_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>	<span class="hljs-type">pmdval_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>	<span class="hljs-type">pudval_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>	<span class="hljs-type">p4dval_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>	<span class="hljs-type">pgdval_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>	<span class="hljs-type">pgprotval_t</span>;<br><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span> <span class="hljs-type">pteval_t</span> pte; &#125; <span class="hljs-type">pte_t</span>;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> EARLY_DYNAMIC_PAGE_TABLES	64</span><br><br><span class="hljs-comment">// arch\x86\kernel\head64.c</span><br><span class="hljs-type">static</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> __initdata next_early_pgt;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs assembly"># arch\x86\kernel\head_64.S<br>NEXT_PAGE(early_dynamic_pgts)	# 一个固定大小缓冲区<br>	.fill	512*EARLY_DYNAMIC_PAGE_TABLES,8,0<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// arch\x86\kernel\head64.c</span><br><span class="hljs-type">int</span> __init __early_make_pgtable(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> address, <span class="hljs-type">pmdval_t</span> pmd)<br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> physaddr = address - __PAGE_OFFSET;	<span class="hljs-comment">// 获取物理地址</span><br>	<span class="hljs-type">pgdval_t</span> pgd, *pgd_p;	<span class="hljs-comment">// 17-25：全局页目录（pgd）</span><br>	<span class="hljs-type">p4dval_t</span> p4d, *p4d_p;	<span class="hljs-comment">// 5级页表使用</span><br>	<span class="hljs-type">pudval_t</span> pud, *pud_p;	<span class="hljs-comment">// 26-34：上层页目录（pud）</span><br>	<span class="hljs-type">pmdval_t</span> *pmd_p;	<span class="hljs-comment">// 35-43：中间页目录（pmd）</span><br><br>	<span class="hljs-comment">/* 非法地址或页表出错  */</span><br>	<span class="hljs-keyword">if</span> (physaddr &gt;= MAXMEM || read_cr3_pa() != __pa_nodebug(early_top_pgt))<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br><br>again:<br>	pgd_p = &amp;early_top_pgt[pgd_index(address)].pgd;<br>	pgd = *pgd_p;<br><br>	<span class="hljs-keyword">if</span> (!IS_ENABLED(CONFIG_X86_5LEVEL))	<span class="hljs-comment">// 不支持5级页表则直接赋值，获取对应p4d表</span><br>		p4d_p = pgd_p;<br>	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pgd)	<span class="hljs-comment">// 支持5级页表且pgd对应表项不为空则获取p4d</span><br>		p4d_p = (<span class="hljs-type">p4dval_t</span> *)((pgd &amp; PTE_PFN_MASK) + __START_KERNEL_map - phys_base);<br>	<span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-keyword">if</span> (next_early_pgt &gt;= EARLY_DYNAMIC_PAGE_TABLES) &#123;	<span class="hljs-comment">// 如果重置次数超过限值则重来</span><br>			reset_early_page_tables();<br>			<span class="hljs-keyword">goto</span> again;<br>		&#125;<br><br>		p4d_p = (<span class="hljs-type">p4dval_t</span> *)early_dynamic_pgts[next_early_pgt++];	<span class="hljs-comment">// 从early_dynamic_pgts中取一项用作p4d</span><br>		<span class="hljs-built_in">memset</span>(p4d_p, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(*p4d_p) * PTRS_PER_P4D);<br>		*pgd_p = (<span class="hljs-type">pgdval_t</span>)p4d_p - __START_KERNEL_map + phys_base + _KERNPG_TABLE;	<span class="hljs-comment">// 填入pgd对应表项</span><br>	&#125;<br>	p4d_p += p4d_index(address);<br>	p4d = *p4d_p;	<span class="hljs-comment">// 获取对应p4d表项（或pgd）</span><br><br>    <span class="hljs-comment">// 以下类似</span><br>    <br>	<span class="hljs-keyword">if</span> (p4d)<br>		pud_p = (<span class="hljs-type">pudval_t</span> *)((p4d &amp; PTE_PFN_MASK) + __START_KERNEL_map - phys_base);<br>	<span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-keyword">if</span> (next_early_pgt &gt;= EARLY_DYNAMIC_PAGE_TABLES) &#123;<br>			reset_early_page_tables();<br>			<span class="hljs-keyword">goto</span> again;<br>		&#125;<br><br>		pud_p = (<span class="hljs-type">pudval_t</span> *)early_dynamic_pgts[next_early_pgt++];<br>		<span class="hljs-built_in">memset</span>(pud_p, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(*pud_p) * PTRS_PER_PUD);<br>		*p4d_p = (<span class="hljs-type">p4dval_t</span>)pud_p - __START_KERNEL_map + phys_base + _KERNPG_TABLE;<br>	&#125;<br>	pud_p += pud_index(address);<br>	pud = *pud_p;<br><br>	<span class="hljs-keyword">if</span> (pud)<br>		pmd_p = (<span class="hljs-type">pmdval_t</span> *)((pud &amp; PTE_PFN_MASK) + __START_KERNEL_map - phys_base);<br>	<span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-keyword">if</span> (next_early_pgt &gt;= EARLY_DYNAMIC_PAGE_TABLES) &#123;<br>			reset_early_page_tables();<br>			<span class="hljs-keyword">goto</span> again;<br>		&#125;<br><br>		pmd_p = (<span class="hljs-type">pmdval_t</span> *)early_dynamic_pgts[next_early_pgt++];<br>		<span class="hljs-built_in">memset</span>(pmd_p, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(*pmd_p) * PTRS_PER_PMD);<br>		*pud_p = (<span class="hljs-type">pudval_t</span>)pmd_p - __START_KERNEL_map + phys_base + _KERNPG_TABLE;<br>	&#125;<br>	pmd_p[pmd_index(address)] = pmd;	<span class="hljs-comment">// 赋值物理地址+一些标志</span><br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="copy-bootdata"><a href="#copy-bootdata" class="headerlink" title="copy_bootdata"></a>copy_bootdata</h2><p>主要不是讲这个函数，因为这个函数触发了缺页中断使得页表发生了变化</p>
+
+
+
+
+<p>调用copy_bootdata时使用了一个宏，对real_mode_data的值进行了修正</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">copy_bootdata(__va(real_mode_data));<br><br><span class="hljs-comment">// arch\arm\include\asm\memory.h</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> __va(x)			((void *)__phys_to_virt((phys_addr_t)(x)))</span><br></code></pre></td></tr></table></figure>
+
+<p>根据调试这个宏应该是将物理地址转化为了线性映射地址</p>
+
+
+<p>显然这时候的页表没有这个地址的映射，所以会触发缺页中断</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Kernel/" class="category-chain-item">Kernel</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/Kernel/Source-Code/" class="category-chain-item">Source Code</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+      
+        <a href="/tags/source-code/" class="print-no-link">#source code</a>
+      
+        <a href="/tags/boot/" class="print-no-link">#boot</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Kernel源码分析-系统启动（二）</div>
+      <div>http://akaieurus.github.io/2023/10/07/Kernel源码分析-系统启动（二）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年10月7日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/11/08/kernel-userfaultfd/" title="userfaultfd">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">userfaultfd</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/10/02/LLVM-IR%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/" title="LLVM IR数据结构分析">
+                        <span class="hidden-mobile">LLVM IR数据结构分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

