@@ -33,7 +33,7 @@
   
   
   <entry>
-    <title>2023年西门子白帽黑客大赛 pwn wp</title>
+    <title>2023 西门子白帽黑客大赛 pwn wp</title>
     <link href="/2025/09/01/ximenzi/"/>
     <url>/2025/09/01/ximenzi/</url>
     
@@ -853,9 +853,9 @@
       
       <tag>kernel</tag>
       
-      <tag>memory</tag>
-      
       <tag>source code</tag>
+      
+      <tag>memory</tag>
       
     </tags>
     
