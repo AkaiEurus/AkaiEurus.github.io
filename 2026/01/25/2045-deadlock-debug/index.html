@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://akaieurus.github.io/img/posts/pc71.jpg">
 <meta property="article:published_time" content="2026-01-25T08:33:03.000Z">
-<meta property="article:modified_time" content="2026-01-27T10:17:30.891Z">
+<meta property="article:modified_time" content="2026-01-27T11:52:04.452Z">
 <meta property="article:author" content="Eurus">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary_large_image">
@@ -399,7 +399,7 @@
 <p>后来想直接改qemu的virt，但折腾了半天没折腾出来</p>
 <p><strong>然后又反转了</strong></p>
 <p>Jon贴了一个log，QSPI设备在probe中出现了空指针解引用，2045分析出由于tegra_qspi_probe在持有锁时panic，mutex可能仍然被标记为持有&#x2F;孤立状态，从而阻塞同一总线上后续的驱动程序绑定，相当于他的patch没有导致问题只是放大了另一个bug导致的崩溃的影响</p>
-<p>事情到这里就差不多结束了，结果就是driver_override需要进行重构，防止单个崩溃造成这么大的影响</p>
+<p>The End</p>
 <h2 id="Eurus-vs-Qemu-1"><a href="#Eurus-vs-Qemu-1" class="headerlink" title="Eurus vs Qemu"></a>Eurus vs Qemu</h2><p><em>结束了吗？并不，我还没玩够:)</em></p>
 <p>我在某天坐车的时候突然想起来其实不用改virt这么大动干戈，可以只写一个新的qemu设备，然后-device挂上就行了，qemu PCI设备的编写方法之前在搞qemu逃逸的时候也见过。由于我们只需要骗过probe，所以设备不需要实现复杂的功能</p>
 <p>比如要模拟一个misc设备，只需要写这么一个device，然后在meason.build文件加一行<code>system_ss.add(files(&#39;tegra194-misc.c&#39;))</code>就行</p>
